@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: #080C10;
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', monospace;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0D1117; }
+::-webkit-scrollbar-thumb { background: #39FF14; border-radius: 3px; }
+
+#root { width: 100%; max-width: 100%; text-align: left; }
+
+@layer components {
+  .glass-panel {
+    @apply bg-dark-700/60 backdrop-blur-md border border-neon-green/10 rounded-xl;
+  }
+  .kpi-card {
+    @apply glass-panel p-4 flex flex-col gap-1 hover:border-neon-green/30 transition-all duration-300;
+  }
+  .neon-text { @apply text-neon-green font-bold; }
+  .neon-border { @apply border border-neon-green/30; }
+  .section-title { @apply text-xs font-semibold tracking-widest text-slate-400 uppercase mb-3; }
+  .live-dot { @apply w-2 h-2 rounded-full bg-neon-green animate-pulse_slow; }
+  .table-row-hover { @apply hover:bg-neon-green/5 transition-colors duration-150; }
+}
+
+.glow-green {
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.15), inset 0 0 15px rgba(57, 255, 20, 0.02);
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #131A22 !important;
+  border: 1px solid rgba(57, 255, 20, 0.3) !important;
+  border-radius: 8px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+}
