@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const CLUBS = ['Driver', '3 Wood', '5 Iron', '6 Iron', '7 Iron', '8 Iron', '9 Iron', 'PW', 'SW'];
 
-export default function SessionBar({ connected, currentClub, sessionInfo, shotCount, onSetClub, onTrigger }) {
+export default function SessionBar({ connected, currentClub, sessionInfo, shotCount, onSetClub, onTrigger, novaConnected = false }) {
   const [elapsed, setElapsed] = useState('00:00');
 
   useEffect(() => {
@@ -39,6 +39,14 @@ export default function SessionBar({ connected, currentClub, sessionInfo, shotCo
       <div className="flex items-center gap-1.5 text-xs text-slate-400">
         <span>🏌️</span>
         <span className="text-white">{shotCount} shots</span>
+      </div>
+
+      {/* Nova hardware badge */}
+      <div className="flex items-center gap-1.5">
+        <div className={`w-2 h-2 rounded-full ${novaConnected ? 'bg-neon-green animate-pulse_slow' : 'bg-slate-600'}`} />
+        <span className={`text-xs font-semibold ${novaConnected ? 'text-neon-green' : 'text-slate-500'}`}>
+          {novaConnected ? 'NOVA LIVE' : 'NOVA –'}
+        </span>
       </div>
 
       <div className="flex items-center gap-2 ml-auto flex-wrap">

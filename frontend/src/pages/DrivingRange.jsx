@@ -9,7 +9,7 @@ import PerformanceTrend from '../components/PerformanceTrend';
 import AccuracyGauge from '../components/AccuracyGauge';
 
 export default function DrivingRange() {
-  const { connected, shots, lastShot, currentClub, sessionInfo, triggerShot, setClub } = useWebSocket();
+  const { connected, shots, lastShot, currentClub, sessionInfo, novaConnected, triggerShot, setClub } = useWebSocket();
   const prev = shots[1] ?? null;
 
   const kpis = [
@@ -32,6 +32,7 @@ export default function DrivingRange() {
         shotCount={shots.length}
         onSetClub={setClub}
         onTrigger={triggerShot}
+        novaConnected={novaConnected}
       />
 
       {/* KPI Cards */}

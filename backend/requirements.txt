@@ -4,3 +4,5 @@ websockets==12.0
 aiosqlite==0.20.0
 pydantic==2.7.1
 python-multipart==0.0.9
+opengolfcoach>=0.3.0
+zeroconf>=0.100.0

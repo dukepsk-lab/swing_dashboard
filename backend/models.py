@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Any
 from datetime import datetime
 
 
@@ -20,6 +20,15 @@ class ShotData(BaseModel):
     apex_height: float = 0.0
     in_target: bool = True
     shot_number: int = 1
+    # open-golf-coach enriched fields
+    shot_name: str = ""
+    shot_rank: str = ""
+    shot_color: str = "#39FF14"
+    backspin_rpm: float = 0.0
+    sidespin_rpm: float = 0.0
+    trajectory: List[Any] = Field(default_factory=list)
+    source: str = "simulated"   # "simulated" | "nova"
+
 
 
 class CourseShot(BaseModel):

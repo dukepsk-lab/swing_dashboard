@@ -3,15 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
 import json
-import uuid
+import logging
 from datetime import datetime
 from typing import List
 
 from models import ShotData
 from simulator import DataSimulator, generate_course_session, generate_hole_shot_path, HOLE_PARS, HOLE_DISTANCES, COURSE_NAMES
+from nova_connector import NovaConnector
 from database import init_db, save_shot, get_session_shots, get_all_sessions, save_round, get_rounds
 
 import random
+
+logging.basicConfig(level=logging.INFO)
 
 # ── state ──────────────────────────────────────────────────────────────────────
 shot_buffer: List[dict] = []
@@ -22,6 +25,7 @@ live_session_id = f"session_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
 session_start = datetime.utcnow()
 is_streaming = False
 stream_task = None
+nova_connector: NovaConnector = None
 
 current_course = {
     "course_name": random.choice(COURSE_NAMES),
@@ -46,18 +50,27 @@ async def broadcast(message: dict):
         active_connections.remove(ws)
 
 
+async def receive_shot(shot: dict):
+    """Shared handler — called by both the simulator loop and the Nova connector."""
+    shot_buffer.append(shot)
+    if len(shot_buffer) > BUFFER_SIZE:
+        shot_buffer.pop(0)
+    await save_shot(shot)
+    await broadcast({"type": "shot", "data": shot})
+
+
 async def stream_loop():
+    """Auto-simulator: runs only when no live Nova device is connected."""
     global is_streaming
     is_streaming = True
     try:
         while is_streaming:
             await asyncio.sleep(3)
+            # Pause the simulator while Nova is supplying real shots
+            if nova_connector and nova_connector.is_connected:
+                continue
             shot = simulator.next_shot(live_session_id)
-            shot_buffer.append(shot)
-            if len(shot_buffer) > BUFFER_SIZE:
-                shot_buffer.pop(0)
-            await save_shot(shot)
-            await broadcast({"type": "shot", "data": shot})
+            await receive_shot(shot)
     finally:
         is_streaming = False
 
@@ -65,12 +78,17 @@ async def stream_loop():
 # ── lifespan ───────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global stream_task, nova_connector
     await init_db()
-    global stream_task
+    # Start Nova connector (discovers device in background; safe if no device present)
+    nova_connector = NovaConnector(on_shot=receive_shot, session_id=live_session_id)
+    await nova_connector.start()
     stream_task = asyncio.create_task(stream_loop())
     yield
+    is_streaming = False
     if stream_task:
         stream_task.cancel()
+    await nova_connector.stop()
 
 
 app = FastAPI(title="Swing Dashboard API", lifespan=lifespan)
@@ -134,17 +152,29 @@ async def websocket_endpoint(websocket: WebSocket):
 # ── REST API ───────────────────────────────────────────────────────────────────
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "connections": len(active_connections)}
+    return {
+        "status": "ok",
+        "connections": len(active_connections),
+        "nova": nova_connector.status if nova_connector else None,
+    }
+
+
+@app.get("/api/nova/status")
+async def nova_status():
+    if nova_connector is None:
+        return {"nova_available": False, "nova_connected": False}
+    return nova_connector.status
 
 
 @app.get("/api/session/current")
 async def get_current_session():
     return {
-        "session_id": live_session_id,
-        "start_time": session_start.isoformat(),
-        "shot_count": len(shot_buffer),
+        "session_id":   live_session_id,
+        "start_time":   session_start.isoformat(),
+        "shot_count":   len(shot_buffer),
         "current_club": simulator._current_club,
         "is_streaming": is_streaming,
+        "nova":         nova_connector.status if nova_connector else None,
     }
 
 

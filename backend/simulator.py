@@ -1,73 +1,160 @@
 import random
 import math
 import asyncio
+import json
+import logging
 from datetime import datetime
 
+import opengolfcoach
+
+log = logging.getLogger(__name__)
+
+MPH_TO_MPS = 1 / 2.23694
+YDS_PER_METER = 1.09361
+
+# Each profile defines the raw launch monitor inputs; OGC derives everything else.
 CLUB_PROFILES = {
-    "Driver":    {"ball_speed": (155, 175), "club_speed": (105, 120), "launch": (10, 14),  "spin": (2200, 2800), "carry": (240, 290), "total": (260, 320)},
-    "3 Wood":    {"ball_speed": (145, 162), "club_speed": (98, 110),  "launch": (12, 16),  "spin": (2800, 3400), "carry": (215, 255), "total": (235, 275)},
-    "5 Iron":    {"ball_speed": (128, 145), "club_speed": (88, 98),   "launch": (17, 22),  "spin": (4200, 5200), "carry": (175, 205), "total": (190, 220)},
-    "6 Iron":    {"ball_speed": (122, 138), "club_speed": (84, 94),   "launch": (18, 23),  "spin": (4800, 5800), "carry": (162, 192), "total": (175, 208)},
-    "7 Iron":    {"ball_speed": (116, 132), "club_speed": (80, 90),   "launch": (19, 25),  "spin": (5500, 6500), "carry": (148, 178), "total": (160, 193)},
-    "8 Iron":    {"ball_speed": (110, 126), "club_speed": (76, 86),   "launch": (21, 26),  "spin": (6200, 7200), "carry": (135, 162), "total": (146, 176)},
-    "9 Iron":    {"ball_speed": (104, 120), "club_speed": (72, 82),   "launch": (23, 28),  "spin": (7000, 8200), "carry": (120, 148), "total": (130, 160)},
-    "PW":        {"ball_speed": (98, 114),  "club_speed": (68, 78),   "launch": (25, 30),  "spin": (8000, 9500), "carry": (108, 132), "total": (115, 142)},
-    "SW":        {"ball_speed": (88, 106),  "club_speed": (60, 72),   "launch": (27, 34),  "spin": (9500, 11000),"carry": (85, 115),  "total": (88, 120)},
+    "Driver": {"ball_speed": (155, 175), "club_speed": (105, 120), "launch": (10, 14),  "spin": (2200, 2800), "spin_axis_std": 10, "h_launch_std": 2.0},
+    "3 Wood": {"ball_speed": (145, 162), "club_speed": (98, 110),  "launch": (12, 16),  "spin": (2800, 3400), "spin_axis_std": 11, "h_launch_std": 2.2},
+    "5 Iron": {"ball_speed": (128, 145), "club_speed": (88, 98),   "launch": (17, 22),  "spin": (4200, 5200), "spin_axis_std": 12, "h_launch_std": 2.5},
+    "6 Iron": {"ball_speed": (122, 138), "club_speed": (84, 94),   "launch": (18, 23),  "spin": (4800, 5800), "spin_axis_std": 13, "h_launch_std": 2.5},
+    "7 Iron": {"ball_speed": (116, 132), "club_speed": (80, 90),   "launch": (19, 25),  "spin": (5500, 6500), "spin_axis_std": 13, "h_launch_std": 2.5},
+    "8 Iron": {"ball_speed": (110, 126), "club_speed": (76, 86),   "launch": (21, 26),  "spin": (6200, 7200), "spin_axis_std": 14, "h_launch_std": 2.8},
+    "9 Iron": {"ball_speed": (104, 120), "club_speed": (72, 82),   "launch": (23, 28),  "spin": (7000, 8200), "spin_axis_std": 14, "h_launch_std": 2.8},
+    "PW":     {"ball_speed": (98, 114),  "club_speed": (68, 78),   "launch": (25, 30),  "spin": (8000, 9500), "spin_axis_std": 15, "h_launch_std": 3.0},
+    "SW":     {"ball_speed": (88, 106),  "club_speed": (60, 72),   "launch": (27, 34),  "spin": (9500, 11000),"spin_axis_std": 16, "h_launch_std": 3.5},
 }
 
-CLUBS = list(CLUB_PROFILES.keys())
-COURSE_NAMES = ["Pebble Beach", "Augusta National", "St Andrews", "Torrey Pines", "Bethpage Black"]
-
-HOLE_PARS = [4, 4, 3, 5, 4, 3, 4, 4, 5, 4, 3, 4, 5, 4, 3, 4, 4, 5]
-HOLE_DISTANCES = [420, 380, 175, 520, 395, 165, 410, 440, 540, 385, 190, 370, 510, 430, 180, 400, 415, 550]
+_SHAPE_WORD_MAP = {"hook": "hook", "draw": "draw", "straight": "straight", "fade": "fade", "slice": "slice"}
 
 
-def _rnd(lo, hi, noise=0.05):
-    base = random.uniform(lo, hi)
-    return round(base * (1 + random.uniform(-noise, noise)), 1)
+def _rnd(lo, hi, noise=0.04):
+    return round(random.uniform(lo, hi) * (1 + random.uniform(-noise, noise)), 1)
+
+
+def _ogc_color_to_css(color_str: str) -> str:
+    """Convert OGC hex '0xFF7043' → CSS '#FF7043'."""
+    return "#" + color_str[2:] if color_str.startswith("0x") else color_str
+
+
+def enrich_with_ogc(
+    ball_speed_mph: float,
+    vertical_launch: float,
+    h_launch: float,
+    total_spin_rpm: float,
+    spin_axis_deg: float,
+    traj_hz: int = 30,
+) -> dict:
+    """
+    Call open-golf-coach to derive carry/total/offline distance, trajectory,
+    shot classification, and spin decomposition from raw launch monitor inputs.
+    Returns a flat dict of enriched fields, or an empty dict on failure.
+    """
+    ogc_input = {
+        "ball_speed_meters_per_second": ball_speed_mph * MPH_TO_MPS,
+        "vertical_launch_angle_degrees": vertical_launch,
+        "horizontal_launch_angle_degrees": h_launch,
+        "total_spin_rpm": total_spin_rpm,
+        "spin_axis_degrees": spin_axis_deg,
+        "trajectory_enabled": True,
+        "trajectory_output_framerate_hz": traj_hz,
+    }
+    try:
+        result = json.loads(opengolfcoach.calculate_derived_values(json.dumps(ogc_input)))
+    except Exception as exc:
+        log.warning("open-golf-coach failed: %s", exc)
+        return {}
+
+    ogc = result["open_golf_coach"]
+    us  = ogc["us_customary_units"]
+
+    # Shot classification (right-handed perspective)
+    shot_name_rh  = ogc["shot_name"]["right_handed"]
+    shot_rank_rh  = ogc["shot_rank"]["right_handed"]
+    shot_color_rh = _ogc_color_to_css(ogc["shot_color_rgb"]["right_handed"])
+    shape_word    = shot_name_rh.split()[-1].lower()
+    shot_shape    = _SHAPE_WORD_MAP.get(shape_word, "straight")
+
+    # Trajectory: convert metres → yards, downsample to ≤60 points for WS payload
+    raw_pts = ogc["trajectory"]["points"]
+    step    = max(1, len(raw_pts) // 60)
+    trajectory = [
+        {"t": p["t"],
+         "x": round(p["x"] * YDS_PER_METER, 2),   # forward (yds)
+         "y": round(p["y"] * YDS_PER_METER, 2),   # lateral right (yds)
+         "z": round(p["z"] * YDS_PER_METER, 2)}   # height (yds)
+        for p in raw_pts[::step]
+    ]
+
+    # Peak height from trajectory
+    apex = round(max((p["z"] for p in raw_pts), default=0.0) * YDS_PER_METER, 1)
+
+    return {
+        "carry_distance":  round(us["carry_distance_yards"], 1),
+        "total_distance":  round(us["total_distance_yards"], 1),
+        "lateral_offset":  round(us["offline_distance_yards"], 1),
+        "apex_height":     apex,
+        "shot_shape":      shot_shape,
+        "shot_name":       shot_name_rh,
+        "shot_rank":       shot_rank_rh,
+        "shot_color":      shot_color_rh,
+        "backspin_rpm":    round(ogc.get("backspin_rpm", 0.0), 1),
+        "sidespin_rpm":    round(ogc.get("sidespin_rpm", 0.0), 1),
+        "trajectory":      trajectory,
+    }
 
 
 def generate_shot(club: str = None, shot_number: int = 1, session_id: str = "default") -> dict:
     if club is None:
-        club = random.choice(CLUBS)
+        club = random.choice(list(CLUB_PROFILES.keys()))
     p = CLUB_PROFILES.get(club, CLUB_PROFILES["7 Iron"])
 
     ball_speed  = _rnd(*p["ball_speed"])
     club_speed  = _rnd(*p["club_speed"])
-    smash       = round(ball_speed / club_speed, 2)
+    smash       = round(ball_speed / club_speed, 3)
     launch      = _rnd(*p["launch"])
-    spin        = int(_rnd(*p["spin"]))
-    carry       = _rnd(*p["carry"])
-    total       = _rnd(*p["total"])
-    lateral     = round(random.gauss(0, 12), 1)
-    apex        = round(carry * math.tan(math.radians(launch)) * 0.18, 1)
+    spin_rpm    = _rnd(*p["spin"])
+    spin_axis   = round(random.gauss(0, p["spin_axis_std"]), 1)
+    h_launch    = round(random.gauss(0, p["h_launch_std"]), 1)
 
-    if abs(lateral) < 8:
-        shot_shape = "straight"
-    elif lateral > 0:
-        shot_shape = "fade" if lateral < 20 else "slice"
-    else:
-        shot_shape = "draw" if lateral > -20 else "hook"
+    enriched = enrich_with_ogc(ball_speed, launch, h_launch, spin_rpm, spin_axis)
 
-    in_target = abs(lateral) < 18 and carry > p["carry"][0] * 0.85
+    # Fallback values if OGC fails (keeps old parabola logic)
+    if not enriched:
+        min_carry = p.get("carry_min", p["ball_speed"][0] * 1.3)
+        lateral   = round(random.gauss(0, 12), 1)
+        carry     = round(ball_speed * 1.38 + random.gauss(0, 8), 1)
+        enriched  = {
+            "carry_distance": carry,
+            "total_distance": round(carry * 1.08, 1),
+            "lateral_offset": lateral,
+            "apex_height":    round(carry * math.tan(math.radians(launch)) * 0.18, 1),
+            "shot_shape":     "straight",
+            "shot_name":      "Straight",
+            "shot_rank":      "C",
+            "shot_color":     "#39FF14",
+            "backspin_rpm":   0.0,
+            "sidespin_rpm":   0.0,
+            "trajectory":     [],
+        }
+
+    in_target = (abs(enriched["lateral_offset"]) < 18
+                 and enriched["carry_distance"] > p["ball_speed"][0] * 1.15)
 
     return {
-        "id": shot_number,
-        "session_id": session_id,
-        "timestamp": datetime.utcnow().isoformat(),
-        "club": club,
-        "ball_speed": ball_speed,
-        "club_speed": club_speed,
+        "id":           shot_number,
+        "session_id":   session_id,
+        "timestamp":    datetime.utcnow().isoformat(),
+        "club":         club,
+        "ball_speed":   ball_speed,
+        "club_speed":   club_speed,
         "smash_factor": smash,
         "launch_angle": launch,
-        "spin_rate": spin,
-        "carry_distance": carry,
-        "total_distance": total,
-        "lateral_offset": lateral,
-        "shot_shape": shot_shape,
-        "apex_height": apex,
-        "in_target": in_target,
-        "shot_number": shot_number,
+        "spin_rate":    int(spin_rpm),
+        "in_target":    in_target,
+        "shot_number":  shot_number,
+        "source":       "simulated",
+        **enriched,
     }
 
 

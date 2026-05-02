@@ -11,6 +11,7 @@ export function useWebSocket() {
   const [currentClub, setCurrentClub] = useState('7 Iron');
   const [sessionInfo, setSessionInfo] = useState(null);
   const [courseData, setCourseData] = useState(null);
+  const [novaConnected, setNovaConnected] = useState(false);
 
   const connect = useCallback(() => {
     try {
@@ -47,9 +48,11 @@ export function useWebSocket() {
               start_time: d.session_start,
             });
             setCourseData(d.course || null);
+            setNovaConnected(d.nova?.nova_connected ?? false);
           } else if (msg.type === 'shot') {
             const shot = msg.data;
             setLastShot(shot);
+            if (shot.source === 'nova') setNovaConnected(true);
             setShots(prev => {
               const updated = [shot, ...prev];
               return updated.slice(0, 50);
@@ -86,5 +89,5 @@ export function useWebSocket() {
   const setClub = useCallback((club) => send({ action: 'set_club', club }), [send]);
   const nextHole = useCallback(() => send({ action: 'next_hole' }), [send]);
 
-  return { connected, shots, lastShot, currentClub, sessionInfo, courseData, triggerShot, setClub, nextHole };
+  return { connected, shots, lastShot, currentClub, sessionInfo, courseData, novaConnected, triggerShot, setClub, nextHole };
 }
