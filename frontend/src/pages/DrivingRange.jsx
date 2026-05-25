@@ -7,6 +7,7 @@ import ShotHistoryTable from '../components/ShotHistoryTable';
 import ClubDistribution from '../components/ClubDistribution';
 import PerformanceTrend from '../components/PerformanceTrend';
 import AccuracyGauge from '../components/AccuracyGauge';
+import ShotDetailPanel from '../components/ShotDetailPanel';
 
 export default function DrivingRange() {
   const { connected, shots, lastShot, currentClub, sessionInfo, triggerShot, setClub } = useWebSocket();
@@ -48,6 +49,9 @@ export default function DrivingRange() {
           />
         ))}
       </div>
+
+      {/* Shot Detail Panel — new visual analytics row */}
+      <ShotDetailPanel shot={lastShot} />
 
       {/* Main panels — row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

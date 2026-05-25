@@ -13,6 +13,9 @@ class ShotData(BaseModel):
     smash_factor: float
     launch_angle: float
     spin_rate: float
+    backspin: float = 0.0
+    sidespin: float = 0.0
+    spin_axis: float = 0.0
     carry_distance: float
     total_distance: float
     lateral_offset: float = 0.0
@@ -20,6 +23,14 @@ class ShotData(BaseModel):
     apex_height: float = 0.0
     in_target: bool = True
     shot_number: int = 1
+    angle_of_attack: float = -4.5
+    club_path: float = 0.0
+    face_to_target: float = 0.0
+    face_to_path: float = 0.0
+    h_face_impact: float = 0.0
+    v_face_impact: float = 0.0
+    shot_rank: str = "C"
+    shot_rank_color: str = "#FFD600"
 
 
 class CourseShot(BaseModel):
