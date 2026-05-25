@@ -1,886 +1,1538 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SwingDash – Mockup</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwingDash — Golf Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#080C10;color:#e2e8f0;font-family:'JetBrains Mono',monospace;overflow-x:hidden}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:#0D1117}
-::-webkit-scrollbar-thumb{background:#39FF14;border-radius:3px}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #06080F;
+    --card: #0C1020;
+    --card2: #121929;
+    --border: rgba(255,255,255,0.07);
+    --blue: #4B8EFF;
+    --cyan: #22D3EE;
+    --amber: #F59E0B;
+    --emerald: #10B981;
+    --text1: #F1F5F9;
+    --text2: #94A3B8;
+    --text3: #475569;
+    --radius: 16px;
+  }
+  html { background: var(--bg); color: var(--text1); font-family: 'Inter', sans-serif; font-size: 13px; }
+  body { min-height: 100vh; padding-bottom: 40px; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(13,17,23,0.92);backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(57,255,20,0.1);padding:10px 24px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:28px;height:28px}
-.logo-text{font-weight:800;font-size:18px;letter-spacing:2px}
-.logo-text span{color:#39FF14}.logo-text em{color:rgba(255,255,255,0.5);font-style:normal}
-.nav-sub{font-size:11px;color:#475569;margin-left:8px}
-.nav-links{display:flex;gap:8px}
-.nav-link{padding:5px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .2s}
-.nav-link.active{background:rgba(57,255,20,0.15);color:#39FF14;border-color:rgba(57,255,20,0.35)}
-.nav-link:not(.active){color:#94a3b8}
-.nav-status{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b}
-.dot{width:8px;height:8px;border-radius:50%;background:#39FF14;animation:pulse 3s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+    background: rgba(6,8,15,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 24px; gap: 32px;
+  }
+  .logo { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; }
+  .logo .ls { color: var(--blue); }
+  .logo .ld { color: var(--text1); }
+  .nav-tabs { display: flex; gap: 4px; flex: 1; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    color: var(--text3); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .nav-tab.active { background: rgba(75,142,255,0.12); color: var(--blue); }
+  .nav-tab:hover:not(.active) { color: var(--text2); background: rgba(255,255,255,0.04); }
+  .status-chip {
+    display: flex; align-items: center; gap: 6px; padding: 5px 12px;
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 20px; font-size: 12px; color: var(--emerald); white-space: nowrap;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 6px var(--emerald); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
-/* LAYOUT */
-.page{padding:70px 20px 32px;max-width:1600px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+  /* MAIN */
+  main { padding: 72px 24px 0; max-width: 1440px; margin: 0 auto; }
 
-/* GLASS PANEL */
-.panel{background:rgba(19,26,34,0.7);border:1px solid rgba(57,255,20,0.1);border-radius:14px;padding:16px;
-  box-shadow:0 0 18px rgba(57,255,20,0.07),inset 0 0 18px rgba(57,255,20,0.015)}
+  /* SESSION BAR */
+  .session-bar {
+    display: flex; align-items: center; padding: 10px 20px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    margin-bottom: 16px; gap: 24px; flex-wrap: wrap;
+  }
+  .session-item { display: flex; flex-direction: column; gap: 1px; }
+  .session-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
+  .session-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text1); }
+  .session-divider { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; }
+  .club-pill {
+    display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+    background: rgba(75,142,255,0.1); border: 1px solid rgba(75,142,255,0.25);
+    border-radius: 20px; color: var(--blue); font-size: 13px; font-weight: 600;
+  }
+  .trigger-btn {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+    padding: 8px 18px; background: var(--blue); border: none; border-radius: 8px;
+    color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.15s; white-space: nowrap;
+  }
+  .trigger-btn:hover { opacity: 0.85; }
 
-/* SESSION BAR */
-.session-bar{background:rgba(13,17,23,0.8);border:1px solid rgba(57,255,20,0.12);border-radius:12px;
-  padding:10px 18px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.session-item{font-size:12px;color:#64748b}
-.session-item span{color:#e2e8f0;font-weight:600}
-.session-item.green span{color:#39FF14}
-.club-badge{background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:#39FF14;
-  padding:3px 12px;border-radius:6px;font-size:12px;font-weight:700;margin-left:auto}
-.btn{padding:5px 14px;border-radius:7px;border:1px solid rgba(57,255,20,0.3);background:rgba(57,255,20,0.08);
-  color:#39FF14;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px}
+  /* KPI STRIP */
+  .kpi-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; position: relative; overflow: hidden;
+  }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--kpi-color, var(--blue));
+  }
+  .kpi-icon { font-size: 14px; margin-bottom: 6px; opacity: 0.7; }
+  .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 4px; }
+  .kpi-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: var(--text1); line-height: 1; }
+  .kpi-unit { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .kpi-delta { font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 6px; }
+  .kpi-delta.pos { color: var(--emerald); }
+  .kpi-delta.neg { color: #F87171; }
+  .kpi-delta.neu { color: var(--text3); }
 
-/* KPI CARDS */
-.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-.kpi-card{background:rgba(19,26,34,0.7);border:1px solid rgba(57,255,20,0.1);border-radius:12px;padding:14px 12px}
-.kpi-label{font-size:9px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
-.kpi-value{font-size:22px;font-weight:800;line-height:1;margin-bottom:2px}
-.kpi-unit{font-size:10px;color:#64748b;margin-left:3px;font-weight:400}
-.kpi-diff{font-size:9px;margin-top:4px}
-.kpi-diff.up{color:#39FF14}.kpi-diff.down{color:#FF6B6B}.kpi-diff.neutral{color:#64748b}
-.kpi-card.highlight .kpi-value{color:#39FF14}
-.kpi-card:not(.highlight) .kpi-value{color:#e2e8f0}
-.kpi-icon{font-size:14px;margin-bottom:4px}
+  /* SHOT DETAIL CARD */
+  .shot-detail {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    margin-bottom: 16px; overflow: hidden;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+  }
 
-/* SHOT DETAIL PANEL */
-.detail-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:14px;
-  border-bottom:1px solid rgba(57,255,20,0.08)}
-.club-info{display:flex;align-items:center;gap:10px}
-.club-name{font-size:20px;font-weight:800;color:#fff}
-.shot-num{font-size:11px;color:#64748b;margin-top:2px}
-.rank-badge{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:24px;font-weight:900;border:2px solid}
-.rank-sp{background:rgba(0,191,255,0.15);border-color:rgba(0,191,255,0.5);color:#7dd3fc;
-  box-shadow:0 0 18px rgba(56,189,248,0.35)}
-.rank-a{background:rgba(57,255,20,0.12);border-color:rgba(57,255,20,0.4);color:#39FF14}
-.rank-b{background:rgba(173,255,47,0.1);border-color:rgba(173,255,47,0.35);color:#bef264}
-.rank-c{background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.35);color:#fde047}
+  /* Hero */
+  .shot-hero {
+    display: flex; align-items: center; padding: 20px 24px; gap: 20px;
+    border-bottom: 1px solid var(--border); background: var(--card2);
+  }
+  .hero-club { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .hero-club-name { font-size: 18px; font-weight: 700; color: var(--text1); }
+  .hero-shot-num { font-size: 13px; color: var(--text3); margin-top: 2px; }
+  .rank-badge {
+    width: 64px; height: 64px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+    background: rgba(16,185,129,0.12); border: 2px solid rgba(16,185,129,0.4);
+    color: var(--emerald); box-shadow: 0 0 20px rgba(16,185,129,0.15); flex-shrink: 0;
+  }
+  .hero-metrics { display: flex; align-items: center; flex: 1; justify-content: flex-end; }
+  .hero-metric { padding: 0 20px; text-align: center; }
+  .hero-metric + .hero-metric { border-left: 1px solid var(--border); }
+  .hero-metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 4px; }
+  .hero-metric-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; }
+  .hero-metric-unit { font-size: 10px; color: var(--text3); }
 
-.hero-metrics{display:flex;gap:4px;align-items:center;margin-left:auto;flex-wrap:wrap}
-.hero-sep{width:1px;height:48px;background:rgba(57,255,20,0.1);margin:0 10px}
-.hero-item{text-align:center}
-.hero-value{font-weight:900;line-height:1}
-.hero-value.xl{font-size:36px;color:#39FF14}
-.hero-value.lg{font-size:26px;color:#e2e8f0}
-.hero-sub{font-size:9px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+  /* Section label */
+  .section-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text3);
+    font-weight: 600; padding: 16px 24px 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-label-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
 
-/* SECTION TITLE */
-.sec-title{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#475569;margin-bottom:10px}
+  /* Ball flight */
+  .ball-flight-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 16px; padding: 0 24px 20px; }
+  .flight-canvas-wrap {
+    background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+  }
+  .canvas-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 8px; }
 
-/* FLIGHT VIEWS */
-.flight-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-canvas{display:block;width:100%;border-radius:6px}
+  /* Physics row */
+  .physics-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    border-top: 1px solid var(--border);
+  }
+  .physics-col { display: flex; flex-direction: column; gap: 12px; padding: 16px 24px 20px; }
+  .physics-col + .physics-col { border-left: 1px solid var(--border); }
+  .physics-col-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); font-weight: 600; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-row.cols4 { grid-template-columns: repeat(4, 1fr); }
+  .stat-row.cols2 { grid-template-columns: repeat(2, 1fr); }
+  .stat-block { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; }
+  .stat-block-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
+  .stat-block-value { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--text1); margin-top: 2px; }
 
-/* BOTTOM ROW */
-.bottom-row{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:16px;margin-top:4px;
-  padding-top:14px;border-top:1px solid rgba(57,255,20,0.08)}
-.sub-title{font-size:9px;color:#475569;letter-spacing:2px;text-transform:uppercase;
-  margin-bottom:8px;text-align:center}
+  /* Two-col rows */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+  .card-title { font-size: 11px; font-weight: 600; color: var(--text3); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.1em; }
 
-/* SPIN STATS */
-.spin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
-.stat-box{text-align:center}
-.stat-label{font-size:9px;color:#475569;letter-spacing:1px;text-transform:uppercase}
-.stat-value{font-size:14px;font-weight:700;margin-top:2px}
-.stat-sub{font-size:9px;color:#475569;margin-top:1px}
+  /* Accuracy gauge */
+  .gauge-center { display: flex; flex-direction: column; align-items: center; }
+  .gauge-val { font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 700; color: var(--text1); margin-top: -4px; }
+  .gauge-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
 
-/* CLUB HEAD */
-.clubhead-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.angle-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.angle-box{text-align:center}
-.angle-label{font-size:9px;color:#475569;letter-spacing:1px;text-transform:uppercase}
-.angle-value{font-size:13px;font-weight:700;margin-top:2px}
+  /* Shot history table */
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding: 0 12px 10px; text-align: left; font-weight: 500; }
+  td { padding: 9px 12px; border-top: 1px solid var(--border); font-size: 12px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .rank-mini { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 5px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .rank-S { background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.35); color: #38BDF8; }
+  .rank-A { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #10B981; }
+  .rank-B { background: rgba(132,204,22,0.12); border: 1px solid rgba(132,204,22,0.3); color: #A3E635; }
+  .rank-C { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #F59E0B; }
+  .rank-D { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.3); color: #FB923C; }
+  .shape-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .shape-draw { background: rgba(75,142,255,0.1); color: var(--blue); border: 1px solid rgba(75,142,255,0.2); }
+  .shape-fade { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+  .shape-str { background: rgba(16,185,129,0.1); color: var(--emerald); border: 1px solid rgba(16,185,129,0.2); }
 
-/* LOWER PANELS */
-.lower-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-.lower-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.lower-grid3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-
-/* TABLE */
-table{width:100%;border-collapse:collapse;font-size:11px}
-th{text-align:left;font-size:9px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;
-  padding:6px 8px;border-bottom:1px solid rgba(57,255,20,0.08)}
-td{padding:7px 8px;border-bottom:1px solid rgba(57,255,20,0.04)}
-tr:hover td{background:rgba(57,255,20,0.03)}
-.rank-chip{display:inline-block;padding:1px 7px;border-radius:5px;font-size:10px;font-weight:700}
-.chip-sp{background:rgba(0,191,255,0.15);color:#7dd3fc}
-.chip-a{background:rgba(57,255,20,0.12);color:#39FF14}
-.chip-b{background:rgba(173,255,47,0.1);color:#bef264}
-.chip-c{background:rgba(255,214,0,0.1);color:#fde047}
-.chip-d{background:rgba(255,107,53,0.12);color:#fb923c}
-.shape-draw{color:#00FFD1}.shape-fade{color:#fb923c}.shape-str{color:#39FF14}
-
-/* RECHARTS-LIKE fake chart */
-.fake-chart{width:100%;height:120px;position:relative}
-.chart-bar{position:absolute;bottom:0;border-radius:3px 3px 0 0;background:rgba(57,255,20,0.6)}
-
-/* DISPERSION dots */
-.disp-area{position:relative;width:100%;height:180px;background:rgba(13,17,23,0.5);
-  border-radius:8px;border:1px solid rgba(57,255,20,0.06);overflow:hidden}
-.disp-vline{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(57,255,20,0.1)}
-.disp-dot{position:absolute;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%)}
-
-/* ACCURACY GAUGE */
-.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
-
-/* FOOTER LABEL */
-.mockup-note{text-align:center;font-size:10px;color:#334155;padding:12px 0;letter-spacing:1px}
+  canvas { display: block; }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="logo">
-    <svg class="logo-icon" viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="14" r="13" stroke="#39FF14" stroke-width="1.5" stroke-opacity="0.4"/>
-      <path d="M9 22V8" stroke="#39FF14" stroke-width="2" stroke-linecap="round"/>
-      <path d="M9 8 L20 12 L9 16" fill="#39FF14" fill-opacity="0.8"/>
-    </svg>
-    <div class="logo-text"><span>SWING</span><em>DASH</em></div>
-    <div class="nav-sub">Golf Simulator Analytics</div>
+  <div class="logo"><span class="ls">SWING</span><span class="ld">DASH</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">Driving Range</div>
+    <div class="nav-tab">Course Play</div>
   </div>
-  <div class="nav-links">
-    <div class="nav-link active">Driving Range</div>
-    <div class="nav-link">Course Play</div>
-  </div>
-  <div class="nav-status">
-    <span>GSPro Connected</span>
-    <div class="dot"></div>
+  <div class="status-chip">
+    <div class="status-dot"></div>
+    GSPro Connected
   </div>
 </nav>
 
-<div class="page">
+<main>
 
-  <!-- SESSION BAR -->
-  <div class="session-bar">
-    <div class="session-item green">● <span>LIVE</span></div>
-    <div class="session-item">Session <span>2026-05-25</span></div>
-    <div class="session-item">Shots <span>14</span></div>
-    <div class="session-item">Duration <span>18:42</span></div>
-    <div class="club-badge">7 Iron</div>
-    <button class="btn">▶ TRIGGER SHOT</button>
+<!-- SESSION BAR -->
+<div class="session-bar">
+  <div class="session-item">
+    <div class="session-label">Session ID</div>
+    <div class="session-value">SES-2024-0847</div>
   </div>
-
-  <!-- KPI CARDS -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-icon">⚡</div>
-      <div class="kpi-label">Ball Speed</div>
-      <div><span class="kpi-value">124.8</span><span class="kpi-unit">mph</span></div>
-      <div class="kpi-diff up">▲ +2.1 vs prev</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">🏌️</div>
-      <div class="kpi-label">Club Speed</div>
-      <div><span class="kpi-value">86.2</span><span class="kpi-unit">mph</span></div>
-      <div class="kpi-diff neutral">— same</div>
-    </div>
-    <div class="kpi-card highlight">
-      <div class="kpi-icon">💥</div>
-      <div class="kpi-label">Smash Factor</div>
-      <div><span class="kpi-value">1.45</span></div>
-      <div class="kpi-diff up">▲ +0.03</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">📐</div>
-      <div class="kpi-label">Launch Angle</div>
-      <div><span class="kpi-value">21.4</span><span class="kpi-unit">°</span></div>
-      <div class="kpi-diff neutral">— same</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">🌀</div>
-      <div class="kpi-label">Spin Rate</div>
-      <div><span class="kpi-value">6,120</span><span class="kpi-unit">rpm</span></div>
-      <div class="kpi-diff down">▼ -240</div>
-    </div>
-    <div class="kpi-card highlight">
-      <div class="kpi-icon">🎯</div>
-      <div class="kpi-label">Carry Dist.</div>
-      <div><span class="kpi-value">168</span><span class="kpi-unit">yds</span></div>
-      <div class="kpi-diff up">▲ +5 yds</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">📏</div>
-      <div class="kpi-label">Total Dist.</div>
-      <div><span class="kpi-value">181</span><span class="kpi-unit">yds</span></div>
-      <div class="kpi-diff up">▲ +4 yds</div>
-    </div>
+  <div class="session-divider"></div>
+  <div class="session-item">
+    <div class="session-label">Duration</div>
+    <div class="session-value">42:18</div>
   </div>
-
-  <!-- SHOT DETAIL PANEL -->
-  <div class="panel">
-
-    <!-- Header -->
-    <div class="detail-header">
-      <div class="club-info">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="1.5">
-          <rect x="8" y="14" width="10" height="7" rx="1"/>
-          <line x1="10" y1="14" x2="6" y2="3"/>
-          <circle cx="6" cy="3" r="1.5" fill="#39FF14"/>
-        </svg>
-        <div>
-          <div class="club-name">7 Iron</div>
-          <div class="shot-num">Shot #14</div>
-        </div>
-      </div>
-
-      <div class="rank-badge rank-a">A</div>
-
-      <div class="hero-metrics">
-        <div class="hero-item">
-          <div class="hero-value xl">1.45</div>
-          <div class="hero-sub">Smash Factor</div>
-        </div>
-        <div class="hero-sep"></div>
-        <div class="hero-item">
-          <div class="hero-value lg">124<span style="font-size:13px;color:#64748b;font-weight:400"> mph</span></div>
-          <div class="hero-sub">Ball Speed</div>
-        </div>
-        <div class="hero-sep"></div>
-        <div class="hero-item">
-          <div class="hero-value lg">86<span style="font-size:13px;color:#64748b;font-weight:400"> mph</span></div>
-          <div class="hero-sub">Club Speed</div>
-        </div>
-        <div class="hero-sep"></div>
-        <div class="hero-item">
-          <div class="hero-value lg" style="color:#39FF14">168<span style="font-size:13px;color:#64748b;font-weight:400"> yds</span></div>
-          <div class="hero-sub">Carry</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ball Flight -->
-    <div class="sec-title">Ball Flight</div>
-    <div class="flight-grid">
-      <div>
-        <canvas id="sideCanvas" height="160"></canvas>
-        <div style="display:flex;gap:16px;font-size:11px;color:#64748b;margin-top:6px;padding:0 4px;flex-wrap:wrap">
-          <span>Carry <span style="color:#39FF14">168y</span></span>
-          <span>Total <span style="color:#39FF14">181y</span></span>
-          <span>Apex <span style="color:#00FFD1">31y</span></span>
-          <span>VLA <span style="color:#e2e8f0">21.4°</span></span>
-        </div>
-      </div>
-      <div>
-        <canvas id="topCanvas" height="200"></canvas>
-        <div style="display:flex;gap:16px;font-size:11px;color:#64748b;margin-top:6px;padding:0 4px">
-          <span>Shape <span style="color:#00FFD1;font-weight:700">DRAW</span></span>
-          <span>Offline <span style="color:#e2e8f0">-8y L</span></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Row: face | ball | club head -->
-    <div class="bottom-row">
-
-      <!-- Club Face -->
-      <div>
-        <div class="sub-title">Club Face Impact</div>
-        <canvas id="faceCanvas" height="120"></canvas>
-        <div style="display:flex;gap:16px;font-size:11px;color:#64748b;justify-content:center;margin-top:6px">
-          <span>H: <span style="color:#fff">+12%</span></span>
-          <span>V: <span style="color:#fff">+8%</span></span>
-        </div>
-      </div>
-
-      <!-- Ball Spin -->
-      <div>
-        <div class="sub-title">Ball · Spin Direction</div>
-        <canvas id="ballCanvas" height="150"></canvas>
-        <div class="spin-stats">
-          <div class="stat-box">
-            <div class="stat-label">Backspin</div>
-            <div class="stat-value" style="color:#00FFD1">5,940</div>
-            <div class="stat-sub">rpm</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Sidespin</div>
-            <div class="stat-value" style="color:#39FF14">-680</div>
-            <div class="stat-sub">rpm</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Axis</div>
-            <div class="stat-value" style="color:#39FF14">-6.5°</div>
-            <div class="stat-sub">draw</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Club Head -->
-      <div>
-        <div class="sec-title" style="text-align:left">Club Head Analysis</div>
-        <div class="clubhead-grid">
-          <div>
-            <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase">Attack Angle</div>
-            <canvas id="clubSideCanvas" height="130"></canvas>
-          </div>
-          <div>
-            <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase">Path & Face</div>
-            <canvas id="clubTopCanvas" height="130"></canvas>
-          </div>
-        </div>
-        <div class="angle-stats">
-          <div class="angle-box">
-            <div class="angle-label">AoA</div>
-            <div class="angle-value" style="color:#f59e0b">-4.8°</div>
-          </div>
-          <div class="angle-box">
-            <div class="angle-label">Path</div>
-            <div class="angle-value" style="color:#39FF14">-1.2°</div>
-          </div>
-          <div class="angle-box">
-            <div class="angle-label">Face</div>
-            <div class="angle-value" style="color:#00FFD1">-2.1°</div>
-          </div>
-          <div class="angle-box">
-            <div class="angle-label">F/P</div>
-            <div class="angle-value" style="color:#39FF14">-0.9°</div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="session-divider"></div>
+  <div class="session-item">
+    <div class="session-label">Shots</div>
+    <div class="session-value">14</div>
   </div>
-
-  <!-- ROW: legacy trajectory + accuracy gauge -->
-  <div class="lower-grid">
-    <div class="panel">
-      <div class="sec-title">Shot Trajectory (Legacy)</div>
-      <canvas id="legacyCanvas" height="150"></canvas>
-      <div style="display:flex;gap:16px;font-size:11px;color:#64748b;margin-top:6px;flex-wrap:wrap">
-        <span>Shape: <span style="color:#fff">draw</span></span>
-        <span>Apex: <span style="color:#00FFD1">31y</span></span>
-        <span>Lateral: <span style="color:#39FF14">-8.0y</span></span>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="sec-title">Accuracy Gauge</div>
-      <div class="gauge-wrap">
-        <canvas id="gaugeCanvas" height="150"></canvas>
-        <div style="font-size:11px;color:#64748b">In-target: <span style="color:#39FF14;font-weight:700">79%</span></div>
-      </div>
-    </div>
+  <div class="session-divider"></div>
+  <div class="club-pill">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="1" width="5" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+      <rect x="2" y="9" width="7" height="3" rx="1" fill="currentColor"/>
+    </svg>
+    7 Iron
   </div>
-
-  <!-- ROW: dispersion + trend -->
-  <div class="lower-grid2">
-    <div class="panel">
-      <div class="sec-title">Shot Dispersion (last 14)</div>
-      <div class="disp-area" id="dispArea">
-        <div class="disp-vline"></div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="sec-title">Performance Trend</div>
-      <canvas id="trendCanvas" height="180"></canvas>
-    </div>
-  </div>
-
-  <!-- ROW: history table + club distribution -->
-  <div class="lower-grid3">
-    <div class="panel">
-      <div class="sec-title">Shot History</div>
-      <table>
-        <thead><tr>
-          <th>#</th><th>Club</th><th>Ball Spd</th><th>Smash</th><th>Carry</th><th>Shape</th><th>Spin</th><th>Rank</th>
-        </tr></thead>
-        <tbody id="historyBody"></tbody>
-      </table>
-    </div>
-    <div class="panel">
-      <div class="sec-title">Club Distribution</div>
-      <canvas id="clubDistCanvas" height="200"></canvas>
-    </div>
-  </div>
-
+  <button class="trigger-btn">&#9654;&nbsp; Trigger Shot</button>
 </div>
 
-<div class="mockup-note">SWINGDASH · MOCKUP PREVIEW · NOT CONNECTED TO LIVE DATA</div>
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card" style="--kpi-color:#4B8EFF">
+    <div class="kpi-icon">&#9889;</div>
+    <div class="kpi-label">Ball Speed</div>
+    <div class="kpi-value">124.8</div>
+    <div class="kpi-unit">mph</div>
+    <div class="kpi-delta pos">&#9650; +1.2 vs prev</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:#22D3EE">
+    <div class="kpi-icon">&#127944;</div>
+    <div class="kpi-label">Club Speed</div>
+    <div class="kpi-value">86.2</div>
+    <div class="kpi-unit">mph</div>
+    <div class="kpi-delta neg">&#9660; -0.8 vs prev</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:#F59E0B">
+    <div class="kpi-icon">&#10022;</div>
+    <div class="kpi-label">Smash Factor</div>
+    <div class="kpi-value">1.45</div>
+    <div class="kpi-unit">ratio</div>
+    <div class="kpi-delta pos">&#9650; +0.02 vs prev</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:#4B8EFF">
+    <div class="kpi-icon">&#128208;</div>
+    <div class="kpi-label">Launch Angle</div>
+    <div class="kpi-value">21.4</div>
+    <div class="kpi-unit">degrees</div>
+    <div class="kpi-delta neu">&#8212; &#177;0.1 vs prev</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:#22D3EE">
+    <div class="kpi-icon">&#127744;</div>
+    <div class="kpi-label">Spin Rate</div>
+    <div class="kpi-value">6120</div>
+    <div class="kpi-unit">rpm</div>
+    <div class="kpi-delta neg">&#9660; -180 vs prev</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:#F59E0B">
+    <div class="kpi-icon">&#128207;</div>
+    <div class="kpi-label">Carry Dist</div>
+    <div class="kpi-value">168</div>
+    <div class="kpi-unit">yards</div>
+    <div class="kpi-delta pos">&#9650; +3 vs prev</div>
+  </div>
+  <div class="kpi-card" style="--kpi-color:#10B981">
+    <div class="kpi-icon">&#127919;</div>
+    <div class="kpi-label">Total Dist</div>
+    <div class="kpi-value">181</div>
+    <div class="kpi-unit">yards</div>
+    <div class="kpi-delta pos">&#9650; +4 vs prev</div>
+  </div>
+</div>
+
+<!-- SHOT DETAIL -->
+<div class="shot-detail">
+
+  <!-- Hero -->
+  <div class="shot-hero">
+    <div class="hero-club">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="11" y="4" width="13" height="20" rx="2" fill="rgba(75,142,255,0.12)" stroke="rgba(75,142,255,0.45)" stroke-width="1.5"/>
+        <rect x="9" y="24" width="17" height="8" rx="2" fill="rgba(75,142,255,0.2)" stroke="rgba(75,142,255,0.55)" stroke-width="1.5"/>
+        <text x="15" y="31" font-size="8" fill="#4B8EFF" font-weight="700" font-family="JetBrains Mono, monospace">7</text>
+      </svg>
+      <div>
+        <div class="hero-club-name">7 Iron</div>
+        <div class="hero-shot-num" style="font-family:'JetBrains Mono',monospace">Shot #14</div>
+      </div>
+    </div>
+    <div class="rank-badge">A</div>
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <div class="hero-metric-label">Smash Factor</div>
+        <div class="hero-metric-value" style="color:#4B8EFF">1.45</div>
+        <div class="hero-metric-unit">ratio</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hero-metric-label">Ball Speed</div>
+        <div class="hero-metric-value">124.8</div>
+        <div class="hero-metric-unit">mph</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hero-metric-label">Club Speed</div>
+        <div class="hero-metric-value">86.2</div>
+        <div class="hero-metric-unit">mph</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hero-metric-label">Carry</div>
+        <div class="hero-metric-value" style="color:#F59E0B">168</div>
+        <div class="hero-metric-unit">yards</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ball Flight -->
+  <div class="section-label">
+    <div class="section-label-dot"></div>
+    BALL FLIGHT
+  </div>
+  <div class="ball-flight-grid">
+    <div class="flight-canvas-wrap">
+      <div class="canvas-title">SIDE VIEW &mdash; TRAJECTORY PROFILE</div>
+      <canvas id="sideView" width="480" height="150"></canvas>
+    </div>
+    <div class="flight-canvas-wrap">
+      <div class="canvas-title">TOP VIEW &mdash; SHOT SHAPE</div>
+      <canvas id="topView" width="280" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- Physics -->
+  <div class="section-label" style="padding-top:4px">
+    <div class="section-label-dot"></div>
+    IMPACT ANALYSIS
+  </div>
+  <div class="physics-row">
+
+    <!-- Col 1: Club Face -->
+    <div class="physics-col">
+      <div class="physics-col-title">Club Face Impact</div>
+      <canvas id="faceCanvas" width="230" height="165" style="margin:0 auto"></canvas>
+      <div class="stat-row cols2">
+        <div class="stat-block">
+          <div class="stat-block-label">Horizontal</div>
+          <div class="stat-block-value" style="color:#F59E0B">+0.12&quot;</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-label">Vertical</div>
+          <div class="stat-block-value" style="color:#10B981">+0.08&quot;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Col 2: Spin Ball -->
+    <div class="physics-col">
+      <div class="physics-col-title">Ball Spin (Live)</div>
+      <canvas id="spinCanvas" width="220" height="185" style="margin:0 auto"></canvas>
+      <div class="stat-row">
+        <div class="stat-block">
+          <div class="stat-block-label">Backspin</div>
+          <div class="stat-block-value">5940</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-label">Sidespin</div>
+          <div class="stat-block-value" style="color:#4B8EFF">-680</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-label">Axis</div>
+          <div class="stat-block-value" style="color:#4B8EFF">-6.5&deg;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Col 3: Club Head Analysis -->
+    <div class="physics-col">
+      <div class="physics-col-title">Club Head Analysis</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div class="canvas-title" style="margin-bottom:4px">ATTACK ANGLE</div>
+          <canvas id="aoaCanvas" width="110" height="130"></canvas>
+        </div>
+        <div>
+          <div class="canvas-title" style="margin-bottom:4px">PATH &amp; FACE</div>
+          <canvas id="pathCanvas" width="110" height="130"></canvas>
+        </div>
+      </div>
+      <div class="stat-row cols4">
+        <div class="stat-block">
+          <div class="stat-block-label">AoA</div>
+          <div class="stat-block-value" style="color:#22D3EE">-4.8&deg;</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-label">Path</div>
+          <div class="stat-block-value" style="color:#4B8EFF">-1.2&deg;</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-label">Face</div>
+          <div class="stat-block-value" style="color:#4B8EFF">-2.1&deg;</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-label">F/P</div>
+          <div class="stat-block-value" style="color:#F59E0B">-0.9&deg;</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /physics-row -->
+</div><!-- /shot-detail -->
+
+<!-- ROW: Trajectory + Accuracy -->
+<div class="two-col">
+  <div class="card">
+    <div class="card-title">Trajectory Overview</div>
+    <canvas id="trajCanvas" width="600" height="160" style="width:100%"></canvas>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column">
+    <div class="card-title">Accuracy Score</div>
+    <div class="gauge-center" style="flex:1;justify-content:center">
+      <canvas id="gaugeCanvas" width="220" height="130"></canvas>
+      <div class="gauge-val">79%</div>
+      <div class="gauge-sub">Session average &mdash; 74%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW: Dispersion + Trend -->
+<div class="two-col">
+  <div class="card">
+    <div class="card-title">Shot Dispersion</div>
+    <canvas id="dispCanvas" width="600" height="210" style="width:100%"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-title">Performance Trend</div>
+    <canvas id="trendCanvas" width="600" height="210" style="width:100%"></canvas>
+  </div>
+</div>
+
+<!-- ROW: History + Club Distribution -->
+<div class="two-col">
+  <div class="card" style="padding:16px 0 8px">
+    <div class="card-title" style="padding:0 16px 8px">Shot History</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Club</th>
+          <th>Ball Spd</th>
+          <th>Smash</th>
+          <th>Carry</th>
+          <th>Shape</th>
+          <th>Spin</th>
+          <th>Rank</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">Club Distribution</div>
+    <canvas id="clubBar" width="600" height="200" style="width:100%"></canvas>
+  </div>
+</div>
+
+</main>
 
 <script>
-// ── Helpers ────────────────────────────────────────────────────────────────────
-function grid(ctx, W, H) {
-  ctx.strokeStyle='rgba(57,255,20,0.05)'; ctx.lineWidth=1;
-  for(let x=0;x<=W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
-  for(let y=0;y<=H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
 }
-function setSize(id) {
-  const c=document.getElementById(id);
-  c.width=c.offsetWidth||c.parentElement.offsetWidth||400;
-  return c;
-}
 
-// ── Side View ──────────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('sideCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  grid(ctx,W,H);
-  const carry=168,apex=31,total=181;
-  const padL=36,padR=20,padT=22,padB=28;
-  const scaleX=(W-padL-padR)/(carry*1.08);
-  const scaleY=(H-padT-padB)/(apex*2.4);
-  const baseY=H-padB; const startX=padL; const landX=startX+carry*scaleX;
-  ctx.strokeStyle='rgba(57,255,20,0.18)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(0,baseY);ctx.lineTo(W,baseY);ctx.stroke();
-  const pts=[];
-  for(let i=0;i<=100;i++){const t=i/100;pts.push({x:startX+t*carry*scaleX,y:baseY-(4*apex*t*(1-t))*scaleY})}
-  // glow
-  ctx.strokeStyle='rgba(0,255,209,0.07)';ctx.lineWidth=8;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
-  // gradient
-  const g=ctx.createLinearGradient(startX,baseY,landX,baseY);
-  g.addColorStop(0,'#39FF14');g.addColorStop(0.45,'#00FFD1');g.addColorStop(1,'rgba(57,255,20,0.35)');
-  ctx.strokeStyle=g;ctx.lineWidth=2.5;ctx.shadowColor='#39FF14';ctx.shadowBlur=7;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
-  ctx.shadowBlur=0;
-  // apex
-  const ap=pts[50];
-  ctx.fillStyle='#00FFD1';ctx.shadowColor='#00FFD1';ctx.shadowBlur=10;
-  ctx.beginPath();ctx.arc(ap.x,ap.y,4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(0,255,209,0.8)';ctx.font='9px JetBrains Mono';
-  ctx.fillText('31y',ap.x+5,ap.y-4);
-  // hang time
-  ctx.fillStyle='rgba(255,214,0,0.5)';ctx.font='9px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('~5.4s',ap.x,baseY-5);
-  // descent arc
-  const arcR=16;
-  ctx.strokeStyle='rgba(255,214,0,0.4)';ctx.lineWidth=1.2;
-  ctx.beginPath();ctx.arc(landX,baseY,arcR,-Math.PI/2,-Math.PI/4,true);ctx.stroke();
-  ctx.fillStyle='rgba(255,214,0,0.65)';ctx.font='8px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('48°',landX+arcR+8,baseY-7);
-  // dots
-  [startX,landX].forEach(x=>{ctx.fillStyle='#39FF14';ctx.shadowColor='#39FF14';ctx.shadowBlur=8;
-    ctx.beginPath();ctx.arc(x,baseY,5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;});
-  // carry label
-  ctx.fillStyle='rgba(57,255,20,0.8)';ctx.font='bold 10px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('168y carry',landX,baseY+14);
-  // total tick
-  const tx=startX+total*scaleX;
-  ctx.strokeStyle='rgba(57,255,20,0.3)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.moveTo(tx,baseY-6);ctx.lineTo(tx,baseY+6);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='rgba(57,255,20,0.45)';ctx.font='8px JetBrains Mono';
-  ctx.fillText('181y total',tx,baseY+22);
-  ctx.fillStyle='rgba(57,255,20,0.28)';ctx.font='8px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('SIDE VIEW',4,12);
-})();
+// ─── SIDE VIEW ─────────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('sideView');
+  var cx = cv.getContext('2d');
+  var W = 480, H = 150;
+  var carry = 168, total = 181, apex = 31;
 
-// ── Top View ───────────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('topCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  grid(ctx,W,H);
-  const carry=168,lateral=-8;
-  const padL=24,padR=24,padT=20,padB=20;
-  const scaleY=(H-padT-padB)/(carry*1.1);
-  const maxLat=Math.max(Math.abs(lateral)*1.6,30);
-  const scaleX=(W-padL-padR)/(maxLat*2);
-  const ox=W/2,oy=H-padB;
-  // target line
-  ctx.strokeStyle='rgba(57,255,20,0.12)';ctx.lineWidth=1;ctx.setLineDash([5,5]);
-  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox,padT);ctx.stroke();ctx.setLineDash([]);
-  // fairway
-  const fw=18*scaleX;
-  ctx.fillStyle='rgba(57,255,20,0.04)';ctx.fillRect(ox-fw,padT,fw*2,H-padT-padB);
-  // curved path (draw = curves left)
-  const pts=[];
-  for(let i=0;i<=80;i++){const t=i/80;pts.push({x:ox+lateral*t*t*scaleX,y:oy-t*carry*scaleY})}
-  ctx.strokeStyle='rgba(0,255,209,0.12)';ctx.lineWidth=7;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
-  ctx.strokeStyle='#00FFD1';ctx.lineWidth=2.5;ctx.shadowColor='#00FFD1';ctx.shadowBlur=8;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();ctx.shadowBlur=0;
-  const lx=ox+lateral*scaleX,ly=oy-carry*scaleY;
-  // offline dash
-  ctx.strokeStyle='rgba(0,255,209,0.3)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
-  ctx.beginPath();ctx.moveTo(ox,ly);ctx.lineTo(lx,ly);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='rgba(0,255,209,0.75)';ctx.font='9px JetBrains Mono';ctx.textAlign='right';
-  ctx.fillText('8y L',lx-3,ly-4);
-  // landing dot
-  ctx.fillStyle='#00FFD1';ctx.shadowColor='#00FFD1';ctx.shadowBlur=10;
-  ctx.beginPath();ctx.arc(lx,ly,6,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-  // tee dot
-  ctx.fillStyle='#39FF14';ctx.shadowColor='#39FF14';ctx.shadowBlur=8;
-  ctx.beginPath();ctx.arc(ox,oy,5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-  // label
-  ctx.fillStyle='#00FFD1';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('DRAW',lx,ly-11);
-  // ruler
-  const r10=10*scaleY;
-  ctx.strokeStyle='rgba(57,255,20,0.2)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(padL,H-8);ctx.lineTo(padL+r10,H-8);ctx.stroke();
-  ctx.fillStyle='rgba(57,255,20,0.3)';ctx.font='7px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('10y',padL+r10/2,H-1);
-  ctx.fillStyle='rgba(57,255,20,0.28)';ctx.font='8px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('TOP VIEW',4,12);
-})();
+  cx.clearRect(0, 0, W, H);
 
-// ── Club Face ──────────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('faceCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  const cx=W/2,cy=H/2,rx=Math.min(W*0.42,58),ry=Math.min(H*0.38,32);
-  // bezel
-  ctx.beginPath();ctx.ellipse(cx,cy,rx+6,ry+6,0,0,Math.PI*2);
-  ctx.fillStyle='#0D1117';ctx.fill();
-  ctx.strokeStyle='rgba(57,255,20,0.2)';ctx.lineWidth=1.5;ctx.stroke();
-  // face bg
-  ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-  const fg=ctx.createRadialGradient(cx-rx*.2,cy-ry*.2,2,cx,cy,rx);
-  fg.addColorStop(0,'#2a3a4a');fg.addColorStop(1,'#0e1a24');
-  ctx.fillStyle=fg;ctx.fill();ctx.strokeStyle='rgba(57,255,20,0.15)';ctx.lineWidth=1;ctx.stroke();
-  // grooves
-  ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.clip();
-  for(let i=1;i<=7;i++){
-    const gy=cy-ry+i*(ry*1.6/8)+ry*.2;
-    ctx.beginPath();ctx.moveTo(cx-rx+4,gy);ctx.lineTo(cx+rx-4,gy);
-    ctx.strokeStyle='rgba(57,255,20,0.08)';ctx.lineWidth=1.2;ctx.stroke();
+  // subtle bg
+  cx.fillStyle = 'rgba(0,0,0,0.2)';
+  cx.fillRect(0, 0, W, H);
+
+  // ground line
+  var groundY = H - 18;
+  cx.strokeStyle = 'rgba(255,255,255,0.1)';
+  cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(16, groundY); cx.lineTo(W - 8, groundY); cx.stroke();
+
+  // horizontal grid
+  cx.strokeStyle = 'rgba(255,255,255,0.04)';
+  for (var gi = 1; gi <= 4; gi++) {
+    var gy = groundY - gi * ((groundY - 8) / 4);
+    cx.beginPath(); cx.moveTo(16, gy); cx.lineTo(W - 8, gy); cx.stroke();
   }
-  ctx.restore();
-  // crosshair
-  ctx.strokeStyle='rgba(57,255,20,0.13)';ctx.lineWidth=0.8;ctx.setLineDash([3,4]);
-  ctx.beginPath();ctx.moveTo(cx,cy-ry+4);ctx.lineTo(cx,cy+ry-4);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-rx+4,cy);ctx.lineTo(cx+rx-4,cy);ctx.stroke();ctx.setLineDash([]);
-  // sweet spot
-  ctx.beginPath();ctx.arc(cx,cy,Math.min(rx,ry)*.28,0,Math.PI*2);
-  ctx.strokeStyle='rgba(57,255,20,0.18)';ctx.lineWidth=1;ctx.stroke();
-  // impact point (slightly toe-side, slightly high)
-  const hx=0.12,vy=0.08;
-  const ipx=cx+hx*rx*.85,ipy=cy-vy*ry*.85;
-  const ipg=ctx.createRadialGradient(ipx-2,ipy-2,0,ipx,ipy,9);
-  ipg.addColorStop(0,'#fff');ipg.addColorStop(0.3,'#39FF14');ipg.addColorStop(1,'rgba(57,255,20,0.2)');
-  ctx.beginPath();ctx.arc(ipx,ipy,7,0,Math.PI*2);ctx.fillStyle=ipg;ctx.fill();
-  ctx.shadowColor='#39FF14';ctx.shadowBlur=14;
-  ctx.beginPath();ctx.arc(ipx,ipy,4,0,Math.PI*2);ctx.fillStyle='#39FF14';ctx.fill();ctx.shadowBlur=0;
-  // ripples
-  [14,20,26].forEach((r,i)=>{
-    ctx.beginPath();ctx.arc(ipx,ipy,r,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(57,255,20,${0.12-i*0.035})`;ctx.lineWidth=1.3;ctx.stroke();
+
+  // build parabola path
+  var pts = [];
+  var drawW = W - 52;
+  var carryFrac = carry / total;
+  var maxH = (groundY - 12) * 0.9;
+
+  for (var i = 0; i <= 100; i++) {
+    var t = i / 100;
+    var x = 20 + t * drawW;
+    var h;
+    if (t <= carryFrac) {
+      h = (t / carryFrac) * (1 - t / carryFrac) * 4 * maxH * 0.95;
+    } else {
+      h = ((1 - t) / (1 - carryFrac)) * ((t - carryFrac) / (1 - carryFrac)) * 4 * maxH * 0.72;
+    }
+    var y = groundY - Math.max(0, h);
+    pts.push([x, y]);
+  }
+
+  // fill gradient
+  var grad = cx.createLinearGradient(0, 8, 0, groundY);
+  grad.addColorStop(0, 'rgba(75,142,255,0.14)');
+  grad.addColorStop(1, 'rgba(75,142,255,0.0)');
+  cx.beginPath();
+  cx.moveTo(pts[0][0], groundY);
+  for (var i = 0; i < pts.length; i++) cx.lineTo(pts[i][0], pts[i][1]);
+  cx.lineTo(pts[pts.length - 1][0], groundY);
+  cx.closePath();
+  cx.fillStyle = grad;
+  cx.fill();
+
+  // trajectory line
+  cx.beginPath();
+  for (var i = 0; i < pts.length; i++) {
+    if (i === 0) cx.moveTo(pts[i][0], pts[i][1]);
+    else cx.lineTo(pts[i][0], pts[i][1]);
+  }
+  cx.strokeStyle = '#4B8EFF';
+  cx.lineWidth = 2;
+  cx.stroke();
+
+  // apex point
+  var apexPt = pts[0];
+  for (var i = 0; i < pts.length; i++) {
+    if (pts[i][1] < apexPt[1]) apexPt = pts[i];
+  }
+  // glow rings
+  [22, 14].forEach(function(r, i) {
+    cx.beginPath();
+    cx.arc(apexPt[0], apexPt[1], r, 0, Math.PI * 2);
+    cx.strokeStyle = i === 0 ? 'rgba(245,158,11,0.08)' : 'rgba(245,158,11,0.18)';
+    cx.lineWidth = i === 0 ? 8 : 4;
+    cx.stroke();
   });
-  // labels
-  ctx.fillStyle='rgba(226,232,240,0.5)';ctx.font='bold 8px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('TOE',cx+rx+12,cy+3);ctx.fillText('HEEL',cx-rx-12,cy+3);
-  ctx.fillText('HIGH',cx,cy-ry-6);ctx.fillText('LOW',cx,cy+ry+13);
-  ctx.fillStyle='#39FF14';ctx.font='bold 9px JetBrains Mono';
-  ctx.fillText('12% toe · center',cx,H-4);
+  cx.beginPath();
+  cx.arc(apexPt[0], apexPt[1], 4, 0, Math.PI * 2);
+  cx.fillStyle = '#F59E0B';
+  cx.fill();
+
+  cx.fillStyle = '#F59E0B';
+  cx.font = '10px JetBrains Mono';
+  cx.fillText('Apex ' + apex + 'y', apexPt[0] - 22, apexPt[1] - 12);
+
+  // carry marker
+  var carryX = 20 + carryFrac * drawW;
+  cx.strokeStyle = 'rgba(75,142,255,0.3)';
+  cx.lineWidth = 1;
+  cx.setLineDash([3, 3]);
+  cx.beginPath(); cx.moveTo(carryX, groundY - 2); cx.lineTo(carryX, groundY - 42); cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle = '#94A3B8';
+  cx.font = '10px Inter';
+  cx.fillText('Carry ' + carry + 'y', carryX - 26, groundY - 6);
+
+  // total marker
+  var totalX = 20 + drawW;
+  cx.fillStyle = '#94A3B8';
+  cx.font = '10px Inter';
+  cx.fillText('Total ' + total + 'y', totalX - 28, groundY - 6);
+
+  // hang time
+  cx.fillStyle = 'rgba(148,163,184,0.5)';
+  cx.font = '10px Inter';
+  cx.fillText('Hang ~5.2s', 22, groundY - 32);
+
+  // descent angle at landing
+  var landX = 20 + drawW;
+  cx.strokeStyle = 'rgba(34,211,238,0.45)';
+  cx.lineWidth = 1.5;
+  cx.beginPath();
+  cx.arc(landX, groundY, 30, -Math.PI * 0.85, -Math.PI, true);
+  cx.stroke();
+  cx.fillStyle = '#22D3EE';
+  cx.font = '9px JetBrains Mono';
+  cx.fillText('52°', landX - 42, groundY - 14);
 })();
 
-// ── Ball Spin ──────────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('ballCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  const r=Math.min(W,H)*0.3,cx=W/2,cy=H/2+2;
-  // shadow
-  ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=14;ctx.shadowOffsetY=5;
-  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#666';ctx.fill();
-  ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-  // ball base
-  const bg=ctx.createRadialGradient(cx-r*.3,cy-r*.35,r*.05,cx,cy,r);
-  bg.addColorStop(0,'#fff');bg.addColorStop(0.4,'#e8edf2');bg.addColorStop(0.75,'#c8d0d8');bg.addColorStop(1,'#9aa4ae');
-  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
-  // dimples
-  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
-  const rows=[{c:4,rf:.18,yo:-.65},{c:8,rf:.17,yo:-.42},{c:12,rf:.16,yo:-.18},
-              {c:14,rf:.15,yo:.08},{c:12,rf:.16,yo:.33},{c:8,rf:.17,yo:.58},{c:4,rf:.17,yo:.78}];
-  rows.forEach(({c:cnt,rf,yo})=>{
-    const dr=r*rf,dy=cy+yo*r,rowR=Math.sqrt(Math.max(0,r*r-(yo*r)*(yo*r)));
-    for(let i=0;i<cnt;i++){
-      const a=(i/cnt)*Math.PI*2,dx=cx+Math.cos(a)*rowR*.88;
-      ctx.beginPath();ctx.arc(dx,dy,dr,0,Math.PI*2);ctx.fillStyle='rgba(80,100,120,0.25)';ctx.fill();
-      ctx.beginPath();ctx.arc(dx-dr*.3,dy-dr*.3,dr*.55,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fill();
+// ─── TOP VIEW ──────────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('topView');
+  var cx = cv.getContext('2d');
+  var W = 280, H = 180;
+  cx.clearRect(0, 0, W, H);
+
+  cx.fillStyle = 'rgba(0,0,0,0.2)';
+  cx.fillRect(0, 0, W, H);
+
+  var mid = W / 2;
+
+  // fairway band
+  var fw = cx.createLinearGradient(mid - 55, 0, mid + 55, 0);
+  fw.addColorStop(0, 'rgba(16,185,129,0)');
+  fw.addColorStop(0.25, 'rgba(16,185,129,0.06)');
+  fw.addColorStop(0.75, 'rgba(16,185,129,0.06)');
+  fw.addColorStop(1, 'rgba(16,185,129,0)');
+  cx.fillStyle = fw;
+  cx.fillRect(mid - 55, 8, 110, H - 20);
+
+  // center target line
+  cx.strokeStyle = 'rgba(255,255,255,0.07)';
+  cx.lineWidth = 1;
+  cx.setLineDash([4, 4]);
+  cx.beginPath(); cx.moveTo(mid, H - 12); cx.lineTo(mid, 12); cx.stroke();
+  cx.setLineDash([]);
+
+  // draw path (slight curve left = draw)
+  var sx = mid, sy = H - 14;
+  var ex = mid - 20, ey = 20;
+  var cpx = mid - 4, cpy = H / 2;
+
+  // glow
+  cx.beginPath();
+  cx.moveTo(sx, sy);
+  cx.quadraticCurveTo(cpx, cpy, ex, ey);
+  cx.strokeStyle = 'rgba(75,142,255,0.2)';
+  cx.lineWidth = 8;
+  cx.stroke();
+
+  cx.beginPath();
+  cx.moveTo(sx, sy);
+  cx.quadraticCurveTo(cpx, cpy, ex, ey);
+  cx.strokeStyle = '#4B8EFF';
+  cx.lineWidth = 2.5;
+  cx.stroke();
+
+  // arrowhead
+  var a = Math.atan2(ey - cpy, ex - cpx);
+  cx.fillStyle = '#4B8EFF';
+  cx.beginPath();
+  cx.moveTo(ex, ey);
+  cx.lineTo(ex - 10 * Math.cos(a - 0.4), ey - 10 * Math.sin(a - 0.4));
+  cx.lineTo(ex - 10 * Math.cos(a + 0.4), ey - 10 * Math.sin(a + 0.4));
+  cx.closePath();
+  cx.fill();
+
+  // landing dot
+  cx.beginPath();
+  cx.arc(ex, ey, 5, 0, Math.PI * 2);
+  cx.fillStyle = '#F59E0B';
+  cx.fill();
+  cx.beginPath();
+  cx.arc(ex, ey, 10, 0, Math.PI * 2);
+  cx.strokeStyle = 'rgba(245,158,11,0.25)';
+  cx.lineWidth = 5;
+  cx.stroke();
+
+  cx.fillStyle = '#F59E0B';
+  cx.font = '10px JetBrains Mono';
+  cx.fillText('-8y L', ex + 10, ey + 4);
+
+  // 10y ruler
+  var ry = H - 6;
+  cx.strokeStyle = 'rgba(148,163,184,0.25)';
+  cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(mid - 22, ry); cx.lineTo(mid + 22, ry); cx.stroke();
+  cx.beginPath(); cx.moveTo(mid - 22, ry - 3); cx.lineTo(mid - 22, ry + 0); cx.stroke();
+  cx.beginPath(); cx.moveTo(mid + 22, ry - 3); cx.lineTo(mid + 22, ry + 0); cx.stroke();
+  cx.fillStyle = 'rgba(148,163,184,0.4)';
+  cx.font = '9px Inter';
+  cx.textAlign = 'center';
+  cx.fillText('10 yds', mid, ry - 5);
+
+  // fairway label
+  cx.fillStyle = 'rgba(16,185,129,0.45)';
+  cx.font = '9px Inter';
+  cx.fillText('FAIRWAY', mid, 22);
+  cx.textAlign = 'left';
+})();
+
+// ─── CLUB FACE ─────────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('faceCanvas');
+  var cx = cv.getContext('2d');
+  var W = 230, H = 165;
+  cx.clearRect(0, 0, W, H);
+
+  var cx0 = W / 2, cy0 = H / 2 - 2;
+
+  // 7 Iron: rectangular blade
+  var fw = 84, fh = 54;
+  var fx = cx0 - fw / 2, fy = cy0 - fh / 2;
+
+  // steel face
+  var faceGrad = cx.createLinearGradient(fx, fy, fx, fy + fh);
+  faceGrad.addColorStop(0, '#2C3E56');
+  faceGrad.addColorStop(0.35, '#3E526A');
+  faceGrad.addColorStop(0.65, '#324056');
+  faceGrad.addColorStop(1, '#1E2C3E');
+
+  roundRect(cx, fx, fy, fw, fh, 4);
+  cx.fillStyle = faceGrad;
+  cx.fill();
+
+  // chrome rim highlight
+  var rimGrad = cx.createLinearGradient(fx, fy, fx, fy + fh);
+  rimGrad.addColorStop(0, 'rgba(200,220,255,0.5)');
+  rimGrad.addColorStop(0.5, 'rgba(140,180,240,0.25)');
+  rimGrad.addColorStop(1, 'rgba(80,120,200,0.35)');
+  roundRect(cx, fx, fy, fw, fh, 4);
+  cx.strokeStyle = rimGrad;
+  cx.lineWidth = 2;
+  cx.stroke();
+
+  // grooves (7 horizontal lines)
+  for (var g = 1; g <= 7; g++) {
+    var gy = fy + 5 + g * (fh - 12) / 8;
+    // groove shadow
+    cx.beginPath(); cx.moveTo(fx + 4, gy); cx.lineTo(fx + fw - 4, gy);
+    cx.strokeStyle = 'rgba(0,0,0,0.55)';
+    cx.lineWidth = 1.8;
+    cx.stroke();
+    // groove highlight edge
+    cx.beginPath(); cx.moveTo(fx + 4, gy + 1.2); cx.lineTo(fx + fw - 4, gy + 1.2);
+    cx.strokeStyle = 'rgba(255,255,255,0.07)';
+    cx.lineWidth = 0.8;
+    cx.stroke();
+  }
+
+  // face number
+  cx.fillStyle = 'rgba(160,190,230,0.65)';
+  cx.font = 'bold 12px JetBrains Mono';
+  cx.fillText('7', fx + fw - 16, fy + fh - 6);
+
+  // labels HEEL / TOE / HIGH / LOW
+  cx.fillStyle = 'rgba(148,163,184,0.45)';
+  cx.font = '9px Inter';
+  cx.textAlign = 'center';
+  cx.fillText('HEEL', fx - 16, cy0 + 3);
+  cx.fillText('TOE', fx + fw + 16, cy0 + 3);
+  cx.fillText('HIGH', cx0, fy - 9);
+  cx.fillText('LOW', cx0, fy + fh + 14);
+  cx.textAlign = 'left';
+
+  // impact point (slightly toe-high from center, near-center = green)
+  var hFrac = 0.12, vFrac = 0.08;
+  var ix = cx0 + hFrac * fw * 1.6;
+  var iy = cy0 - vFrac * fh * 1.6;
+
+  // outer ripple rings
+  [[22, 'rgba(16,185,129,0.08)', 6],
+   [14, 'rgba(16,185,129,0.16)', 3],
+   [8,  'rgba(16,185,129,0.3)',  1.5]].forEach(function(d) {
+    cx.beginPath();
+    cx.arc(ix, iy, d[0], 0, Math.PI * 2);
+    cx.strokeStyle = d[1];
+    cx.lineWidth = d[2];
+    cx.stroke();
+  });
+  // core dot
+  var dotGrad = cx.createRadialGradient(ix - 2, iy - 2, 0, ix, iy, 6);
+  dotGrad.addColorStop(0, '#34D399');
+  dotGrad.addColorStop(1, '#10B981');
+  cx.beginPath();
+  cx.arc(ix, iy, 5, 0, Math.PI * 2);
+  cx.fillStyle = dotGrad;
+  cx.fill();
+})();
+
+// ─── SPIN BALL ANIMATION ───────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('spinCanvas');
+  var cx = cv.getContext('2d');
+  var W = 220, H = 185;
+  var bcx = W / 2, bcy = H / 2 - 10;
+  var R = 54;
+  var spinAxis = -6.5;
+  var backspin = 5940;
+  var spinSpeed = backspin / 55000;
+  var tiltRad = spinAxis * Math.PI / 180;
+  var bandY = 0;
+
+  // precompute dimple positions
+  var dimples = [];
+  for (var row = -6; row <= 6; row++) {
+    var rowR = Math.sqrt(1 - (row / 7) * (row / 7));
+    var cols = Math.max(4, Math.floor(rowR * 15));
+    for (var c = 0; c < cols; c++) {
+      var angle = (c / cols) * Math.PI * 2 + (row % 2) * 0.2;
+      var dx = rowR * 0.88 * Math.cos(angle);
+      var dy = (row / 7) * 0.88;
+      dimples.push([dx, dy]);
+    }
+  }
+
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+
+    // drop shadow
+    var shad = cx.createRadialGradient(bcx + 5, bcy + R, 2, bcx + 5, bcy + R + 6, R * 0.75);
+    shad.addColorStop(0, 'rgba(0,0,0,0.5)');
+    shad.addColorStop(1, 'rgba(0,0,0,0)');
+    cx.fillStyle = shad;
+    cx.beginPath();
+    cx.ellipse(bcx + 5, bcy + R + 4, R * 0.9, R * 0.22, 0, 0, Math.PI * 2);
+    cx.fill();
+
+    // clip to ball
+    cx.save();
+    cx.beginPath();
+    cx.arc(bcx, bcy, R, 0, Math.PI * 2);
+    cx.clip();
+
+    // base sphere gradient
+    var sg = cx.createRadialGradient(bcx - R * 0.35, bcy - R * 0.35, R * 0.05, bcx, bcy, R);
+    sg.addColorStop(0, '#f8fafc');
+    sg.addColorStop(0.25, '#e2eaf4');
+    sg.addColorStop(0.6, '#c8d4e8');
+    sg.addColorStop(1, '#8aa0bf');
+    cx.fillStyle = sg;
+    cx.fillRect(bcx - R - 2, bcy - R - 2, (R + 2) * 2, (R + 2) * 2);
+
+    // dimples
+    dimples.forEach(function(d) {
+      var px2 = bcx + d[0] * R;
+      var py2 = bcy + d[1] * R;
+      cx.beginPath();
+      cx.arc(px2, py2, 2.4, 0, Math.PI * 2);
+      cx.fillStyle = 'rgba(70,95,140,0.2)';
+      cx.fill();
+    });
+
+    // animated band — ellipse sweeping upward
+    var pos = bandY % 1.0;
+    // map 0→1 to bcy+R → bcy-R (bottom to top)
+    var bandCy = bcy + R - pos * 2 * R;
+    var yFrac = (bandCy - bcy) / R;
+    var ellRx = R * Math.sqrt(Math.max(0, 1 - yFrac * yFrac)) * 0.99;
+    var ellRy = R * 0.13;
+
+    // slight horizontal shift from tilt
+    var bandCx = bcx + yFrac * R * Math.sin(tiltRad) * 0.4;
+
+    if (ellRx > 3) {
+      var bg = cx.createLinearGradient(bandCx - ellRx, bandCy, bandCx + ellRx, bandCy);
+      bg.addColorStop(0, 'rgba(10,30,140,0)');
+      bg.addColorStop(0.12, 'rgba(25,65,195,0.88)');
+      bg.addColorStop(0.5, 'rgba(55,120,255,0.96)');
+      bg.addColorStop(0.88, 'rgba(25,65,195,0.88)');
+      bg.addColorStop(1, 'rgba(10,30,140,0)');
+      cx.beginPath();
+      cx.ellipse(bandCx, bandCy, ellRx, ellRy, tiltRad * 0.15, 0, Math.PI * 2);
+      cx.fillStyle = bg;
+      cx.fill();
+
+      // text on band when near equator
+      if (Math.abs(yFrac) < 0.38 && ellRx > 25) {
+        var fs = Math.min(13, ellRx * 0.34);
+        cx.fillStyle = 'rgba(255,255,255,0.92)';
+        cx.font = 'bold ' + fs + 'px Inter';
+        cx.textAlign = 'center';
+        cx.fillText('TP5x', bandCx, bandCy + 4);
+        cx.font = Math.min(8, ellRx * 0.22) + 'px Inter';
+        cx.fillStyle = 'rgba(255,255,255,0.72)';
+        cx.fillText('TaylorMade', bandCx, bandCy - 5);
+        cx.textAlign = 'left';
+      }
+    }
+
+    cx.restore(); // unclip
+
+    // specular highlight
+    var spec = cx.createRadialGradient(bcx - R * 0.38, bcy - R * 0.38, 1, bcx - R * 0.25, bcy - R * 0.25, R * 0.45);
+    spec.addColorStop(0, 'rgba(255,255,255,0.58)');
+    spec.addColorStop(0.55, 'rgba(255,255,255,0.1)');
+    spec.addColorStop(1, 'rgba(255,255,255,0)');
+    cx.beginPath();
+    cx.arc(bcx, bcy, R, 0, Math.PI * 2);
+    cx.fillStyle = spec;
+    cx.fill();
+
+    // ball outline
+    cx.beginPath();
+    cx.arc(bcx, bcy, R, 0, Math.PI * 2);
+    cx.strokeStyle = 'rgba(100,140,200,0.28)';
+    cx.lineWidth = 1.5;
+    cx.stroke();
+
+    // rotation arrow (backspin arc over top, tilted by spinAxis)
+    var ar = R + 16;
+    cx.save();
+    cx.translate(bcx, bcy);
+    cx.rotate(tiltRad * 0.5);
+    // arc going counter-clockwise over top
+    cx.beginPath();
+    cx.arc(0, 0, ar, -Math.PI * 0.78, -Math.PI * 0.22, false);
+    cx.strokeStyle = 'rgba(75,142,255,0.75)';
+    cx.lineWidth = 2.5;
+    cx.lineCap = 'round';
+    cx.stroke();
+    // arrowhead at end of arc
+    var ae = -Math.PI * 0.22;
+    var ax1 = Math.cos(ae) * ar, ay1 = Math.sin(ae) * ar;
+    var tangent = ae + Math.PI / 2;
+    cx.beginPath();
+    cx.moveTo(ax1, ay1);
+    cx.lineTo(ax1 + 8 * Math.cos(tangent - 0.5), ay1 + 8 * Math.sin(tangent - 0.5));
+    cx.moveTo(ax1, ay1);
+    cx.lineTo(ax1 + 8 * Math.cos(tangent + 0.5), ay1 + 8 * Math.sin(tangent + 0.5));
+    cx.strokeStyle = 'rgba(75,142,255,0.75)';
+    cx.lineWidth = 2;
+    cx.stroke();
+    cx.restore();
+  }
+
+  function animate() {
+    bandY += spinSpeed;
+    if (bandY >= 1) bandY -= 1;
+    draw();
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+})();
+
+// ─── ATTACK ANGLE ──────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('aoaCanvas');
+  var cx = cv.getContext('2d');
+  var W = 110, H = 130;
+  cx.clearRect(0, 0, W, H);
+
+  var aoa = -4.8;
+  var rad = aoa * Math.PI / 180;
+  var ox = W / 2, oy = H - 20;
+
+  // ground
+  cx.strokeStyle = 'rgba(255,255,255,0.1)';
+  cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(4, oy); cx.lineTo(W - 4, oy); cx.stroke();
+
+  // grass texture hint
+  cx.fillStyle = 'rgba(16,185,129,0.08)';
+  cx.fillRect(4, oy, W - 8, 8);
+
+  // swing path dashed
+  var pathLen = 72;
+  var ex = ox + pathLen * Math.cos(Math.PI + rad);
+  var ey = oy + pathLen * Math.sin(Math.PI + rad);
+  cx.strokeStyle = 'rgba(75,142,255,0.3)';
+  cx.lineWidth = 1.2;
+  cx.setLineDash([4, 3]);
+  cx.beginPath(); cx.moveTo(ox, oy); cx.lineTo(ex, ey); cx.stroke();
+  cx.setLineDash([]);
+
+  // iron club head silhouette
+  cx.save();
+  cx.translate(ex, ey);
+  cx.rotate(Math.PI + rad);
+  // club head (iron: thin horizontal rect)
+  var cg = cx.createLinearGradient(-14, -4, 14, 6);
+  cg.addColorStop(0, 'rgba(75,142,255,0.35)');
+  cg.addColorStop(1, 'rgba(75,142,255,0.15)');
+  roundRect(cx, -14, -4, 28, 10, 2);
+  cx.fillStyle = cg; cx.fill();
+  cx.strokeStyle = 'rgba(75,142,255,0.6)';
+  cx.lineWidth = 1.5;
+  cx.stroke();
+  // hosel
+  cx.strokeStyle = 'rgba(75,142,255,0.45)';
+  cx.lineWidth = 2;
+  cx.beginPath(); cx.moveTo(-6, -4); cx.lineTo(-6, -18); cx.stroke();
+  cx.restore();
+
+  // angle arc
+  cx.strokeStyle = '#22D3EE';
+  cx.lineWidth = 1.8;
+  cx.beginPath();
+  cx.arc(ox, oy, 24, Math.PI + rad, Math.PI, true);
+  cx.stroke();
+
+  // angle label
+  cx.fillStyle = '#22D3EE';
+  cx.font = 'bold 11px JetBrains Mono';
+  cx.textAlign = 'center';
+  cx.fillText(aoa + '°', ox - 2, oy - 32);
+  cx.textAlign = 'left';
+})();
+
+// ─── PATH & FACE ───────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('pathCanvas');
+  var cx = cv.getContext('2d');
+  var W = 110, H = 130;
+  cx.clearRect(0, 0, W, H);
+
+  var cx0 = W / 2, cy0 = H / 2 + 8;
+  var clubPath = -1.2, faceAngle = -2.1;
+  var pathRad = clubPath * Math.PI / 180;
+  var faceRad = faceAngle * Math.PI / 180;
+
+  // target line (dashed center)
+  cx.strokeStyle = 'rgba(255,255,255,0.08)';
+  cx.lineWidth = 1;
+  cx.setLineDash([3, 3]);
+  cx.beginPath(); cx.moveTo(cx0, 10); cx.lineTo(cx0, H - 10); cx.stroke();
+  cx.setLineDash([]);
+
+  cx.save();
+  cx.translate(cx0, cy0);
+
+  // club head top-down (iron: elongated horizontal rect)
+  cx.save();
+  cx.rotate(pathRad);
+  var hg = cx.createLinearGradient(-18, -7, 18, 7);
+  hg.addColorStop(0, 'rgba(75,142,255,0.2)');
+  hg.addColorStop(1, 'rgba(75,142,255,0.08)');
+  roundRect(cx, -18, -7, 36, 14, 3);
+  cx.fillStyle = hg; cx.fill();
+  cx.strokeStyle = 'rgba(75,142,255,0.5)';
+  cx.lineWidth = 1.5;
+  cx.stroke();
+  cx.restore();
+
+  // path arrow (emerald)
+  var pLen = 40;
+  var px1 = -Math.sin(pathRad) * pLen, py1 = -Math.cos(pathRad) * pLen;
+  var px2 = Math.sin(pathRad) * pLen, py2 = Math.cos(pathRad) * pLen;
+  cx.strokeStyle = '#10B981';
+  cx.lineWidth = 2;
+  cx.beginPath(); cx.moveTo(px1, py1); cx.lineTo(px2, py2); cx.stroke();
+  // arrowhead tip
+  var pa = Math.atan2(py2 - py1, px2 - px1);
+  cx.fillStyle = '#10B981';
+  cx.beginPath();
+  cx.moveTo(px2, py2);
+  cx.lineTo(px2 - 8 * Math.cos(pa - 0.4), py2 - 8 * Math.sin(pa - 0.4));
+  cx.lineTo(px2 - 8 * Math.cos(pa + 0.4), py2 - 8 * Math.sin(pa + 0.4));
+  cx.closePath(); cx.fill();
+
+  // face angle indicator (cyan)
+  cx.strokeStyle = '#22D3EE';
+  cx.lineWidth = 2;
+  var fLen = 22;
+  cx.beginPath();
+  cx.moveTo(-Math.sin(faceRad) * fLen, -Math.cos(faceRad) * fLen - 7);
+  cx.lineTo(Math.sin(faceRad) * fLen, Math.cos(faceRad) * fLen - 7);
+  cx.stroke();
+
+  // face-to-path arc
+  cx.beginPath();
+  cx.arc(0, 0, 16, -Math.PI / 2 + pathRad, -Math.PI / 2 + faceRad, false);
+  cx.strokeStyle = 'rgba(245,158,11,0.45)';
+  cx.lineWidth = 1.5;
+  cx.stroke();
+
+  cx.restore();
+
+  // labels
+  cx.font = '8px Inter';
+  cx.textAlign = 'center';
+  cx.fillStyle = '#10B981';
+  cx.fillText('Path ' + clubPath + '°', W / 2, H - 14);
+  cx.fillStyle = '#22D3EE';
+  cx.fillText('Face ' + faceAngle + '°', W / 2, H - 4);
+  cx.textAlign = 'left';
+})();
+
+// ─── TRAJECTORY OVERVIEW ───────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('trajCanvas');
+  var cx = cv.getContext('2d');
+  var W = 600, H = 160;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = 'rgba(0,0,0,0)';
+
+  var carry = 168, total = 181, apex = 31;
+  var groundY = H - 24;
+  var drawW = W - 60;
+
+  // grid
+  cx.strokeStyle = 'rgba(255,255,255,0.04)';
+  cx.lineWidth = 1;
+  for (var i = 1; i <= 5; i++) {
+    cx.beginPath(); cx.moveTo(30, groundY - i * ((groundY - 10) / 5)); cx.lineTo(W - 10, groundY - i * ((groundY - 10) / 5)); cx.stroke();
+  }
+
+  var cf = carry / total;
+  var maxH2 = (groundY - 12) * 0.88;
+  var pts2 = [];
+  for (var i = 0; i <= 100; i++) {
+    var t = i / 100;
+    var x = 32 + t * drawW;
+    var h;
+    if (t <= cf) h = (t / cf) * (1 - t / cf) * 4 * maxH2 * 0.96;
+    else h = ((1 - t) / (1 - cf)) * ((t - cf) / (1 - cf)) * 4 * maxH2 * 0.7;
+    pts2.push([x, groundY - Math.max(0, h)]);
+  }
+
+  var g2 = cx.createLinearGradient(0, 8, 0, groundY);
+  g2.addColorStop(0, 'rgba(75,142,255,0.12)');
+  g2.addColorStop(1, 'rgba(75,142,255,0)');
+  cx.beginPath();
+  cx.moveTo(pts2[0][0], groundY);
+  pts2.forEach(function(p) { cx.lineTo(p[0], p[1]); });
+  cx.lineTo(pts2[pts2.length - 1][0], groundY);
+  cx.closePath();
+  cx.fillStyle = g2; cx.fill();
+
+  cx.beginPath();
+  pts2.forEach(function(p, i) { if (i === 0) cx.moveTo(p[0], p[1]); else cx.lineTo(p[0], p[1]); });
+  cx.strokeStyle = '#4B8EFF';
+  cx.lineWidth = 2;
+  cx.stroke();
+
+  // ground
+  cx.strokeStyle = 'rgba(255,255,255,0.08)';
+  cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(28, groundY); cx.lineTo(W - 8, groundY); cx.stroke();
+
+  // axis labels
+  cx.fillStyle = 'rgba(148,163,184,0.4)';
+  cx.font = '10px JetBrains Mono';
+  cx.fillText('0', 18, groundY + 2);
+  cx.fillText(total + 'y', W - 34, groundY + 12);
+  cx.fillText(apex + 'y', 4, 16);
+})();
+
+// ─── ACCURACY GAUGE ────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('gaugeCanvas');
+  var cx = cv.getContext('2d');
+  var W = 220, H = 130;
+  cx.clearRect(0, 0, W, H);
+  var gcx = W / 2, gcy = H - 8, gr = 88;
+  var val = 0.79;
+
+  // track background
+  cx.beginPath();
+  cx.arc(gcx, gcy, gr, Math.PI, 0, false);
+  cx.strokeStyle = 'rgba(255,255,255,0.06)';
+  cx.lineWidth = 14;
+  cx.lineCap = 'butt';
+  cx.stroke();
+
+  // colored arc
+  var cg = cx.createLinearGradient(gcx - gr, gcy, gcx + gr, gcy);
+  cg.addColorStop(0, '#4B8EFF');
+  cg.addColorStop(0.5, '#22D3EE');
+  cg.addColorStop(1, '#10B981');
+  cx.beginPath();
+  cx.arc(gcx, gcy, gr, Math.PI, Math.PI + val * Math.PI, false);
+  cx.strokeStyle = cg;
+  cx.lineWidth = 14;
+  cx.lineCap = 'round';
+  cx.stroke();
+
+  // inner track glow
+  cx.beginPath();
+  cx.arc(gcx, gcy, gr, Math.PI, Math.PI + val * Math.PI, false);
+  cx.strokeStyle = 'rgba(75,142,255,0.2)';
+  cx.lineWidth = 22;
+  cx.lineCap = 'round';
+  cx.stroke();
+
+  // tick marks
+  for (var ti = 0; ti <= 10; ti++) {
+    var ta = Math.PI + (ti / 10) * Math.PI;
+    var r1 = gr + 10, r2 = gr + 17;
+    cx.strokeStyle = ti % 5 === 0 ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)';
+    cx.lineWidth = ti % 5 === 0 ? 1.5 : 1;
+    cx.beginPath();
+    cx.moveTo(gcx + r1 * Math.cos(ta), gcy + r1 * Math.sin(ta));
+    cx.lineTo(gcx + r2 * Math.cos(ta), gcy + r2 * Math.sin(ta));
+    cx.stroke();
+  }
+
+  // min/max labels
+  cx.fillStyle = 'rgba(148,163,184,0.4)';
+  cx.font = '10px JetBrains Mono';
+  cx.fillText('0', gcx - gr - 16, gcy + 4);
+  cx.textAlign = 'right';
+  cx.fillText('100', gcx + gr + 6, gcy + 4);
+  cx.textAlign = 'left';
+})();
+
+// ─── DISPERSION ────────────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('dispCanvas');
+  var cx = cv.getContext('2d');
+  var W = 600, H = 210;
+  cx.clearRect(0, 0, W, H);
+
+  var cx0 = W / 2, cy0 = H - 18;
+
+  // fairway band
+  var fw = cx.createLinearGradient(cx0 - 70, 0, cx0 + 70, 0);
+  fw.addColorStop(0, 'rgba(16,185,129,0)');
+  fw.addColorStop(0.25, 'rgba(16,185,129,0.05)');
+  fw.addColorStop(0.75, 'rgba(16,185,129,0.05)');
+  fw.addColorStop(1, 'rgba(16,185,129,0)');
+  cx.fillStyle = fw;
+  cx.fillRect(cx0 - 70, 8, 140, H - 30);
+
+  // center line
+  cx.strokeStyle = 'rgba(255,255,255,0.06)';
+  cx.lineWidth = 1;
+  cx.setLineDash([4, 4]);
+  cx.beginPath(); cx.moveTo(cx0, cy0); cx.lineTo(cx0, 12); cx.stroke();
+  cx.setLineDash([]);
+
+  // target line
+  var targetY = 38;
+  cx.strokeStyle = 'rgba(245,158,11,0.18)';
+  cx.lineWidth = 1;
+  cx.setLineDash([5, 4]);
+  cx.beginPath(); cx.moveTo(20, targetY); cx.lineTo(W - 20, targetY); cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle = 'rgba(245,158,11,0.4)';
+  cx.font = '9px Inter';
+  cx.fillText('Target 168y', 22, targetY - 4);
+
+  // dots data
+  var shots = [
+    {x: 0,   y: 168, r: 'A', cur: false},
+    {x: -8,  y: 168, r: 'A', cur: true},
+    {x: 5,   y: 163, r: 'B', cur: false},
+    {x: -12, y: 172, r: 'B', cur: false},
+    {x: 3,   y: 158, r: 'C', cur: false},
+    {x: -6,  y: 165, r: 'A', cur: false},
+    {x: 15,  y: 170, r: 'C', cur: false},
+    {x: -4,  y: 175, r: 'B', cur: false},
+    {x: 8,   y: 161, r: 'C', cur: false},
+    {x: -18, y: 166, r: 'D', cur: false},
+    {x: 2,   y: 169, r: 'A', cur: false},
+    {x: -9,  y: 162, r: 'B', cur: false},
+    {x: 6,   y: 171, r: 'B', cur: false},
+    {x: -3,  y: 174, r: 'A', cur: false}
+  ];
+
+  var maxDist = 185, maxLat = 35;
+  var scaleY = (H - 55) / maxDist;
+  var scaleX = (W / 2 - 28) / maxLat;
+  var rankC = {S: '#38BDF8', A: '#10B981', B: '#A3E635', C: '#F59E0B', D: '#FB923C'};
+
+  // dispersion ellipse
+  cx.save();
+  cx.translate(cx0 - 4, cy0 - 166 * scaleY);
+  cx.strokeStyle = 'rgba(75,142,255,0.18)';
+  cx.lineWidth = 1.5;
+  cx.setLineDash([3, 3]);
+  cx.beginPath();
+  cx.ellipse(0, 0, 21 * scaleX, 13 * scaleY, 0, 0, Math.PI * 2);
+  cx.stroke();
+  cx.setLineDash([]);
+  cx.restore();
+
+  shots.forEach(function(d) {
+    var px2 = cx0 + d.x * scaleX;
+    var py2 = cy0 - d.y * scaleY;
+    var col = rankC[d.r] || '#94A3B8';
+
+    if (d.cur) {
+      // current shot — larger with glow
+      cx.beginPath(); cx.arc(px2, py2, 16, 0, Math.PI * 2);
+      cx.fillStyle = 'rgba(16,185,129,0.06)'; cx.fill();
+      cx.beginPath(); cx.arc(px2, py2, 9, 0, Math.PI * 2);
+      cx.fillStyle = 'rgba(16,185,129,0.15)'; cx.fill();
+      cx.beginPath(); cx.arc(px2, py2, 6, 0, Math.PI * 2);
+      cx.fillStyle = col; cx.fill();
+      cx.strokeStyle = col;
+      cx.lineWidth = 1.5;
+      cx.stroke();
+    } else {
+      cx.beginPath(); cx.arc(px2, py2, 4, 0, Math.PI * 2);
+      cx.globalAlpha = 0.55;
+      cx.fillStyle = col; cx.fill();
+      cx.globalAlpha = 1;
     }
   });
-  ctx.restore();
-  // blue brand band
-  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
-  ctx.fillStyle='rgba(0,80,160,0.72)';ctx.fillRect(cx-r,cy-r*.18,r*2,r*.36);
-  ctx.font=`bold ${r*.28}px Arial`;ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('TP5x',cx,cy);
-  ctx.font=`${r*.14}px Arial`;ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fillText('TaylorMade',cx,cy-r*.28);
-  ctx.restore();
-  // specular
-  const sg=ctx.createRadialGradient(cx-r*.28,cy-r*.32,0,cx-r*.28,cy-r*.32,r*.55);
-  sg.addColorStop(0,'rgba(255,255,255,0.52)');sg.addColorStop(0.5,'rgba(255,255,255,0.1)');sg.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
-  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.lineWidth=2;ctx.stroke();
-  // spin arrow — draw = slightly left
-  const spinAxis=-6.5;
-  const arrowAngle=(spinAxis*Math.PI/180)-Math.PI/2;
-  const arLen=r*.9;
-  const ax=cx+Math.cos(arrowAngle)*(r+8),ay=cy+Math.sin(arrowAngle)*(r+8);
-  const bx=cx+Math.cos(arrowAngle)*(r+8+arLen),by=cy+Math.sin(arrowAngle)*(r+8+arLen);
-  ctx.strokeStyle='#00FFD1';ctx.lineWidth=2.5;ctx.lineCap='round';
-  ctx.shadowColor='#00FFD1';ctx.shadowBlur=8;
-  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();
-  ctx.fillStyle='#00FFD1';
-  ctx.beginPath();ctx.moveTo(bx,by);
-  ctx.lineTo(bx-8*Math.cos(arrowAngle-.4),by-8*Math.sin(arrowAngle-.4));
-  ctx.lineTo(bx-8*Math.cos(arrowAngle+.4),by-8*Math.sin(arrowAngle+.4));
-  ctx.closePath();ctx.fill();ctx.shadowBlur=0;
-  // arc
-  ctx.strokeStyle='rgba(0,255,209,0.3)';ctx.lineWidth=1.2;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.arc(cx,cy,r+5,-Math.PI/2,arrowAngle,spinAxis<0);ctx.stroke();ctx.setLineDash([]);
+
+  // Y-axis labels
+  cx.fillStyle = 'rgba(148,163,184,0.35)';
+  cx.font = '9px JetBrains Mono';
+  cx.textAlign = 'right';
+  [150, 160, 170, 180].forEach(function(v) {
+    cx.fillText(v + 'y', 28, cy0 - v * scaleY + 3);
+  });
+
+  // X-axis labels
+  cx.textAlign = 'center';
+  [-20, -10, 0, 10, 20].forEach(function(v) {
+    cx.fillText(v > 0 ? '+' + v : v, cx0 + v * scaleX, cy0 + 12);
+  });
+  cx.textAlign = 'left';
 })();
 
-// ── Club Side ─────────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('clubSideCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height; const s=1.1;
-  const cx=W*.42,cy=H*.56;
-  grid(ctx,W,H);
-  // ground
-  ctx.strokeStyle='rgba(57,255,20,0.18)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(0,cy+14*s);ctx.lineTo(W,cy+14*s);ctx.stroke();
-  // swing path dashed
-  const aoa=-4.8,pathAng=(aoa*Math.PI/180);
-  ctx.strokeStyle='rgba(57,255,20,0.25)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-  ctx.beginPath();ctx.moveTo(cx-Math.cos(pathAng)*55,cy-Math.sin(pathAng)*55);
-  ctx.lineTo(cx+Math.cos(pathAng)*20,cy+Math.sin(pathAng)*20);ctx.stroke();ctx.setLineDash([]);
-  // AoA arc
-  ctx.strokeStyle='rgba(57,255,20,0.4)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.arc(cx,cy,26,0,pathAng,pathAng<0);ctx.stroke();ctx.setLineDash([]);
-  // iron head
-  ctx.save();ctx.translate(cx,cy);ctx.rotate(pathAng);
-  ctx.beginPath();ctx.rect(-2*s,-26*s,4*s,26*s);ctx.fillStyle='#8899aa';ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(-6*s,0);ctx.lineTo(-6*s,12*s);ctx.lineTo(22*s,10*s);ctx.lineTo(22*s,2*s);ctx.lineTo(8*s,0);ctx.closePath();
-  const hg=ctx.createLinearGradient(-6*s,0,22*s,12*s);hg.addColorStop(0,'#3a4a5a');hg.addColorStop(1,'#1a2530');
-  ctx.fillStyle=hg;ctx.fill();ctx.strokeStyle='rgba(57,255,20,0.25)';ctx.lineWidth=1;ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-6*s,0);ctx.lineTo(-6*s,12*s);
-  ctx.strokeStyle='#39FF14';ctx.lineWidth=2;ctx.shadowColor='#39FF14';ctx.shadowBlur=5;ctx.stroke();ctx.shadowBlur=0;
-  ctx.restore();
-  ctx.fillStyle='#39FF14';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('AoA: -4.8°',W*.76,cy-6);
-  ctx.fillStyle='rgba(57,255,20,0.25)';ctx.font='8px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('SIDE VIEW · AOA',3,10);
-})();
+// ─── PERFORMANCE TREND ─────────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('trendCanvas');
+  var cx = cv.getContext('2d');
+  var W = 600, H = 210;
+  cx.clearRect(0, 0, W, H);
 
-// ── Club Top ──────────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('clubTopCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height; const s=1.1;
-  const cx=W*.4,cy=H*.55;
-  grid(ctx,W,H);
-  // target line
-  ctx.strokeStyle='rgba(57,255,20,0.2)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-  ctx.beginPath();ctx.moveTo(cx,H);ctx.lineTo(cx,0);ctx.stroke();ctx.setLineDash([]);
-  const cp=-1.2,ft=-2.1;
-  const cpAng=(cp*Math.PI/180)-Math.PI/2;
-  const ftAng=(ft*Math.PI/180)-Math.PI/2;
-  // path arrow
-  const arLen=50,bx=cx+Math.cos(cpAng)*arLen,by=cy+Math.sin(cpAng)*arLen;
-  ctx.strokeStyle='rgba(57,255,20,0.5)';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(cx-Math.cos(cpAng)*22,cy-Math.sin(cpAng)*22);ctx.lineTo(bx,by);ctx.stroke();
-  ctx.fillStyle='#39FF14';
-  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx-7*Math.cos(cpAng-.35),by-7*Math.sin(cpAng-.35));
-  ctx.lineTo(bx-7*Math.cos(cpAng+.35),by-7*Math.sin(cpAng+.35));ctx.closePath();ctx.fill();
-  // arcs
-  ctx.strokeStyle='rgba(57,255,20,0.35)';ctx.lineWidth=1.2;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.arc(cx,cy,26,-Math.PI/2,cpAng,cp<0);ctx.stroke();
-  ctx.strokeStyle='rgba(0,255,209,0.45)';
-  ctx.beginPath();ctx.arc(cx,cy,16,-Math.PI/2,ftAng,ft<0);ctx.stroke();ctx.setLineDash([]);
-  // iron head top
-  ctx.save();ctx.translate(cx,cy);ctx.rotate(cpAng);
-  ctx.beginPath();ctx.rect(-2*s,-34*s,4*s,34*s);ctx.fillStyle='#8899aa';ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(-4*s,0);ctx.lineTo(-4*s,8*s);ctx.lineTo(26*s,6*s);ctx.lineTo(26*s,-2*s);ctx.closePath();
-  const tg=ctx.createLinearGradient(-4*s,0,26*s,0);tg.addColorStop(0,'#3a4a5a');tg.addColorStop(1,'#1a2530');
-  ctx.fillStyle=tg;ctx.fill();ctx.strokeStyle='rgba(57,255,20,0.25)';ctx.lineWidth=1;ctx.stroke();
-  ctx.restore();
-  // face angle line
-  ctx.save();ctx.translate(cx,cy);ctx.rotate(ftAng);
-  ctx.beginPath();ctx.moveTo(-4*s,0);ctx.lineTo(-4*s,8*s);
-  ctx.strokeStyle='#00FFD1';ctx.lineWidth=2.5;ctx.shadowColor='#00FFD1';ctx.shadowBlur=5;ctx.stroke();ctx.shadowBlur=0;
-  ctx.restore();
-  // labels
-  ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillStyle='#39FF14';ctx.fillText('Path: -1.2°',W*.78,cy-16);
-  ctx.fillStyle='#00FFD1';ctx.fillText('Face: -2.1°',W*.78,cy);
-  ctx.fillStyle='rgba(57,255,20,0.25)';ctx.font='8px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('TOP · PATH/FACE',3,10);
-})();
+  var carryData = [155, 159, 158, 163, 161, 165, 161, 164, 166, 163, 165, 167, 168, 168];
+  var smashData = [1.38, 1.40, 1.41, 1.42, 1.41, 1.43, 1.42, 1.43, 1.44, 1.43, 1.44, 1.45, 1.44, 1.45];
+  var N = carryData.length;
+  var pad = {l: 44, r: 18, t: 16, b: 30};
+  var iW = W - pad.l - pad.r;
+  var iH = H - pad.t - pad.b;
+  var carryMin = 150, carryMax = 175;
 
-// ── Legacy Trajectory ─────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('legacyCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  grid(ctx,W,H);
-  const carry=168,apex=31;
-  const scaleX=(W-60)/Math.max(carry*1.1,50);
-  const scaleY=(H-40)/Math.max(apex*2.2,30);
-  const baseY=H-20,startX=30,landX=startX+carry*scaleX;
-  ctx.strokeStyle='rgba(57,255,20,0.15)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(0,baseY);ctx.lineTo(W,baseY);ctx.stroke();
-  const pts=[];
-  for(let i=0;i<=80;i++){const t=i/80;pts.push({x:startX+t*carry*scaleX,y:baseY-(4*apex*t*(1-t))*scaleY})}
-  ctx.strokeStyle='rgba(57,255,20,0.1)';ctx.lineWidth=6;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
-  const g=ctx.createLinearGradient(startX,baseY,landX,baseY);
-  g.addColorStop(0,'rgba(57,255,20,0.9)');g.addColorStop(0.5,'rgba(0,255,209,0.9)');g.addColorStop(1,'rgba(57,255,20,0.4)');
-  ctx.strokeStyle=g;ctx.lineWidth=2.5;ctx.shadowColor='#39FF14';ctx.shadowBlur=8;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();ctx.shadowBlur=0;
-  const ap=pts[40];
-  ctx.fillStyle='#00FFD1';ctx.shadowColor='#00FFD1';ctx.shadowBlur=10;
-  ctx.beginPath();ctx.arc(ap.x,ap.y,4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(0,255,209,0.8)';ctx.font='10px JetBrains Mono';ctx.fillText('31y',ap.x+6,ap.y-4);
-  [startX,landX].forEach(x=>{ctx.fillStyle='#39FF14';ctx.shadowColor='#39FF14';ctx.shadowBlur=8;
-    ctx.beginPath();ctx.arc(x,baseY,5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;});
-  ctx.fillStyle='rgba(57,255,20,0.7)';ctx.font='10px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('168y',landX,baseY+14);ctx.textAlign='left';ctx.fillText('7 Iron',startX,baseY+14);
-  ctx.fillStyle='rgba(0,255,150,0.6)';ctx.fillText('-8y L',landX-14,baseY+26);
-})();
+  function px(i) { return pad.l + (i / (N - 1)) * iW; }
+  function pyC(v) { return pad.t + iH - (v - carryMin) / (carryMax - carryMin) * iH; }
+  var sfMin = 1.35, sfMax = 1.50;
+  function pySF(v) { return pad.t + iH - (v - sfMin) / (sfMax - sfMin) * iH; }
 
-// ── Accuracy Gauge ────────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('gaugeCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  const cx=W/2,cy=H*.6,r=Math.min(W,H)*.38;
-  const pct=0.79;
-  // bg arc
-  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,0,false);
-  ctx.strokeStyle='rgba(57,255,20,0.1)';ctx.lineWidth=14;ctx.lineCap='round';ctx.stroke();
-  // value arc
-  const g=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
-  g.addColorStop(0,'#39FF14');g.addColorStop(1,'#00FFD1');
-  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,Math.PI+Math.PI*pct,false);
-  ctx.strokeStyle=g;ctx.lineWidth=14;ctx.shadowColor='#39FF14';ctx.shadowBlur=12;ctx.stroke();ctx.shadowBlur=0;
-  // text
-  ctx.fillStyle='#39FF14';ctx.font='bold 28px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('79%',cx,cy-8);
-  ctx.fillStyle='#475569';ctx.font='9px JetBrains Mono';ctx.fillText('IN TARGET',cx,cy+14);
-  // ticks
-  for(let i=0;i<=10;i++){
-    const a=Math.PI+i*(Math.PI/10);
-    const x1=cx+Math.cos(a)*(r-18),y1=cy+Math.sin(a)*(r-18);
-    const x2=cx+Math.cos(a)*(r-10),y2=cy+Math.sin(a)*(r-10);
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
-    ctx.strokeStyle='rgba(57,255,20,0.2)';ctx.lineWidth=1;ctx.stroke();
+  // grid
+  cx.strokeStyle = 'rgba(255,255,255,0.04)';
+  cx.lineWidth = 1;
+  for (var g = 1; g <= 4; g++) {
+    cx.beginPath(); cx.moveTo(pad.l, pad.t + g * iH / 4); cx.lineTo(W - pad.r, pad.t + g * iH / 4); cx.stroke();
   }
+
+  // carry area fill
+  var ca = cx.createLinearGradient(0, pad.t, 0, pad.t + iH);
+  ca.addColorStop(0, 'rgba(245,158,11,0.18)');
+  ca.addColorStop(1, 'rgba(245,158,11,0)');
+  cx.beginPath();
+  cx.moveTo(px(0), pad.t + iH);
+  carryData.forEach(function(v, i) { cx.lineTo(px(i), pyC(v)); });
+  cx.lineTo(px(N - 1), pad.t + iH);
+  cx.closePath();
+  cx.fillStyle = ca; cx.fill();
+
+  // carry line
+  cx.beginPath();
+  carryData.forEach(function(v, i) { if (i === 0) cx.moveTo(px(i), pyC(v)); else cx.lineTo(px(i), pyC(v)); });
+  cx.strokeStyle = '#F59E0B';
+  cx.lineWidth = 2;
+  cx.stroke();
+
+  // smash factor line
+  cx.beginPath();
+  smashData.forEach(function(v, i) { if (i === 0) cx.moveTo(px(i), pySF(v)); else cx.lineTo(px(i), pySF(v)); });
+  cx.strokeStyle = '#4B8EFF';
+  cx.lineWidth = 1.5;
+  cx.setLineDash([4, 3]);
+  cx.stroke();
+  cx.setLineDash([]);
+
+  // end dots
+  [
+    [px(N - 1), pyC(carryData[N - 1]), '#F59E0B'],
+    [px(N - 1), pySF(smashData[N - 1]), '#4B8EFF']
+  ].forEach(function(d) {
+    cx.beginPath(); cx.arc(d[0], d[1], 4, 0, Math.PI * 2);
+    cx.fillStyle = d[2]; cx.fill();
+    cx.strokeStyle = d[2] + '44'; cx.lineWidth = 6; cx.stroke();
+  });
+
+  // Y axis labels (carry)
+  cx.fillStyle = 'rgba(148,163,184,0.4)';
+  cx.font = '9px JetBrains Mono';
+  cx.textAlign = 'right';
+  for (var j = 0; j <= 4; j++) {
+    var v = carryMin + (j / 4) * (carryMax - carryMin);
+    cx.fillText(v + 'y', pad.l - 4, pyC(v) + 3);
+  }
+
+  // X axis shot numbers
+  cx.textAlign = 'center';
+  cx.fillStyle = 'rgba(148,163,184,0.3)';
+  cx.font = '9px Inter';
+  [1, 4, 7, 10, 14].forEach(function(n) {
+    var idx = n - 1;
+    if (idx >= 0 && idx < N) cx.fillText('#' + n, px(idx), H - 8);
+  });
+  cx.textAlign = 'left';
+
+  // legend
+  var legY = pad.t + 6;
+  cx.strokeStyle = '#F59E0B'; cx.lineWidth = 2; cx.setLineDash([]);
+  cx.beginPath(); cx.moveTo(pad.l, legY); cx.lineTo(pad.l + 20, legY); cx.stroke();
+  cx.fillStyle = 'rgba(148,163,184,0.55)'; cx.font = '9px Inter';
+  cx.fillText('Carry (y)', pad.l + 24, legY + 3);
+
+  cx.strokeStyle = '#4B8EFF'; cx.lineWidth = 1.5; cx.setLineDash([4, 3]);
+  cx.beginPath(); cx.moveTo(pad.l + 90, legY); cx.lineTo(pad.l + 110, legY); cx.stroke();
+  cx.setLineDash([]);
+  cx.fillText('Smash Factor', pad.l + 114, legY + 3);
 })();
 
-// ── Dispersion ────────────────────────────────────────────────────────────────
-(function(){
-  const area=document.getElementById('dispArea');
-  const W=area.offsetWidth,H=area.offsetHeight||180;
-  const shots=[
-    {x:-3,c:168},{x:8,c:172},{x:-12,c:165},{x:5,c:170},{x:-8,c:168},{x:22,c:158},
-    {x:-2,c:171},{x:18,c:163},{x:-15,c:167},{x:4,c:169},{x:-6,c:172},{x:12,c:166},
-    {x:-20,c:161},{x:-8,c:168}
+// ─── SHOT HISTORY TABLE ────────────────────────────────────────────────────
+(function() {
+  var rows = [
+    {n: 14, club: '7 Iron', bs: 124.8, sf: 1.45, carry: 168, shape: 'Draw', spin: 6120, rank: 'A'},
+    {n: 13, club: '7 Iron', bs: 123.6, sf: 1.43, carry: 165, shape: 'Draw', spin: 6300, rank: 'A'},
+    {n: 12, club: '7 Iron', bs: 121.2, sf: 1.42, carry: 161, shape: 'Str',  spin: 6180, rank: 'B'},
+    {n: 11, club: '7 Iron', bs: 125.1, sf: 1.44, carry: 167, shape: 'Draw', spin: 6050, rank: 'A'},
+    {n: 10, club: '7 Iron', bs: 119.8, sf: 1.39, carry: 158, shape: 'Fade', spin: 6640, rank: 'C'},
+    {n: 9,  club: '7 Iron', bs: 122.4, sf: 1.42, carry: 163, shape: 'Draw', spin: 6210, rank: 'B'},
+    {n: 8,  club: '7 Iron', bs: 126.3, sf: 1.46, carry: 170, shape: 'Draw', spin: 5980, rank: 'S'}
   ];
-  const maxLat=30,maxCarry=180,minCarry=155;
-  shots.forEach((s,i)=>{
-    const px=50+s.x/maxLat*38; // % left
-    const py=85-(s.c-minCarry)/(maxCarry-minCarry)*70; // % top
-    const div=document.createElement('div');
-    div.className='disp-dot';
-    const isLast=i===shots.length-1;
-    div.style.cssText=`left:${px}%;top:${py}%;background:${isLast?'#39FF14':Math.abs(s.x)<10?'rgba(57,255,20,0.55)':'rgba(255,107,53,0.55)'};
-      box-shadow:${isLast?'0 0 8px #39FF14':'none'};width:${isLast?'10px':'7px'};height:${isLast?'10px':'7px'}`;
-    area.appendChild(div);
-  });
-})();
-
-// ── Performance Trend ─────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('trendCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  grid(ctx,W,H);
-  const vals=[165,172,158,168,174,163,170,165,172,178,166,171,174,168];
-  const minV=150,maxV=185;
-  const pts=vals.map((v,i)=>({
-    x:30+i*(W-50)/(vals.length-1),
-    y:H-25-(v-minV)/(maxV-minV)*(H-50)
-  }));
-  // area fill
-  const ag=ctx.createLinearGradient(0,30,0,H-20);
-  ag.addColorStop(0,'rgba(57,255,20,0.15)');ag.addColorStop(1,'rgba(57,255,20,0)');
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.lineTo(pts[pts.length-1].x,H-20);ctx.lineTo(pts[0].x,H-20);ctx.closePath();
-  ctx.fillStyle=ag;ctx.fill();
-  // line
-  ctx.strokeStyle='#39FF14';ctx.lineWidth=2;ctx.shadowColor='#39FF14';ctx.shadowBlur=6;
-  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();ctx.shadowBlur=0;
-  // dots
-  pts.forEach((p,i)=>{
-    ctx.fillStyle=i===pts.length-1?'#00FFD1':'#39FF14';
-    ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fill();
-  });
-  // labels
-  ctx.fillStyle='rgba(57,255,20,0.4)';ctx.font='9px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('CARRY (yds)',4,14);
-  [155,165,175,185].forEach(v=>{
-    const y=H-25-(v-minV)/(maxV-minV)*(H-50);
-    ctx.fillStyle='rgba(57,255,20,0.2)';ctx.font='8px JetBrains Mono';ctx.textAlign='right';
-    ctx.fillText(v,26,y+3);
-    ctx.strokeStyle='rgba(57,255,20,0.05)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(28,y);ctx.lineTo(W,y);ctx.stroke();
-  });
-})();
-
-// ── History Table ─────────────────────────────────────────────────────────────
-(function(){
-  const rows=[
-    {n:14,club:'7 Iron',bs:124.8,sm:1.45,c:168,shape:'draw',spin:6120,rank:'A'},
-    {n:13,club:'7 Iron',bs:121.2,sm:1.42,c:165,shape:'straight',spin:6380,rank:'B'},
-    {n:12,club:'8 Iron',bs:118.4,sm:1.43,c:155,shape:'fade',spin:6910,rank:'B'},
-    {n:11,club:'7 Iron',bs:125.6,sm:1.46,c:171,shape:'straight',spin:5980,rank:'A'},
-    {n:10,club:'Driver',bs:165.2,sm:1.48,c:272,shape:'straight',spin:2420,rank:'S+'},
-    {n:9, club:'7 Iron',bs:116.8,sm:1.40,c:161,shape:'slice',spin:7140,rank:'C'},
-    {n:8, club:'PW',    bs:104.1,sm:1.41,c:124,shape:'straight',spin:8720,rank:'A'},
-  ];
-  const rankClass={S:'chip-sp','S+':'chip-sp',A:'chip-a',B:'chip-b',C:'chip-c',D:'chip-d'};
-  const shapeClass={draw:'shape-draw',fade:'shape-fade',straight:'shape-str',slice:'shape-fade'};
-  const tbody=document.getElementById('historyBody');
-  rows.forEach(r=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td style="color:#475569">${r.n}</td>
-      <td style="color:#e2e8f0;font-weight:600">${r.club}</td>
-      <td style="color:#e2e8f0">${r.bs}</td>
-      <td style="color:#39FF14;font-weight:700">${r.sm}</td>
-      <td style="color:#39FF14;font-weight:700">${r.c}y</td>
-      <td class="${shapeClass[r.shape]||'shape-str'}" style="text-transform:capitalize">${r.shape}</td>
-      <td style="color:#94a3b8">${r.spin.toLocaleString()}</td>
-      <td><span class="rank-chip ${rankClass[r.rank]||'chip-c'}">${r.rank}</span></td>`;
+  var tbody = document.getElementById('historyBody');
+  rows.forEach(function(r, idx) {
+    var shapeClass = r.shape === 'Draw' ? 'shape-draw' : r.shape === 'Fade' ? 'shape-fade' : 'shape-str';
+    var tr = document.createElement('tr');
+    if (idx === 0) tr.style.background = 'rgba(75,142,255,0.04)';
+    tr.innerHTML =
+      '<td class="mono" style="color:var(--text3)">' + r.n + '</td>' +
+      '<td style="color:var(--text2)">' + r.club + '</td>' +
+      '<td class="mono">' + r.bs + '</td>' +
+      '<td class="mono" style="color:#4B8EFF">' + r.sf + '</td>' +
+      '<td class="mono" style="color:#F59E0B">' + r.carry + 'y</td>' +
+      '<td><span class="shape-pill ' + shapeClass + '">' + r.shape + '</span></td>' +
+      '<td class="mono" style="color:var(--text2)">' + r.spin + '</td>' +
+      '<td><span class="rank-mini rank-' + r.rank + '">' + r.rank + '</span></td>';
     tbody.appendChild(tr);
   });
 })();
 
-// ── Club Distribution ─────────────────────────────────────────────────────────
-(function(){
-  const c=setSize('clubDistCanvas'); const ctx=c.getContext('2d');
-  const W=c.width,H=c.height;
-  const clubs=[{n:'DR',v:3},{n:'3W',v:1},{n:'7I',v:6},{n:'8I',v:2},{n:'PW',v:2}];
-  const max=Math.max(...clubs.map(c=>c.v));
-  const bW=Math.floor((W-40)/clubs.length)-6;
-  clubs.forEach((cl,i)=>{
-    const x=24+i*(bW+6),bH=(cl.v/max)*(H-55),y=H-30-bH;
-    const g=ctx.createLinearGradient(x,y,x,y+bH);
-    g.addColorStop(0,'rgba(57,255,20,0.85)');g.addColorStop(1,'rgba(57,255,20,0.3)');
-    ctx.fillStyle=g;
-    ctx.beginPath();
-    ctx.roundRect?ctx.roundRect(x,y,bW,bH,3):ctx.rect(x,y,bW,bH);
-    ctx.fill();
-    ctx.fillStyle='rgba(57,255,20,0.5)';ctx.font='bold 9px JetBrains Mono';
-    ctx.textAlign='center';ctx.fillText(cl.n,x+bW/2,H-14);
-    ctx.fillStyle='rgba(226,232,240,0.6)';ctx.font='9px JetBrains Mono';
-    ctx.fillText(cl.v,x+bW/2,y-5);
+// ─── CLUB DISTRIBUTION BAR ─────────────────────────────────────────────────
+(function() {
+  var cv = document.getElementById('clubBar');
+  var cx = cv.getContext('2d');
+  var W = 600, H = 200;
+  cx.clearRect(0, 0, W, H);
+
+  var clubs = [
+    {name: 'PW',  shots: 8},
+    {name: '9I',  shots: 5},
+    {name: '8I',  shots: 10},
+    {name: '7I',  shots: 14, active: true},
+    {name: '6I',  shots: 7},
+    {name: '5I',  shots: 4},
+    {name: '5W',  shots: 3}
+  ];
+  var maxShots = 14;
+  var pad = {l: 38, r: 18, t: 14, b: 32};
+  var iW = W - pad.l - pad.r;
+  var iH = H - pad.t - pad.b;
+  var bW = (iW / clubs.length) * 0.55;
+  var gap = iW / clubs.length;
+
+  // grid
+  cx.strokeStyle = 'rgba(255,255,255,0.04)';
+  cx.lineWidth = 1;
+  for (var g = 1; g <= 4; g++) {
+    cx.beginPath();
+    cx.moveTo(pad.l, pad.t + g * iH / 4);
+    cx.lineTo(W - pad.r, pad.t + g * iH / 4);
+    cx.stroke();
+  }
+
+  clubs.forEach(function(c, i) {
+    var bH = (c.shots / maxShots) * iH;
+    var bx = pad.l + i * gap + (gap - bW) / 2;
+    var by = pad.t + iH - bH;
+    var active = c.active;
+
+    var bg = cx.createLinearGradient(bx, by, bx, by + bH);
+    if (active) {
+      bg.addColorStop(0, 'rgba(75,142,255,0.95)');
+      bg.addColorStop(0.6, 'rgba(75,142,255,0.7)');
+      bg.addColorStop(1, 'rgba(75,142,255,0.25)');
+    } else {
+      bg.addColorStop(0, 'rgba(75,142,255,0.38)');
+      bg.addColorStop(1, 'rgba(75,142,255,0.08)');
+    }
+    roundRect(cx, bx, by, bW, bH, 5);
+    cx.fillStyle = bg;
+    cx.fill();
+
+    if (active) {
+      roundRect(cx, bx, by, bW, bH, 5);
+      cx.strokeStyle = 'rgba(75,142,255,0.55)';
+      cx.lineWidth = 1;
+      cx.stroke();
+      // subtle top glow
+      cx.beginPath();
+      cx.arc(bx + bW / 2, by, bW / 2, Math.PI, 0, false);
+      cx.fillStyle = 'rgba(75,142,255,0.12)';
+      cx.fill();
+    }
+
+    // shot count
+    cx.fillStyle = active ? '#F1F5F9' : 'rgba(148,163,184,0.55)';
+    cx.font = (active ? 'bold ' : '') + '12px JetBrains Mono';
+    cx.textAlign = 'center';
+    cx.fillText(c.shots, bx + bW / 2, by - 5);
+
+    // club name
+    cx.font = (active ? 'bold ' : '') + '11px Inter';
+    cx.fillStyle = active ? '#F1F5F9' : 'rgba(148,163,184,0.45)';
+    cx.fillText(c.name, bx + bW / 2, H - 10);
+    cx.textAlign = 'left';
   });
-  ctx.fillStyle='rgba(57,255,20,0.3)';ctx.font='8px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('SHOTS PER CLUB',4,12);
+
+  // Y axis
+  cx.fillStyle = 'rgba(148,163,184,0.35)';
+  cx.font = '9px JetBrains Mono';
+  cx.textAlign = 'right';
+  for (var j = 0; j <= 4; j++) {
+    var v = Math.round((j / 4) * maxShots);
+    cx.fillText(v, pad.l - 5, pad.t + iH - (j / 4) * iH + 3);
+  }
+  cx.textAlign = 'left';
 })();
 </script>
 </body>
