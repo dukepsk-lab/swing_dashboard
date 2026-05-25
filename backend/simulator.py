@@ -27,6 +27,30 @@ def _rnd(lo, hi, noise=0.05):
     return round(base * (1 + random.uniform(-noise, noise)), 1)
 
 
+SHOT_RANK_THRESHOLDS = [
+    (0.92, "S+"), (0.85, "S"), (0.75, "A"), (0.62, "B"), (0.48, "C"), (0.32, "D"),
+]
+
+SHOT_RANK_COLORS = {
+    "S+": "#00BFFF", "S": "#4FC3F7", "A": "#39FF14",
+    "B": "#ADFF2F", "C": "#FFD600", "D": "#FF6B35", "E": "#FF4444",
+}
+
+AOA_BY_CLUB = {
+    "Driver": (-1.5, 3.0), "3 Wood": (-3.0, 0.5), "5 Iron": (-5.0, -2.0),
+    "6 Iron": (-5.5, -2.5), "7 Iron": (-6.0, -3.0), "8 Iron": (-6.5, -3.5),
+    "9 Iron": (-7.0, -4.0), "PW": (-7.5, -4.5), "SW": (-9.0, -5.0),
+}
+
+
+def _shot_rank(smash, in_target, lateral):
+    score = smash / 1.50 * 0.6 + (1.0 if in_target else 0.3) * 0.25 + max(0, 1 - abs(lateral) / 40) * 0.15
+    for threshold, rank in SHOT_RANK_THRESHOLDS:
+        if score >= threshold:
+            return rank
+    return "E"
+
+
 def generate_shot(club: str = None, shot_number: int = 1, session_id: str = "default") -> dict:
     if club is None:
         club = random.choice(CLUBS)
@@ -42,6 +66,24 @@ def generate_shot(club: str = None, shot_number: int = 1, session_id: str = "def
     lateral     = round(random.gauss(0, 12), 1)
     apex        = round(carry * math.tan(math.radians(launch)) * 0.18, 1)
 
+    # Spin components — spin_axis drives draw/fade; positive = fade/slice
+    spin_axis   = round(lateral * 0.9 + random.gauss(0, 2), 1)
+    backspin    = int(spin * math.cos(math.radians(abs(spin_axis))))
+    sidespin    = int(spin * math.sin(math.radians(spin_axis)))
+
+    # Club data
+    aoa_range   = AOA_BY_CLUB.get(club, (-5.0, -2.0))
+    aoa         = round(random.uniform(*aoa_range), 1)
+    club_path   = round(random.gauss(lateral * 0.05, 1.5), 1)
+    face_target = round(lateral * 0.06 + random.gauss(0, 1.0), 1)
+    face_path   = round(face_target - club_path, 1)
+
+    # Face impact position: 0,0 = center; x: -1=heel, +1=toe; y: -1=low, +1=high
+    h_impact    = round(random.gauss(0, 0.25), 2)
+    v_impact    = round(random.gauss(0.1, 0.2), 2)
+    h_impact    = max(-1.0, min(1.0, h_impact))
+    v_impact    = max(-1.0, min(1.0, v_impact))
+
     if abs(lateral) < 8:
         shot_shape = "straight"
     elif lateral > 0:
@@ -50,6 +92,7 @@ def generate_shot(club: str = None, shot_number: int = 1, session_id: str = "def
         shot_shape = "draw" if lateral > -20 else "hook"
 
     in_target = abs(lateral) < 18 and carry > p["carry"][0] * 0.85
+    rank      = _shot_rank(smash, in_target, lateral)
 
     return {
         "id": shot_number,
@@ -61,6 +104,9 @@ def generate_shot(club: str = None, shot_number: int = 1, session_id: str = "def
         "smash_factor": smash,
         "launch_angle": launch,
         "spin_rate": spin,
+        "backspin": backspin,
+        "sidespin": sidespin,
+        "spin_axis": spin_axis,
         "carry_distance": carry,
         "total_distance": total,
         "lateral_offset": lateral,
@@ -68,6 +114,14 @@ def generate_shot(club: str = None, shot_number: int = 1, session_id: str = "def
         "apex_height": apex,
         "in_target": in_target,
         "shot_number": shot_number,
+        "angle_of_attack": aoa,
+        "club_path": club_path,
+        "face_to_target": face_target,
+        "face_to_path": face_path,
+        "h_face_impact": h_impact,
+        "v_face_impact": v_impact,
+        "shot_rank": rank,
+        "shot_rank_color": SHOT_RANK_COLORS[rank],
     }
 
 
