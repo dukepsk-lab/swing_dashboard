@@ -1,27 +1,40 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
 import json
-import uuid
+import os
+import logging
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
-from models import ShotData
-from simulator import DataSimulator, generate_course_session, generate_hole_shot_path, HOLE_PARS, HOLE_DISTANCES, COURSE_NAMES
+import ogc
+from gspro_connect import GSProConnectServer, DEFAULT_PORT
+from simulator import generate_course_session, generate_hole_shot_path, HOLE_PARS, HOLE_DISTANCES, COURSE_NAMES, CLUBS
 from database import init_db, save_shot, get_session_shots, get_all_sessions, save_round, get_rounds
 
 import random
+
+logging.basicConfig(level=logging.INFO)
 
 # ── state ──────────────────────────────────────────────────────────────────────
 shot_buffer: List[dict] = []
 BUFFER_SIZE = 50
 active_connections: List[WebSocket] = []
-simulator = DataSimulator()
+
+# GSPro ball data carries no club name, so shots are tagged with the dashboard-selected club.
+current_club = "7 Iron"
+shot_counter = 0
+
 live_session_id = f"session_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
 session_start = datetime.utcnow()
-is_streaming = False
-stream_task = None
+
+gspro_server: Optional[GSProConnectServer] = None
+lm_connected = False
+lm_device_id: Optional[str] = None
+
+GSPRO_HOST = os.environ.get("GSPRO_CONNECT_HOST", "0.0.0.0")
+GSPRO_PORT = int(os.environ.get("GSPRO_CONNECT_PORT", DEFAULT_PORT))
 
 current_course = {
     "course_name": random.choice(COURSE_NAMES),
@@ -46,31 +59,53 @@ async def broadcast(message: dict):
         active_connections.remove(ws)
 
 
-async def stream_loop():
-    global is_streaming
-    is_streaming = True
-    try:
-        while is_streaming:
-            await asyncio.sleep(3)
-            shot = simulator.next_shot(live_session_id)
-            shot_buffer.append(shot)
-            if len(shot_buffer) > BUFFER_SIZE:
-                shot_buffer.pop(0)
-            await save_shot(shot)
-            await broadcast({"type": "shot", "data": shot})
-    finally:
-        is_streaming = False
+# ── GSPro Connect callbacks ──────────────────────────────────────────────────────
+async def ingest_ball_data(ball: dict, club_data: Optional[dict] = None, club: Optional[str] = None) -> dict:
+    """Reverse-calc one launch-monitor shot via open-golf-coach, persist and broadcast it."""
+    global shot_counter
+    shot_counter += 1
+    shot = ogc.derive(
+        ball,
+        club_data=club_data,
+        club=club or current_club,
+        session_id=live_session_id,
+        shot_number=shot_counter,
+    )
+    shot_buffer.append(shot)
+    if len(shot_buffer) > BUFFER_SIZE:
+        shot_buffer.pop(0)
+    await save_shot(shot)
+    await broadcast({"type": "shot", "data": shot})
+    return shot
+
+
+async def on_shot(ball: dict, club_data: Optional[dict], raw: dict):
+    await ingest_ball_data(ball, club_data)
+
+
+async def on_status(connected: bool, device_id: Optional[str]):
+    global lm_connected, lm_device_id
+    lm_connected = connected
+    lm_device_id = device_id
+    await broadcast({"type": "lm_status", "data": {"connected": connected, "device_id": device_id}})
 
 
 # ── lifespan ───────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
-    global stream_task
-    stream_task = asyncio.create_task(stream_loop())
+    global gspro_server
+    gspro_server = GSProConnectServer(on_shot, on_status, host=GSPRO_HOST, port=GSPRO_PORT)
+    try:
+        await gspro_server.start()
+    except OSError as e:
+        logging.error("Could not bind GSPro Connect receiver on %s:%s (%s). "
+                      "Live launch-monitor input is disabled; /api/shot/manual still works.",
+                      GSPRO_HOST, GSPRO_PORT, e)
+        gspro_server = None
     yield
-    if stream_task:
-        stream_task.cancel()
+    if gspro_server:
+        await gspro_server.stop()
 
 
 app = FastAPI(title="Swing Dashboard API", lifespan=lifespan)
@@ -86,6 +121,7 @@ app.add_middleware(
 # ── WebSocket ──────────────────────────────────────────────────────────────────
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    global current_club
     await websocket.accept()
     active_connections.append(websocket)
     try:
@@ -96,9 +132,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 "shots": shot_buffer[-20:],
                 "session_id": live_session_id,
                 "session_start": session_start.isoformat(),
-                "current_club": simulator._current_club,
+                "current_club": current_club,
                 "course": current_course,
                 "scorecard": scorecard,
+                "lm_connected": lm_connected,
+                "lm_device_id": lm_device_id,
             }
         }))
         while True:
@@ -106,15 +144,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 msg = await asyncio.wait_for(websocket.receive_text(), timeout=30)
                 data = json.loads(msg)
                 if data.get("action") == "set_club":
-                    simulator._current_club = data["club"]
-                    await broadcast({"type": "club_change", "data": {"club": data["club"]}})
-                elif data.get("action") == "trigger_shot":
-                    shot = simulator.next_shot(live_session_id)
-                    shot_buffer.append(shot)
-                    if len(shot_buffer) > BUFFER_SIZE:
-                        shot_buffer.pop(0)
-                    await save_shot(shot)
-                    await broadcast({"type": "shot", "data": shot})
+                    current_club = data["club"]
+                    await broadcast({"type": "club_change", "data": {"club": current_club}})
                 elif data.get("action") == "next_hole":
                     hole_idx = current_course["hole"]
                     if hole_idx < 18:
@@ -134,7 +165,14 @@ async def websocket_endpoint(websocket: WebSocket):
 # ── REST API ───────────────────────────────────────────────────────────────────
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "connections": len(active_connections)}
+    return {
+        "status": "ok",
+        "connections": len(active_connections),
+        "gspro_listening": gspro_server is not None,
+        "gspro_port": GSPRO_PORT,
+        "launch_monitor_connected": lm_connected,
+        "ogc_available": ogc.available(),
+    }
 
 
 @app.get("/api/session/current")
@@ -143,8 +181,8 @@ async def get_current_session():
         "session_id": live_session_id,
         "start_time": session_start.isoformat(),
         "shot_count": len(shot_buffer),
-        "current_club": simulator._current_club,
-        "is_streaming": is_streaming,
+        "current_club": current_club,
+        "launch_monitor_connected": lm_connected,
     }
 
 
@@ -207,13 +245,16 @@ async def list_rounds():
 
 
 @app.post("/api/shot/manual")
-async def manual_shot(club: str = None):
-    shot = simulator.next_shot(live_session_id)
-    if club:
-        shot["club"] = club
-    shot_buffer.append(shot)
-    if len(shot_buffer) > BUFFER_SIZE:
-        shot_buffer.pop(0)
-    await save_shot(shot)
-    await broadcast({"type": "shot", "data": shot})
+async def manual_shot(payload: dict = Body(default=None)):
+    """Inject a shot in GSPro Connect format (no hardware needed).
+
+    Accepts either a full GSPro message ({"BallData": {...}, "ClubData": {...}}) or a bare
+    BallData object ({"Speed": 150, "VLA": 12, "HLA": -1, "TotalSpin": 2600, "SpinAxis": -6}).
+    An optional "club" overrides the dashboard-selected club.
+    """
+    payload = payload or {}
+    ball = payload.get("BallData") or {k: v for k, v in payload.items() if k not in ("ClubData", "club")}
+    club_data = payload.get("ClubData")
+    club = payload.get("club")
+    shot = await ingest_ball_data(ball, club_data, club)
     return shot

@@ -2,6 +2,8 @@
 
 A professional, real-time golf simulator analytics dashboard inspired by Trackman / GSPro, built with **React + Tailwind CSS + Recharts** (frontend) and **FastAPI + WebSocket** (backend).
 
+Live shot data comes from a real launch monitor over the **GSPro Open Connect V1** protocol — SwingDash listens on TCP **port 921** exactly like GSPro does, so you point the launch monitor straight at it (no man-in-the-middle, nothing injected into GSPro). The launch monitor's ball data is then *reverse-calculated* into club/swing metrics (club speed, smash factor, club path, face angles, distances, shot shape & grade) using the official [**open-golf-coach**](https://github.com/OpenLaunchLabs/open-golf-coach) library.
+
 ---
 
 ## Screenshots
@@ -22,7 +24,7 @@ A professional, real-time golf simulator analytics dashboard inspired by Trackma
 - **Club Distribution**: Pie chart of clubs used in the session
 - **Performance Trend**: Line chart of carry, ball speed, and smash factor over time
 - **Accuracy Gauge**: Radial gauge showing on-target %, fairway %, avg carry
-- **Session Bar**: Live indicator, session timer, club selector, manual shot trigger
+- **Session Bar**: Live indicator, session timer, launch-monitor connection status, club selector
 
 ### Page 2 — Course Play Dashboard
 - **Course Header**: Course name, hole, par, distance, wind
@@ -35,10 +37,10 @@ A professional, real-time golf simulator analytics dashboard inspired by Trackma
 - **Hole Selector**: Click any hole 1–18 with color-coded score indicators
 
 ### Real-time System
-- WebSocket for sub-second shot push from backend → all connected clients
-- Auto-reconnect on disconnect
-- Manual shot trigger button + club selection from browser
-- GSPro-compatible JSON shot format
+- **GSPro Connect receiver**: TCP server on port 921 that accepts launch-monitor shots (heartbeats + BallData/ClubData), exactly like GSPro
+- **open-golf-coach reverse-calc**: derives club speed, smash, club path, face-to-target/path, carry/total, apex, spin decomposition, and shot name/rank from ball data
+- WebSocket for sub-second shot push from backend → all connected clients (with auto-reconnect)
+- Club selection from the browser (tags incoming shots, since GSPro ball data carries no club name)
 
 ---
 
@@ -47,10 +49,14 @@ A professional, real-time golf simulator analytics dashboard inspired by Trackma
 ```
 swing_dashboard/
 ├── backend/
-│   ├── main.py          # FastAPI app, WebSocket hub, REST endpoints
-│   ├── simulator.py     # Shot data generator (9 club profiles)
-│   ├── database.py      # aiosqlite helpers
-│   ├── models.py        # Pydantic models
+│   ├── main.py            # FastAPI app, WebSocket hub, REST endpoints
+│   ├── gspro_connect.py   # GSPro Open Connect V1 TCP receiver (port 921)
+│   ├── ogc.py             # open-golf-coach reverse-calc wrapper
+│   ├── simulator.py       # Course Play demo-round generator
+│   ├── database.py        # aiosqlite helpers
+│   ├── models.py          # Pydantic models
+│   ├── tools/
+│   │   └── fake_lm.py     # Fake launch monitor (test client, no hardware needed)
 │   └── requirements.txt
 └── frontend/
     ├── src/
@@ -76,7 +82,18 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-The API and WebSocket server starts at `http://localhost:8000`.
+The API and WebSocket server starts at `http://localhost:8000`, and the GSPro Connect
+receiver starts on TCP port **921**. Point your launch monitor's GSPro Connect output at
+this machine's IP on port 921. (`pip install` pulls in `opengolfcoach` for the reverse-calc.)
+
+> Port 921 is privileged on some systems and may need elevated permissions, or override it
+> with `GSPRO_CONNECT_PORT` / `GSPRO_CONNECT_HOST` env vars.
+
+**No launch monitor handy?** Drive the full pipeline with the bundled fake client:
+
+```bash
+python tools/fake_lm.py 127.0.0.1 921 4   # sends 4 sample shots
+```
 
 ### 2. Frontend
 
@@ -100,9 +117,11 @@ Open `http://localhost:5173` in your browser.
 | GET | `/api/shots/buffer` | In-memory shot buffer |
 | GET | `/api/sessions` | List all sessions |
 | GET | `/api/sessions/{id}/shots` | Shots for a specific session |
-| GET | `/api/course/demo` | Generate a full simulated 18-hole round |
+| GET | `/api/course/demo` | Generate a full demo 18-hole round (Course Play page) |
 | GET | `/api/course/hole/{n}/path` | Shot path for a specific hole |
-| POST | `/api/shot/manual` | Manually trigger a shot |
+| POST | `/api/shot/manual` | Inject a shot in GSPro Connect format (BallData JSON) — no hardware needed |
+
+`/api/health` also reports `gspro_listening`, `gspro_port`, `launch_monitor_connected`, and `ogc_available`.
 
 ---
 
@@ -113,8 +132,9 @@ Open `http://localhost:5173` in your browser.
 ### Server → Client messages
 
 ```json
-{ "type": "init",  "data": { "shots": [...], "session_id": "...", "current_club": "..." } }
+{ "type": "init",  "data": { "shots": [...], "session_id": "...", "current_club": "...", "lm_connected": false } }
 { "type": "shot",  "data": { ...shot fields... } }
+{ "type": "lm_status", "data": { "connected": true, "device_id": "..." } }
 { "type": "club_change", "data": { "club": "Driver" } }
 { "type": "hole_change", "data": { ...course fields... } }
 { "type": "ping" }
@@ -123,8 +143,7 @@ Open `http://localhost:5173` in your browser.
 ### Client → Server messages
 
 ```json
-{ "action": "set_club",    "club": "Driver" }
-{ "action": "trigger_shot" }
+{ "action": "set_club", "club": "Driver" }
 { "action": "next_hole" }
 ```
 
@@ -153,15 +172,28 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## GSPro Integration
+## Data flow — GSPro Connect + open-golf-coach
 
-The backend is ready to accept real GSPro data. To connect:
+```
+Launch monitor ──(GSPro Open Connect V1, TCP :921)──▶ gspro_connect.py
+        │  BallData {Speed, VLA, HLA, TotalSpin, SpinAxis, ...}
+        ▼
+     ogc.py  ──▶ opengolfcoach.calculate_derived_values()   (reverse calculation)
+        │  ↳ club speed, smash, club path, face-to-target/path,
+        │    carry/total/offline distance, apex, spin decomposition,
+        │    shot name / rank / colour
+        ▼
+   main.py  ──(WebSocket "shot")──▶  React dashboard
+```
 
-1. Configure GSPro to send JSON data to `localhost:8000/api/shot/manual` (POST)  
-   **or** implement a UDP listener in `simulator.py` that reads from GSPro's local data port
-2. The WebSocket will automatically broadcast each received shot to all connected browsers
-
-For direct WebSocket mode, modify `simulator.py` to read from GSPro's local stream instead of the random generator.
+- **Non-intrusive:** SwingDash *is* the GSPro Connect endpoint the launch monitor talks to.
+  It never sits between the launch monitor and a real GSPro instance and injects nothing into
+  GSPro — point the launch monitor at SwingDash (host:921) directly.
+- **Reverse calculation:** launch monitors typically report only ball flight; open-golf-coach
+  derives the club/swing-side numbers from that ball data. If the monitor *does* send measured
+  `ClubData`, those values override the estimate (see `ogc._apply_measured_club_data`).
+- **Handedness:** the library returns hand-dependent fields as `{left_handed, right_handed}`;
+  SwingDash uses the right-handed variant by default (`hand` arg in `ogc.derive`).
 
 ---
 
@@ -172,4 +204,4 @@ For direct WebSocket mode, modify `simulator.py` to read from GSPro's local stre
 | Frontend | React 19, Vite, Tailwind CSS v3, Recharts, Framer Motion, React Router |
 | Backend | FastAPI, uvicorn, websockets, aiosqlite |
 | Database | SQLite (auto-created as `swing_data.db`) |
-| Data | Simulated 9-club shot model with realistic stat distributions |
+| Live data | GSPro Open Connect V1 (TCP :921) + open-golf-coach reverse-calc |

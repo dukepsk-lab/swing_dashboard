@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 
 const CLUBS = ['Driver', '3 Wood', '5 Iron', '6 Iron', '7 Iron', '8 Iron', '9 Iron', 'PW', 'SW'];
 
-export default function SessionBar({ connected, currentClub, sessionInfo, shotCount, onSetClub, onTrigger }) {
+export default function SessionBar({ connected, currentClub, sessionInfo, shotCount, onSetClub, launchMonitor }) {
+  const lmConnected = launchMonitor?.connected;
   const [elapsed, setElapsed] = useState('00:00');
 
   useEffect(() => {
@@ -41,6 +42,16 @@ export default function SessionBar({ connected, currentClub, sessionInfo, shotCo
         <span className="text-white">{shotCount} shots</span>
       </div>
 
+      <div className="h-4 w-px bg-slate-600" />
+
+      {/* Launch monitor (GSPro Connect) status */}
+      <div className="flex items-center gap-2" title={launchMonitor?.deviceId || 'GSPro Connect :921'}>
+        <div className={`w-2.5 h-2.5 rounded-full ${lmConnected ? 'bg-neon-green animate-pulse_slow' : 'bg-slate-500'}`} />
+        <span className={`text-xs font-bold tracking-wider ${lmConnected ? 'text-neon-green' : 'text-slate-400'}`}>
+          {lmConnected ? `LAUNCH MONITOR${launchMonitor?.deviceId ? ` · ${launchMonitor.deviceId}` : ''}` : 'WAITING FOR LAUNCH MONITOR…'}
+        </span>
+      </div>
+
       <div className="flex items-center gap-2 ml-auto flex-wrap">
         <span className="text-xs text-slate-400">Club:</span>
         <select
@@ -50,13 +61,6 @@ export default function SessionBar({ connected, currentClub, sessionInfo, shotCo
         >
           {CLUBS.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-
-        <button
-          onClick={onTrigger}
-          className="px-3 py-1 text-xs font-bold bg-neon-green/10 hover:bg-neon-green/20 border border-neon-green/30 text-neon-green rounded-lg transition-all"
-        >
-          ⚡ Trigger Shot
-        </button>
       </div>
     </div>
   );

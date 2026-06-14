@@ -10,7 +10,7 @@ import AccuracyGauge from '../components/AccuracyGauge';
 import ShotDetailPanel from '../components/ShotDetailPanel';
 
 export default function DrivingRange() {
-  const { connected, shots, lastShot, currentClub, sessionInfo, triggerShot, setClub } = useWebSocket();
+  const { connected, shots, lastShot, currentClub, sessionInfo, launchMonitor, setClub } = useWebSocket();
   const prev = shots[1] ?? null;
 
   const kpis = [
@@ -32,8 +32,21 @@ export default function DrivingRange() {
         sessionInfo={sessionInfo}
         shotCount={shots.length}
         onSetClub={setClub}
-        onTrigger={triggerShot}
+        launchMonitor={launchMonitor}
       />
+
+      {/* Empty state — waiting for the first shot from the launch monitor */}
+      {shots.length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-2 py-10 px-4 text-center bg-dark-700/40 border border-neon-green/10 rounded-xl">
+          <div className="text-neon-green text-sm font-bold tracking-wider">
+            {launchMonitor?.connected ? 'LAUNCH MONITOR CONNECTED — TAKE A SWING' : 'WAITING FOR LAUNCH MONITOR'}
+          </div>
+          <div className="text-xs text-slate-400">
+            Point your launch monitor's GSPro Connect output at this machine on port <span className="text-white font-mono">921</span>.
+            Club &amp; swing metrics are reverse-calculated from ball data via open-golf-coach.
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
