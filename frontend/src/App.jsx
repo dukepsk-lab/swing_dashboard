@@ -48,8 +48,8 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="hidden md:block">GSPro Connected</span>
-            <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse_slow"/>
+            <span className="hidden md:block">GSPro Connect · :921</span>
+            <div className="w-2 h-2 rounded-full bg-slate-500"/>
           </div>
         </nav>
 

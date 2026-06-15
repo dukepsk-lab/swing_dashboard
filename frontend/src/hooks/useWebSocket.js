@@ -11,6 +11,7 @@ export function useWebSocket() {
   const [currentClub, setCurrentClub] = useState('7 Iron');
   const [sessionInfo, setSessionInfo] = useState(null);
   const [courseData, setCourseData] = useState(null);
+  const [launchMonitor, setLaunchMonitor] = useState({ connected: false, deviceId: null });
 
   const connect = useCallback(() => {
     try {
@@ -47,6 +48,9 @@ export function useWebSocket() {
               start_time: d.session_start,
             });
             setCourseData(d.course || null);
+            setLaunchMonitor({ connected: !!d.lm_connected, deviceId: d.lm_device_id || null });
+          } else if (msg.type === 'lm_status') {
+            setLaunchMonitor({ connected: !!msg.data.connected, deviceId: msg.data.device_id || null });
           } else if (msg.type === 'shot') {
             const shot = msg.data;
             setLastShot(shot);
@@ -82,9 +86,8 @@ export function useWebSocket() {
     }
   }, []);
 
-  const triggerShot = useCallback(() => send({ action: 'trigger_shot' }), [send]);
   const setClub = useCallback((club) => send({ action: 'set_club', club }), [send]);
   const nextHole = useCallback(() => send({ action: 'next_hole' }), [send]);
 
-  return { connected, shots, lastShot, currentClub, sessionInfo, courseData, triggerShot, setClub, nextHole };
+  return { connected, shots, lastShot, currentClub, sessionInfo, courseData, launchMonitor, setClub, nextHole };
 }
