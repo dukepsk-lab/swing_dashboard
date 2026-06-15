@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import ogc
+import gspro_codes
 from gspro_connect import GSProConnectServer, DEFAULT_PORT
 from simulator import generate_course_session, generate_hole_shot_path, HOLE_PARS, HOLE_DISTANCES, COURSE_NAMES, CLUBS
 from database import init_db, save_shot, get_session_shots, get_all_sessions, save_round, get_rounds
@@ -22,8 +23,10 @@ shot_buffer: List[dict] = []
 BUFFER_SIZE = 50
 active_connections: List[WebSocket] = []
 
-# GSPro ball data carries no club name, so shots are tagged with the dashboard-selected club.
+# GSPro ball data carries no club name. In standalone mode the dashboard-selected club is used;
+# in relay mode GSPro reports the selected club/handedness back, which overrides these.
 current_club = "7 Iron"
+current_hand = "right_handed"  # open-golf-coach handedness key
 shot_counter = 0
 
 live_session_id = f"session_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
@@ -35,6 +38,9 @@ lm_device_id: Optional[str] = None
 
 GSPRO_HOST = os.environ.get("GSPRO_CONNECT_HOST", "0.0.0.0")
 GSPRO_PORT = int(os.environ.get("GSPRO_CONNECT_PORT", DEFAULT_PORT))
+# Set GSPRO_UPSTREAM_HOST to relay to a real GSPro (and read back its selected club/handedness).
+GSPRO_UPSTREAM_HOST = os.environ.get("GSPRO_UPSTREAM_HOST") or None
+GSPRO_UPSTREAM_PORT = int(os.environ.get("GSPRO_UPSTREAM_PORT", DEFAULT_PORT))
 
 current_course = {
     "course_name": random.choice(COURSE_NAMES),
@@ -70,6 +76,7 @@ async def ingest_ball_data(ball: dict, club_data: Optional[dict] = None, club: O
         club=club or current_club,
         session_id=live_session_id,
         shot_number=shot_counter,
+        hand=current_hand,
     )
     shot_buffer.append(shot)
     if len(shot_buffer) > BUFFER_SIZE:
@@ -90,12 +97,31 @@ async def on_status(connected: bool, device_id: Optional[str]):
     await broadcast({"type": "lm_status", "data": {"connected": connected, "device_id": device_id}})
 
 
+async def on_player(club_code: Optional[str], handed: Optional[str]):
+    """Relay tap: GSPro reports its selected club / handedness back to the launch monitor."""
+    global current_club, current_hand
+    if club_code:
+        label = gspro_codes.club_label(club_code)
+        if label and label != current_club:
+            current_club = label
+            await broadcast({"type": "club_change", "data": {"club": current_club, "source": "gspro"}})
+    if handed:
+        hand = gspro_codes.hand_from_gspro(handed)
+        if hand != current_hand:
+            current_hand = hand
+            await broadcast({"type": "hand_change", "data": {"hand": hand}})
+
+
 # ── lifespan ───────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
     global gspro_server
-    gspro_server = GSProConnectServer(on_shot, on_status, host=GSPRO_HOST, port=GSPRO_PORT)
+    gspro_server = GSProConnectServer(
+        on_shot, on_status, on_player,
+        host=GSPRO_HOST, port=GSPRO_PORT,
+        upstream_host=GSPRO_UPSTREAM_HOST, upstream_port=GSPRO_UPSTREAM_PORT,
+    )
     try:
         await gspro_server.start()
     except OSError as e:
@@ -133,6 +159,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 "session_id": live_session_id,
                 "session_start": session_start.isoformat(),
                 "current_club": current_club,
+                "current_hand": current_hand,
                 "course": current_course,
                 "scorecard": scorecard,
                 "lm_connected": lm_connected,
@@ -170,7 +197,11 @@ async def health():
         "connections": len(active_connections),
         "gspro_listening": gspro_server is not None,
         "gspro_port": GSPRO_PORT,
+        "mode": gspro_server.mode if gspro_server else ("relay" if GSPRO_UPSTREAM_HOST else "standalone"),
+        "upstream": f"{GSPRO_UPSTREAM_HOST}:{GSPRO_UPSTREAM_PORT}" if GSPRO_UPSTREAM_HOST else None,
         "launch_monitor_connected": lm_connected,
+        "current_club": current_club,
+        "current_hand": current_hand,
         "ogc_available": ogc.available(),
     }
 

@@ -59,7 +59,10 @@ export default function SessionBar({ connected, currentClub, sessionInfo, shotCo
           onChange={e => onSetClub(e.target.value)}
           className="bg-dark-600 border border-neon-green/20 text-neon-green text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-neon-green/50 cursor-pointer"
         >
-          {CLUBS.map(c => <option key={c} value={c}>{c}</option>)}
+          {/* Include any GSPro-reported club that isn't in the fixed list so it still shows */}
+          {(CLUBS.includes(currentClub) ? CLUBS : [currentClub, ...CLUBS]).map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
         </select>
       </div>
     </div>

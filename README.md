@@ -50,13 +50,15 @@ Live shot data comes from a real launch monitor over the **GSPro Open Connect V1
 swing_dashboard/
 ├── backend/
 │   ├── main.py            # FastAPI app, WebSocket hub, REST endpoints
-│   ├── gspro_connect.py   # GSPro Open Connect V1 TCP receiver (port 921)
+│   ├── gspro_connect.py   # GSPro Open Connect V1 receiver + transparent relay (port 921)
 │   ├── ogc.py             # open-golf-coach reverse-calc wrapper
+│   ├── gspro_codes.py     # GSPro club-code → label / handedness helpers
 │   ├── simulator.py       # Course Play demo-round generator
 │   ├── database.py        # aiosqlite helpers
 │   ├── models.py          # Pydantic models
 │   ├── tools/
-│   │   └── fake_lm.py     # Fake launch monitor (test client, no hardware needed)
+│   │   ├── fake_lm.py     # Fake launch monitor (test client, no hardware needed)
+│   │   └── fake_gspro.py  # Fake upstream GSPro (for testing relay mode)
 │   └── requirements.txt
 └── frontend/
     ├── src/
@@ -94,6 +96,28 @@ this machine's IP on port 921. (`pip install` pulls in `opengolfcoach` for the r
 ```bash
 python tools/fake_lm.py 127.0.0.1 921 4   # sends 4 sample shots
 ```
+
+#### Modes: standalone vs relay
+
+| Mode | Topology | What you get |
+|------|----------|--------------|
+| **Standalone** (default) | launch monitor → SwingDash :921 | Ball data → reverse-calc. Club is chosen in the dashboard. |
+| **Relay** | launch monitor → SwingDash → real GSPro | Same reverse-calc **plus** the selected club & handedness that GSPro reports back (`Player.Club`/`Player.Handed`). Bytes are forwarded unchanged both ways, so GSPro and the launch monitor behave exactly as normal. |
+
+Enable relay with env vars (point the launch monitor at SwingDash, and SwingDash at GSPro):
+
+```bash
+# SwingDash listens on 922 for the LM and relays to real GSPro on 127.0.0.1:921
+GSPRO_CONNECT_PORT=922 GSPRO_UPSTREAM_HOST=127.0.0.1 GSPRO_UPSTREAM_PORT=921 \
+  uvicorn main:app --port 8000
+```
+
+> Since GSPro itself uses port 921, on a single machine run SwingDash's listener on another
+> port (point the LM connector there) or run GSPro on a second machine. If the upstream GSPro is
+> unreachable, SwingDash falls back to self-acking so the launch monitor keeps working.
+>
+> Test relay with no hardware: `python tools/fake_gspro.py 922 I7 RH` (a stub GSPro that acks
+> with a selected club), then run the backend in relay mode against it and fire `fake_lm.py`.
 
 ### 2. Frontend
 
@@ -135,7 +159,8 @@ Open `http://localhost:5173` in your browser.
 { "type": "init",  "data": { "shots": [...], "session_id": "...", "current_club": "...", "lm_connected": false } }
 { "type": "shot",  "data": { ...shot fields... } }
 { "type": "lm_status", "data": { "connected": true, "device_id": "..." } }
-{ "type": "club_change", "data": { "club": "Driver" } }
+{ "type": "club_change", "data": { "club": "Driver", "source": "gspro" } }
+{ "type": "hand_change", "data": { "hand": "right_handed" } }
 { "type": "hole_change", "data": { ...course fields... } }
 { "type": "ping" }
 ```
@@ -186,14 +211,21 @@ Launch monitor ──(GSPro Open Connect V1, TCP :921)──▶ gspro_connect.py
    main.py  ──(WebSocket "shot")──▶  React dashboard
 ```
 
-- **Non-intrusive:** SwingDash *is* the GSPro Connect endpoint the launch monitor talks to.
-  It never sits between the launch monitor and a real GSPro instance and injects nothing into
-  GSPro — point the launch monitor at SwingDash (host:921) directly.
+- **Non-intrusive:** in **standalone** mode SwingDash *is* the GSPro Connect endpoint the launch
+  monitor talks to — point the LM at SwingDash directly, no real GSPro needed. In **relay** mode
+  SwingDash forwards every byte unchanged between the LM and a real GSPro and only *taps* the
+  stream, so both programs behave exactly as normal (nothing injected into GSPro).
 - **Reverse calculation:** launch monitors typically report only ball flight; open-golf-coach
   derives the club/swing-side numbers from that ball data. If the monitor *does* send measured
   `ClubData`, those values override the estimate (see `ogc._apply_measured_club_data`).
+- **Selected club & handedness (relay only):** GSPro's response carries a `Player` object with
+  `{Handed, Club}` — the only downstream info the protocol provides. The relay reads it
+  (`gspro_connect._tap_gspro_to_lm` → `main.on_player`), expands the club code via
+  `gspro_codes.club_label`, auto-updates the dashboard club, and feeds handedness into
+  `ogc.derive(hand=...)`. The protocol carries **no** course, hole, lie/surface, or ball-position
+  data, so those are out of scope.
 - **Handedness:** the library returns hand-dependent fields as `{left_handed, right_handed}`;
-  SwingDash uses the right-handed variant by default (`hand` arg in `ogc.derive`).
+  SwingDash uses right-handed by default and switches to GSPro's reported hand in relay mode.
 
 ---
 
@@ -204,4 +236,4 @@ Launch monitor ──(GSPro Open Connect V1, TCP :921)──▶ gspro_connect.py
 | Frontend | React 19, Vite, Tailwind CSS v3, Recharts, Framer Motion, React Router |
 | Backend | FastAPI, uvicorn, websockets, aiosqlite |
 | Database | SQLite (auto-created as `swing_data.db`) |
-| Live data | GSPro Open Connect V1 (TCP :921) + open-golf-coach reverse-calc |
+| Live data | GSPro Open Connect V1 (standalone receiver or transparent relay) + open-golf-coach reverse-calc |
