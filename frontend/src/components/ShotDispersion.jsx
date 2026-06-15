@@ -2,7 +2,7 @@ import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceL
 
 const CustomDot = (props) => {
   const { cx, cy, payload } = props;
-  const color = payload.in_target ? '#39FF14' : '#FF6B6B';
+  const color = payload.in_target ? '#22d3ee' : '#FF6B6B';
   return (
     <g>
       <circle cx={cx} cy={cy} r={5} fill={color} fillOpacity={0.7} stroke={color} strokeWidth={1} />
@@ -39,7 +39,7 @@ export default function ShotDispersion({ shots }) {
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <ScatterChart margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(57,255,20,0.08)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,211,238,0.08)" />
             <XAxis
               dataKey="x"
               type="number"
@@ -55,8 +55,8 @@ export default function ShotDispersion({ shots }) {
               tickLine={false}
               label={{ value: 'Carry', angle: -90, position: 'insideLeft', fill: '#475569', fontSize: 10 }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(57,255,20,0.2)' }} />
-            <ReferenceLine x={0} stroke="rgba(57,255,20,0.3)" strokeDasharray="4 2" />
+            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(34,211,238,0.2)' }} />
+            <ReferenceLine x={0} stroke="rgba(34,211,238,0.3)" strokeDasharray="4 2" />
             <ReferenceLine x={-18} stroke="rgba(255,107,107,0.3)" strokeDasharray="2 2" />
             <ReferenceLine x={18} stroke="rgba(255,107,107,0.3)" strokeDasharray="2 2" />
             <Scatter data={data} shape={<CustomDot />} />

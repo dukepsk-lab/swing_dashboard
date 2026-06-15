@@ -6,7 +6,7 @@ function drawSideView(ctx, W, H, shot) {
   ctx.clearRect(0, 0, W, H);
 
   // Grid
-  ctx.strokeStyle = 'rgba(57,255,20,0.05)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.05)';
   ctx.lineWidth = 1;
   for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
   for (let y = 0; y <= H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
@@ -22,7 +22,7 @@ function drawSideView(ctx, W, H, shot) {
   const landX  = startX + carry * scaleX;
 
   // Ground
-  ctx.strokeStyle = 'rgba(57,255,20,0.18)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.18)';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(W, baseY); ctx.stroke();
 
@@ -38,7 +38,7 @@ function drawSideView(ctx, W, H, shot) {
   });
 
   // Glow trail
-  ctx.strokeStyle = 'rgba(0,255,209,0.08)';
+  ctx.strokeStyle = 'rgba(59,130,246,0.08)';
   ctx.lineWidth = 8;
   ctx.beginPath();
   pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
@@ -46,12 +46,12 @@ function drawSideView(ctx, W, H, shot) {
 
   // Main gradient line
   const grad = ctx.createLinearGradient(startX, baseY, landX, baseY);
-  grad.addColorStop(0, '#39FF14');
-  grad.addColorStop(0.45, '#00FFD1');
-  grad.addColorStop(1, '#39FF1466');
+  grad.addColorStop(0, '#22d3ee');
+  grad.addColorStop(0.45, '#3b82f6');
+  grad.addColorStop(1, '#22d3ee66');
   ctx.strokeStyle = grad;
   ctx.lineWidth = 2.5;
-  ctx.shadowColor = '#39FF14';
+  ctx.shadowColor = '#22d3ee';
   ctx.shadowBlur = 8;
   ctx.beginPath();
   pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
@@ -83,11 +83,11 @@ function drawSideView(ctx, W, H, shot) {
   }
 
   // Apex dot
-  ctx.fillStyle = '#00FFD1';
-  ctx.shadowColor = '#00FFD1'; ctx.shadowBlur = 10;
+  ctx.fillStyle = '#3b82f6';
+  ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 10;
   ctx.beginPath(); ctx.arc(apexPt.x, apexPt.y, 4, 0, Math.PI * 2); ctx.fill();
   ctx.shadowBlur = 0;
-  ctx.fillStyle = 'rgba(0,255,209,0.8)';
+  ctx.fillStyle = 'rgba(59,130,246,0.8)';
   ctx.font = '9px JetBrains Mono';
   ctx.textAlign = 'left';
   ctx.fillText(`${apex.toFixed(0)}y`, apexPt.x + 5, apexPt.y - 4);
@@ -102,33 +102,33 @@ function drawSideView(ctx, W, H, shot) {
   }
 
   // Start dot
-  ctx.fillStyle = '#39FF14'; ctx.shadowColor = '#39FF14'; ctx.shadowBlur = 8;
+  ctx.fillStyle = '#22d3ee'; ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 8;
   ctx.beginPath(); ctx.arc(startX, baseY, 5, 0, Math.PI * 2); ctx.fill();
   ctx.shadowBlur = 0;
 
   // Landing dot
-  ctx.fillStyle = '#39FF14';
+  ctx.fillStyle = '#22d3ee';
   ctx.beginPath(); ctx.arc(landX, baseY, 5, 0, Math.PI * 2); ctx.fill();
 
   // Distance label
-  ctx.fillStyle = 'rgba(57,255,20,0.8)';
+  ctx.fillStyle = 'rgba(34,211,238,0.8)';
   ctx.font = 'bold 10px JetBrains Mono';
   ctx.textAlign = 'center';
   ctx.fillText(`${carry.toFixed(0)}y carry`, landX, baseY + 14);
 
   // Total distance tick
   const totalX = startX + (shot.total_distance || carry * 1.05) * scaleX;
-  ctx.strokeStyle = 'rgba(57,255,20,0.3)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.3)';
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 3]);
   ctx.beginPath(); ctx.moveTo(totalX, baseY - 6); ctx.lineTo(totalX, baseY + 6); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = 'rgba(57,255,20,0.5)';
+  ctx.fillStyle = 'rgba(34,211,238,0.5)';
   ctx.font = '8px JetBrains Mono';
   ctx.fillText(`${(shot.total_distance || carry * 1.05).toFixed(0)}y total`, totalX, baseY + 22);
 
   // Axis label
-  ctx.fillStyle = 'rgba(57,255,20,0.3)';
+  ctx.fillStyle = 'rgba(34,211,238,0.3)';
   ctx.font = '8px JetBrains Mono';
   ctx.textAlign = 'left';
   ctx.fillText('SIDE VIEW', 4, 12);
@@ -140,7 +140,7 @@ function drawSideView(ctx, W, H, shot) {
 function drawTopView(ctx, W, H, shot) {
   ctx.clearRect(0, 0, W, H);
 
-  ctx.strokeStyle = 'rgba(57,255,20,0.05)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.05)';
   ctx.lineWidth = 1;
   for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
   for (let y = 0; y <= H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
@@ -157,7 +157,7 @@ function drawTopView(ctx, W, H, shot) {
   const originY = H - padB;
 
   // Target line (straight ahead)
-  ctx.strokeStyle = 'rgba(57,255,20,0.12)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.12)';
   ctx.lineWidth = 1;
   ctx.setLineDash([5, 5]);
   ctx.beginPath(); ctx.moveTo(originX, originY); ctx.lineTo(originX, padT); ctx.stroke();
@@ -165,7 +165,7 @@ function drawTopView(ctx, W, H, shot) {
 
   // Fairway zone (±18y band)
   const fwHalf = 18 * scaleX;
-  ctx.fillStyle = 'rgba(57,255,20,0.04)';
+  ctx.fillStyle = 'rgba(34,211,238,0.04)';
   ctx.fillRect(originX - fwHalf, padT, fwHalf * 2, H - padT - padB);
 
   if (!shot) return;
@@ -185,7 +185,7 @@ function drawTopView(ctx, W, H, shot) {
   // Shape color
   const shapeColor = shape.includes('slice') || shape.includes('fade')
     ? '#FF6B35' : shape.includes('hook') || shape.includes('draw')
-    ? '#00FFD1' : '#39FF14';
+    ? '#3b82f6' : '#22d3ee';
 
   // Glow trail
   ctx.strokeStyle = shapeColor + '18';
@@ -227,7 +227,7 @@ function drawTopView(ctx, W, H, shot) {
 
   // Tee dot
   ctx.beginPath(); ctx.arc(originX, originY, 5, 0, Math.PI * 2);
-  ctx.fillStyle = '#39FF14'; ctx.shadowColor = '#39FF14'; ctx.shadowBlur = 8; ctx.fill(); ctx.shadowBlur = 0;
+  ctx.fillStyle = '#22d3ee'; ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 8; ctx.fill(); ctx.shadowBlur = 0;
 
   // Labels
   ctx.fillStyle = shapeColor;
@@ -235,18 +235,18 @@ function drawTopView(ctx, W, H, shot) {
   ctx.textAlign = 'center';
   ctx.fillText(shape.toUpperCase(), landX, landY - 10);
 
-  ctx.fillStyle = 'rgba(57,255,20,0.3)';
+  ctx.fillStyle = 'rgba(34,211,238,0.3)';
   ctx.font = '8px JetBrains Mono';
   ctx.textAlign = 'left';
   ctx.fillText('TOP VIEW', 4, 12);
 
   // Scale ruler at bottom
   const ruler10y = 10 * scaleY;
-  ctx.strokeStyle = 'rgba(57,255,20,0.2)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(34,211,238,0.2)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(padL, H - 8); ctx.lineTo(padL + ruler10y, H - 8); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(padL, H - 6); ctx.lineTo(padL, H - 10); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(padL + ruler10y, H - 6); ctx.lineTo(padL + ruler10y, H - 10); ctx.stroke();
-  ctx.fillStyle = 'rgba(57,255,20,0.3)'; ctx.font = '7px JetBrains Mono'; ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(34,211,238,0.3)'; ctx.font = '7px JetBrains Mono'; ctx.textAlign = 'center';
   ctx.fillText('10y', padL + ruler10y / 2, H - 1);
 }
 

@@ -101,7 +101,7 @@ function drawSpinArrow(ctx, cx, cy, r, spinAxis, backspin, sidespin) {
   const bx = cx + Math.cos(arrowAngle) * (r + 10 + arrowLen);
   const by = cy + Math.sin(arrowAngle) * (r + 10 + arrowLen);
 
-  const arrowColor = spinDeg < 10 ? '#39FF14' : Math.abs(sidespin) > backspin * 0.5 ? '#FF6B35' : '#00FFD1';
+  const arrowColor = spinDeg < 10 ? '#22d3ee' : Math.abs(sidespin) > backspin * 0.5 ? '#FF6B35' : '#3b82f6';
 
   ctx.save();
   ctx.strokeStyle = arrowColor;

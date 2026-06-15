@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const COLORS = ['#39FF14', '#00FFD1', '#ADFF2F', '#00BFFF', '#FF6B6B', '#FFD700', '#FF8C00', '#C084FC', '#F472B6'];
+const COLORS = ['#22d3ee', '#3b82f6', '#60a5fa', '#00BFFF', '#FF6B6B', '#FFD700', '#FF8C00', '#C084FC', '#F472B6'];
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;

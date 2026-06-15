@@ -28,7 +28,7 @@ export default function PerformanceTrend({ shots }) {
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(57,255,20,0.07)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,211,238,0.07)" />
             <XAxis
               dataKey="shot"
               tick={{ fill: '#64748b', fontSize: 10 }}
@@ -41,25 +41,25 @@ export default function PerformanceTrend({ shots }) {
               type="monotone"
               dataKey="carry"
               name="Carry (yds)"
-              stroke="#39FF14"
+              stroke="#22d3ee"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, fill: '#39FF14' }}
+              activeDot={{ r: 4, fill: '#22d3ee' }}
             />
             <Line
               type="monotone"
               dataKey="ball_speed"
               name="Ball Speed"
-              stroke="#00FFD1"
+              stroke="#3b82f6"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, fill: '#00FFD1' }}
+              activeDot={{ r: 4, fill: '#3b82f6' }}
             />
             <Line
               type="monotone"
               dataKey="smash"
               name="Smash×10"
-              stroke="#ADFF2F"
+              stroke="#60a5fa"
               strokeWidth={1.5}
               strokeDasharray="4 2"
               dot={false}

@@ -5,18 +5,18 @@ import CourseDashboard from './pages/CourseDashboard';
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-dark-900 font-mono">
+      <div className="min-h-screen font-sans text-slate-200">
         {/* Top navigation bar */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-800/90 backdrop-blur-md border-b border-neon-green/10 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Golf flag icon */}
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <circle cx="14" cy="14" r="13" stroke="#39FF14" strokeWidth="1.5" strokeOpacity="0.4"/>
-              <path d="M9 22V8" stroke="#39FF14" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M9 8 L20 12 L9 16" fill="#39FF14" fillOpacity="0.8"/>
+              <circle cx="14" cy="14" r="13" stroke="#22d3ee" strokeWidth="1.5" strokeOpacity="0.4"/>
+              <path d="M9 22V8" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M9 8 L20 12 L9 16" fill="#22d3ee" fillOpacity="0.8"/>
             </svg>
-            <span className="text-neon-green font-bold text-lg tracking-wider">SWING<span className="text-white/60">DASH</span></span>
-            <span className="text-xs text-slate-500 ml-2 hidden sm:block">Golf Simulator Analytics</span>
+            <span className="font-extrabold text-lg tracking-wide bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">SWINGBOX</span>
+            <span className="text-xs text-slate-500 hidden sm:block">Golf Simulator</span>
           </div>
 
           <div className="flex items-center gap-2">

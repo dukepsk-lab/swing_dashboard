@@ -30,7 +30,7 @@ function drawIronSide(ctx, cx, cy, scale, aoa, faceAngle) {
   headGrad.addColorStop(1, '#1a2530');
   ctx.fillStyle = headGrad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(57,255,20,0.3)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.3)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -38,9 +38,9 @@ function drawIronSide(ctx, cx, cy, scale, aoa, faceAngle) {
   ctx.beginPath();
   ctx.moveTo(-6 * scale, 0);
   ctx.lineTo(-6 * scale, 12 * scale);
-  ctx.strokeStyle = '#39FF14';
+  ctx.strokeStyle = '#22d3ee';
   ctx.lineWidth = 2;
-  ctx.shadowColor = '#39FF14'; ctx.shadowBlur = 6;
+  ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 6;
   ctx.stroke();
   ctx.shadowBlur = 0;
 
@@ -48,7 +48,7 @@ function drawIronSide(ctx, cx, cy, scale, aoa, faceAngle) {
   ctx.beginPath();
   ctx.moveTo(-6 * scale, 12 * scale);
   ctx.lineTo(22 * scale, 10 * scale);
-  ctx.strokeStyle = 'rgba(57,255,20,0.2)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.2)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -80,7 +80,7 @@ function drawWoodSide(ctx, cx, cy, scale, aoa, faceAngle) {
   woodGrad.addColorStop(1, '#0e1820');
   ctx.fillStyle = woodGrad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(57,255,20,0.3)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.3)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -88,9 +88,9 @@ function drawWoodSide(ctx, cx, cy, scale, aoa, faceAngle) {
   ctx.beginPath();
   ctx.moveTo(-10 * scale, 0);
   ctx.lineTo(-6 * scale, 14 * scale);
-  ctx.strokeStyle = '#39FF14';
+  ctx.strokeStyle = '#22d3ee';
   ctx.lineWidth = 2.5;
-  ctx.shadowColor = '#39FF14'; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
+  ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
 
   ctx.restore();
 }
@@ -118,7 +118,7 @@ function drawIronTop(ctx, cx, cy, scale, clubPath, faceTarget) {
   tGrad.addColorStop(1, '#1a2530');
   ctx.fillStyle = tGrad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(57,255,20,0.3)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.3)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -131,9 +131,9 @@ function drawIronTop(ctx, cx, cy, scale, clubPath, faceTarget) {
   ctx.beginPath();
   ctx.moveTo(-4 * scale, 0);
   ctx.lineTo(-4 * scale, 8 * scale);
-  ctx.strokeStyle = '#00FFD1';
+  ctx.strokeStyle = '#3b82f6';
   ctx.lineWidth = 2.5;
-  ctx.shadowColor = '#00FFD1'; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
+  ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
   ctx.restore();
 }
 
@@ -156,7 +156,7 @@ function drawWoodTop(ctx, cx, cy, scale, clubPath, faceTarget) {
   wGrad.addColorStop(1, '#0e1820');
   ctx.fillStyle = wGrad;
   ctx.fill();
-  ctx.strokeStyle = 'rgba(57,255,20,0.3)';
+  ctx.strokeStyle = 'rgba(34,211,238,0.3)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -169,9 +169,9 @@ function drawWoodTop(ctx, cx, cy, scale, clubPath, faceTarget) {
   ctx.beginPath();
   ctx.moveTo(-8 * scale, -2 * scale);
   ctx.lineTo(-8 * scale, 10 * scale);
-  ctx.strokeStyle = '#00FFD1';
+  ctx.strokeStyle = '#3b82f6';
   ctx.lineWidth = 2.5;
-  ctx.shadowColor = '#00FFD1'; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
+  ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
   ctx.restore();
 }
 
@@ -218,12 +218,12 @@ export default function ClubHeadView({ shot }) {
     const cx = W * 0.42, cy = H * 0.56;
 
     // Grid
-    ctx.strokeStyle = 'rgba(57,255,20,0.05)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(34,211,238,0.05)'; ctx.lineWidth = 1;
     for (let x = 0; x <= W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y <= H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
     // Ground line
-    ctx.strokeStyle = 'rgba(57,255,20,0.2)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(34,211,238,0.2)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(0, cy + 14 * scale); ctx.lineTo(W, cy + 14 * scale); ctx.stroke();
 
     // Swing path direction arrow (at AoA)
@@ -231,23 +231,23 @@ export default function ClubHeadView({ shot }) {
     const arrowLen = 60;
     const ax = cx - Math.cos(pathAngle) * arrowLen;
     const ay = cy - Math.sin(pathAngle) * arrowLen;
-    ctx.strokeStyle = 'rgba(57,255,20,0.3)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(34,211,238,0.3)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
     ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(cx + Math.cos(pathAngle) * 20, cy + Math.sin(pathAngle) * 20); ctx.stroke();
     ctx.setLineDash([]);
 
     // AoA angle arc
     const horizAngle = 0;
-    drawAngleArc(ctx, cx, cy, 28, horizAngle, pathAngle, 'rgba(57,255,20,0.45)');
+    drawAngleArc(ctx, cx, cy, 28, horizAngle, pathAngle, 'rgba(34,211,238,0.45)');
 
     // Club head
     if (wood) drawWoodSide(ctx, cx, cy, scale, aoa, faceTgt);
     else drawIronSide(ctx, cx, cy, scale, aoa, faceTgt);
 
     // AoA label
-    drawAngleLabel(ctx, W * 0.75, cy - 8, aoa, '#39FF14', 'AoA', 0, 0);
+    drawAngleLabel(ctx, W * 0.75, cy - 8, aoa, '#22d3ee', 'AoA', 0, 0);
 
     // View label
-    ctx.fillStyle = 'rgba(57,255,20,0.3)'; ctx.font = '8px JetBrains Mono'; ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(34,211,238,0.3)'; ctx.font = '8px JetBrains Mono'; ctx.textAlign = 'left';
     ctx.fillText('SIDE VIEW · ATTACK ANGLE', 4, 10);
   }, [shot, aoa, faceTgt, wood, scale]);
 
@@ -261,12 +261,12 @@ export default function ClubHeadView({ shot }) {
     const cx = W * 0.4, cy = H * 0.55;
 
     // Grid
-    ctx.strokeStyle = 'rgba(57,255,20,0.05)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(34,211,238,0.05)'; ctx.lineWidth = 1;
     for (let x = 0; x <= W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y <= H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
     // Target line (straight ahead — upward = away)
-    ctx.strokeStyle = 'rgba(57,255,20,0.2)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(34,211,238,0.2)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
     ctx.beginPath(); ctx.moveTo(cx, H); ctx.lineTo(cx, 0); ctx.stroke();
     ctx.setLineDash([]);
 
@@ -275,10 +275,10 @@ export default function ClubHeadView({ shot }) {
     const arrowLen = 55;
     const bx = cx + Math.cos(cpAngle) * arrowLen;
     const by = cy + Math.sin(cpAngle) * arrowLen;
-    ctx.strokeStyle = 'rgba(57,255,20,0.5)'; ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(34,211,238,0.5)'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(cx - Math.cos(cpAngle) * 25, cy - Math.sin(cpAngle) * 25); ctx.lineTo(bx, by); ctx.stroke();
     // arrowhead
-    ctx.fillStyle = '#39FF14';
+    ctx.fillStyle = '#22d3ee';
     ctx.beginPath();
     ctx.moveTo(bx, by);
     ctx.lineTo(bx - 8 * Math.cos(cpAngle - 0.35), by - 8 * Math.sin(cpAngle - 0.35));
@@ -286,22 +286,22 @@ export default function ClubHeadView({ shot }) {
     ctx.closePath(); ctx.fill();
 
     // Path angle arc from target line
-    drawAngleArc(ctx, cx, cy, 26, -Math.PI / 2, cpAngle, 'rgba(57,255,20,0.4)');
+    drawAngleArc(ctx, cx, cy, 26, -Math.PI / 2, cpAngle, 'rgba(34,211,238,0.4)');
 
     // Face angle arc
     const faceAngle = (faceTgt * Math.PI) / 180 - Math.PI / 2;
-    drawAngleArc(ctx, cx, cy, 16, -Math.PI / 2, faceAngle, 'rgba(0,255,209,0.5)');
+    drawAngleArc(ctx, cx, cy, 16, -Math.PI / 2, faceAngle, 'rgba(59,130,246,0.5)');
 
     // Club head top view
     if (wood) drawWoodTop(ctx, cx, cy, scale, clubPath, faceTgt);
     else drawIronTop(ctx, cx, cy, scale, clubPath, faceTgt);
 
     // Labels
-    drawAngleLabel(ctx, W * 0.78, cy - 20, clubPath, '#39FF14', 'Path', 0, 0);
-    drawAngleLabel(ctx, W * 0.78, cy,       faceTgt, '#00FFD1', 'Face', 0, 0);
-    drawAngleLabel(ctx, W * 0.78, cy + 18,  facePath, clubPath - faceTgt > 0 ? '#FF6B35' : '#ADFF2F', 'F/P', 0, 0);
+    drawAngleLabel(ctx, W * 0.78, cy - 20, clubPath, '#22d3ee', 'Path', 0, 0);
+    drawAngleLabel(ctx, W * 0.78, cy,       faceTgt, '#3b82f6', 'Face', 0, 0);
+    drawAngleLabel(ctx, W * 0.78, cy + 18,  facePath, clubPath - faceTgt > 0 ? '#FF6B35' : '#60a5fa', 'F/P', 0, 0);
 
-    ctx.fillStyle = 'rgba(57,255,20,0.3)'; ctx.font = '8px JetBrains Mono'; ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(34,211,238,0.3)'; ctx.font = '8px JetBrains Mono'; ctx.textAlign = 'left';
     ctx.fillText('TOP VIEW · PATH & FACE', 4, 10);
   }, [shot, clubPath, faceTgt, facePath, wood, scale]);
 

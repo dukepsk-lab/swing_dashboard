@@ -9,7 +9,7 @@ export default function RoundSummary({ scores = [], courseName = '' }) {
 
   const bars = [
     { label: 'Eagle-', count: eagles, color: '#FFD700' },
-    { label: 'Birdie', count: birdies, color: '#39FF14' },
+    { label: 'Birdie', count: birdies, color: '#22d3ee' },
     { label: 'Par', count: pars, color: '#94a3b8' },
     { label: 'Bogey', count: bogeys, color: '#FB923C' },
     { label: 'Double+', count: doubles, color: '#EF4444' },

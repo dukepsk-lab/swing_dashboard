@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 
-const shapeColor = { straight: '#39FF14', draw: '#00FFD1', fade: '#ADFF2F', hook: '#FF6B6B', slice: '#FF4444' };
+const shapeColor = { straight: '#22d3ee', draw: '#3b82f6', fade: '#60a5fa', hook: '#FF6B6B', slice: '#FF4444' };
 
 export default function ShotHistoryTable({ shots }) {
   const recent = shots.slice(0, 20);
@@ -22,7 +22,7 @@ export default function ShotHistoryTable({ shots }) {
               {recent.map((s, i) => (
                 <motion.tr
                   key={s.id ?? s.timestamp ?? i}
-                  initial={{ opacity: 0, x: -10, backgroundColor: 'rgba(57,255,20,0.08)' }}
+                  initial={{ opacity: 0, x: -10, backgroundColor: 'rgba(34,211,238,0.08)' }}
                   animate={{ opacity: 1, x: 0, backgroundColor: 'rgba(0,0,0,0)' }}
                   transition={{ duration: 0.4 }}
                   className="table-row-hover border-b border-slate-800/40"

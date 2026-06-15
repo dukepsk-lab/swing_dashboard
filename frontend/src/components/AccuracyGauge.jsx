@@ -5,7 +5,7 @@ export default function AccuracyGauge({ shots }) {
   const onTarget = shots.filter(s => s.in_target).length;
   const pct = total > 0 ? Math.round((onTarget / total) * 100) : 0;
 
-  const color = pct >= 80 ? '#39FF14' : pct >= 60 ? '#ADFF2F' : '#FF6B6B';
+  const color = pct >= 80 ? '#22d3ee' : pct >= 60 ? '#60a5fa' : '#FF6B6B';
   const data = [{ value: pct, fill: color }];
 
   const fairways = total > 0 ? Math.round((shots.filter(s => Math.abs(s.lateral_offset) < 12).length / total) * 100) : 0;

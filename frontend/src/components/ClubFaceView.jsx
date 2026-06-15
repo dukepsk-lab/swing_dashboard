@@ -14,8 +14,8 @@ const CLUB_SHAPES = {
 
 function impactColor(h, v) {
   const d = Math.sqrt(h * h + v * v);
-  if (d < 0.25) return '#39FF14';
-  if (d < 0.5)  return '#ADFF2F';
+  if (d < 0.25) return '#22d3ee';
+  if (d < 0.5)  return '#60a5fa';
   if (d < 0.75) return '#FFD600';
   return '#FF4444';
 }
@@ -41,7 +41,7 @@ export default function ClubFaceView({ shot }) {
     ctx.ellipse(cx, cy, rx + 6, ry + 6, 0, 0, Math.PI * 2);
     ctx.fillStyle = '#0D1117';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(57,255,20,0.25)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.25)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
@@ -53,7 +53,7 @@ export default function ClubFaceView({ shot }) {
     faceGrad.addColorStop(1, '#0e1a24');
     ctx.fillStyle = faceGrad;
     ctx.fill();
-    ctx.strokeStyle = 'rgba(57,255,20,0.18)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.18)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -69,14 +69,14 @@ export default function ClubFaceView({ shot }) {
       ctx.beginPath();
       ctx.moveTo(cx - rx + 4, gy);
       ctx.lineTo(cx + rx - 4, gy);
-      ctx.strokeStyle = 'rgba(57,255,20,0.08)';
+      ctx.strokeStyle = 'rgba(34,211,238,0.08)';
       ctx.lineWidth = 1.2;
       ctx.stroke();
     }
     ctx.restore();
 
     // Crosshair
-    ctx.strokeStyle = 'rgba(57,255,20,0.15)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.15)';
     ctx.lineWidth = 0.8;
     ctx.setLineDash([3, 4]);
     ctx.beginPath(); ctx.moveTo(cx, cy - ry + 4); ctx.lineTo(cx, cy + ry - 4); ctx.stroke();
@@ -86,7 +86,7 @@ export default function ClubFaceView({ shot }) {
     // Ideal sweet-spot ring
     ctx.beginPath();
     ctx.arc(cx, cy, Math.min(rx, ry) * 0.28, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(57,255,20,0.20)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.20)';
     ctx.lineWidth = 1;
     ctx.stroke();
 

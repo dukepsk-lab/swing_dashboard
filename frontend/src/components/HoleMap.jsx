@@ -38,8 +38,8 @@ export default function HoleMap({ holeData }) {
     });
 
     // Tee box
-    ctx.fillStyle = '#39FF14';
-    ctx.shadowColor = '#39FF14';
+    ctx.fillStyle = '#22d3ee';
+    ctx.shadowColor = '#22d3ee';
     ctx.shadowBlur = 8;
     ctx.beginPath();
     ctx.arc(cx, H - pad, 6, 0, Math.PI * 2);
@@ -76,9 +76,9 @@ export default function HoleMap({ holeData }) {
     for (let i = 1; i < pts.length; i++) {
       const p0 = pts[i - 1];
       const p1 = pts[i];
-      ctx.strokeStyle = `rgba(57,255,20,${0.8 - i * 0.1})`;
+      ctx.strokeStyle = `rgba(34,211,238,${0.8 - i * 0.1})`;
       ctx.lineWidth = 2;
-      ctx.shadowColor = '#39FF14';
+      ctx.shadowColor = '#22d3ee';
       ctx.shadowBlur = 4;
       ctx.beginPath();
       ctx.moveTo(p0.cx, p0.cy);
@@ -87,12 +87,12 @@ export default function HoleMap({ holeData }) {
       ctx.shadowBlur = 0;
 
       // Shot dot
-      ctx.fillStyle = '#39FF14';
+      ctx.fillStyle = '#22d3ee';
       ctx.beginPath();
       ctx.arc(p1.cx, p1.cy, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = 'rgba(57,255,20,0.7)';
+      ctx.fillStyle = 'rgba(34,211,238,0.7)';
       ctx.font = '9px JetBrains Mono';
       ctx.fillText(path[i - 1]?.label || '', p1.cx + 5, p1.cy - 4);
     }

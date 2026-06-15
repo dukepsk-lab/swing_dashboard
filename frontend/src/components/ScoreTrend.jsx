@@ -35,20 +35,20 @@ export default function ScoreTrend({ scores = [] }) {
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(57,255,20,0.07)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,211,238,0.07)" />
             <XAxis dataKey="hole" tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} label={{ value: 'Hole', position: 'insideBottom', fill: '#475569', fontSize: 10, offset: -2 }} />
             <YAxis tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
-            <ReferenceLine y={0} stroke="rgba(57,255,20,0.4)" strokeDasharray="4 2" label={{ value: 'E', fill: '#39FF14', fontSize: 10 }} />
+            <ReferenceLine y={0} stroke="rgba(34,211,238,0.4)" strokeDasharray="4 2" label={{ value: 'E', fill: '#22d3ee', fontSize: 10 }} />
             <Line
               type="monotone"
               dataKey="cumulative"
               name="vs Par"
-              stroke="#00FFD1"
+              stroke="#3b82f6"
               strokeWidth={2.5}
               dot={(props) => {
                 const { cx, cy, payload } = props;
-                const color = payload.cumulative <= 0 ? '#39FF14' : '#FF6B6B';
+                const color = payload.cumulative <= 0 ? '#22d3ee' : '#FF6B6B';
                 return <circle key={props.key} cx={cx} cy={cy} r={4} fill={color} stroke={color} />;
               }}
             />

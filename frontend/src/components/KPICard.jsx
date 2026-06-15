@@ -20,8 +20,8 @@ export default function KPICard({ label, value, unit, prev, highlight = false, i
         <motion.span
           key={value}
           className={`text-2xl font-bold ${highlight ? 'text-neon-green' : 'text-white'}`}
-          initial={{ scale: 1.15, color: '#39FF14' }}
-          animate={{ scale: 1, color: highlight ? '#39FF14' : '#ffffff' }}
+          initial={{ scale: 1.15, color: '#22d3ee' }}
+          animate={{ scale: 1, color: highlight ? '#22d3ee' : '#ffffff' }}
           transition={{ duration: 0.4 }}
         >
           {value ?? '--'}

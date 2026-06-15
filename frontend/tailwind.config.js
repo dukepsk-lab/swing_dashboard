@@ -4,20 +4,22 @@ export default {
   theme: {
     extend: {
       colors: {
+        // navy/cyan theme — names kept (`neon-*`) so existing classes retint
         neon: {
-          green: "#39FF14",
-          lime: "#ADFF2F",
-          teal: "#00FFD1",
+          green: "#22d3ee", // primary accent (cyan)
+          lime: "#60a5fa",  // sky
+          teal: "#3b82f6",  // blue
         },
         dark: {
-          900: "#080C10",
-          800: "#0D1117",
-          700: "#131A22",
-          600: "#1C2632",
-          500: "#243040",
+          900: "#060914",
+          800: "#0a0f20",
+          700: "#141c34",
+          600: "#1b2546",
+          500: "#243156",
         },
       },
       fontFamily: {
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         mono: ["JetBrains Mono", "Fira Code", "monospace"],
       },
       animation: {
@@ -28,12 +30,11 @@ export default {
       keyframes: {
         fadeIn: { "0%": { opacity: 0, transform: "translateY(8px)" }, "100%": { opacity: 1, transform: "translateY(0)" } },
         glow: {
-          "0%, 100%": { boxShadow: "0 0 5px #39FF14, 0 0 10px #39FF14" },
-          "50%": { boxShadow: "0 0 20px #39FF14, 0 0 40px #39FF14" },
+          "0%, 100%": { boxShadow: "0 0 5px #22d3ee, 0 0 10px #3b82f6" },
+          "50%": { boxShadow: "0 0 20px #22d3ee, 0 0 40px #3b82f6" },
         },
       },
     },
   },
   plugins: [],
 };
-

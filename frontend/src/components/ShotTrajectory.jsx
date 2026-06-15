@@ -14,7 +14,7 @@ export default function ShotTrajectory({ shot }) {
     ctx.clearRect(0, 0, W, H);
 
     // Background grid
-    ctx.strokeStyle = 'rgba(57,255,20,0.05)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.05)';
     ctx.lineWidth = 1;
     for (let x = 0; x <= W; x += 40) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
@@ -36,7 +36,7 @@ export default function ShotTrajectory({ shot }) {
     const startX = 30;
 
     // Draw ground line
-    ctx.strokeStyle = 'rgba(57,255,20,0.15)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.15)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, baseY);
@@ -58,7 +58,7 @@ export default function ShotTrajectory({ shot }) {
     const landLateral = (lateral / carry) * 20;
 
     // Faint trail
-    ctx.strokeStyle = 'rgba(57,255,20,0.12)';
+    ctx.strokeStyle = 'rgba(34,211,238,0.12)';
     ctx.lineWidth = 6;
     ctx.beginPath();
     pts.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
@@ -66,12 +66,12 @@ export default function ShotTrajectory({ shot }) {
 
     // Main trajectory gradient
     const grad = ctx.createLinearGradient(startX, baseY, landX, baseY);
-    grad.addColorStop(0, 'rgba(57,255,20,0.9)');
-    grad.addColorStop(0.5, 'rgba(0,255,209,0.9)');
-    grad.addColorStop(1, 'rgba(57,255,20,0.4)');
+    grad.addColorStop(0, 'rgba(34,211,238,0.9)');
+    grad.addColorStop(0.5, 'rgba(59,130,246,0.9)');
+    grad.addColorStop(1, 'rgba(34,211,238,0.4)');
     ctx.strokeStyle = grad;
     ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#39FF14';
+    ctx.shadowColor = '#22d3ee';
     ctx.shadowBlur = 8;
     ctx.beginPath();
     pts.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
@@ -80,21 +80,21 @@ export default function ShotTrajectory({ shot }) {
 
     // Apex dot
     const apexPt = pts[Math.floor(steps / 2)];
-    ctx.fillStyle = '#00FFD1';
-    ctx.shadowColor = '#00FFD1';
+    ctx.fillStyle = '#3b82f6';
+    ctx.shadowColor = '#3b82f6';
     ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.arc(apexPt.x, apexPt.y, 4, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    ctx.fillStyle = 'rgba(0,255,209,0.8)';
+    ctx.fillStyle = 'rgba(59,130,246,0.8)';
     ctx.font = '10px JetBrains Mono';
     ctx.fillText(`${apex.toFixed(0)}y`, apexPt.x + 6, apexPt.y - 4);
 
     // Start dot
-    ctx.fillStyle = '#39FF14';
-    ctx.shadowColor = '#39FF14';
+    ctx.fillStyle = '#22d3ee';
+    ctx.shadowColor = '#22d3ee';
     ctx.shadowBlur = 8;
     ctx.beginPath();
     ctx.arc(startX, baseY, 5, 0, Math.PI * 2);
@@ -102,13 +102,13 @@ export default function ShotTrajectory({ shot }) {
     ctx.shadowBlur = 0;
 
     // Landing dot
-    ctx.fillStyle = '#39FF14';
+    ctx.fillStyle = '#22d3ee';
     ctx.beginPath();
     ctx.arc(landX, baseY, 5, 0, Math.PI * 2);
     ctx.fill();
 
     // Labels
-    ctx.fillStyle = 'rgba(57,255,20,0.7)';
+    ctx.fillStyle = 'rgba(34,211,238,0.7)';
     ctx.font = '10px JetBrains Mono';
     ctx.fillText(`${carry.toFixed(0)}y`, landX - 14, baseY + 14);
     ctx.fillText(shot.club || '', startX, baseY + 14);
@@ -116,7 +116,7 @@ export default function ShotTrajectory({ shot }) {
     // Lateral offset indicator
     if (Math.abs(lateral) > 1) {
       const dir = lateral > 0 ? 'R' : 'L';
-      ctx.fillStyle = lateral > 15 ? '#FF6B6B' : 'rgba(57,255,20,0.6)';
+      ctx.fillStyle = lateral > 15 ? '#FF6B6B' : 'rgba(34,211,238,0.6)';
       ctx.fillText(`${Math.abs(lateral).toFixed(0)}y ${dir}`, landX - 14, baseY + 26);
     }
   }, [shot]);
