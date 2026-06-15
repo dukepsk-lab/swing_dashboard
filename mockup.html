@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SwingDash — Mockup (GSPro Connect + open-golf-coach)</title>
+<style>
+  :root{
+    --neon:#39FF14; --neon-dim:rgba(57,255,20,.12); --neon-bd:rgba(57,255,20,.25);
+    --bg900:#0a0e0a; --bg800:#0f140f; --bg700:#141a14; --bg600:#1b231b;
+    --txt:#e8f0e8; --mut:#7c8a7c; --cyan:#4FC3F7; --lime:#ADFF2F;
+    --amber:#FFD600; --orange:#FF6B35; --red:#FF4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%,rgba(57,255,20,.06),transparent),var(--bg900);
+    color:var(--txt);
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    min-height:100vh;
+  }
+  a{color:inherit}
+  .wrap{max-width:1500px;margin:0 auto;padding:0 18px 60px}
+
+  /* nav */
+  nav{
+    position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+    background:rgba(15,20,15,.85);border-bottom:1px solid var(--neon-bd);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 22px;margin-bottom:18px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand b{color:var(--neon);font-size:19px;letter-spacing:2px}
+  .brand b span{color:rgba(232,240,232,.55)}
+  .brand small{color:var(--mut);font-size:11px;margin-left:6px}
+  .tabs{display:flex;gap:8px}
+  .tab{padding:7px 16px;border-radius:9px;font-size:13px;font-weight:600;border:1px solid transparent;color:var(--mut);cursor:pointer}
+  .tab.active{background:var(--neon-dim);color:var(--neon);border-color:var(--neon-bd)}
+  .conn{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:11px}
+  .dot{width:9px;height:9px;border-radius:50%}
+  .dot.on{background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s infinite}
+  .dot.off{background:#566556}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* session bar */
+  .sbar{
+    display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+    background:rgba(20,26,20,.6);border:1px solid var(--neon-bd);
+    border-radius:13px;padding:10px 16px;margin-bottom:16px;font-size:12px;
+  }
+  .sbar .sep{width:1px;height:16px;background:#33402f}
+  .sbar .live{color:var(--neon);font-weight:700;letter-spacing:1px}
+  .sbar .mut{color:var(--mut)}
+  .sbar .val{color:#fff}
+  .pill{margin-left:auto;display:flex;align-items:center;gap:8px}
+  select{background:var(--bg600);border:1px solid var(--neon-bd);color:var(--neon);font:inherit;font-size:12px;border-radius:8px;padding:4px 8px;cursor:pointer}
+  .src{font-size:10px;color:var(--mut);border:1px solid #33402f;border-radius:6px;padding:2px 6px}
+
+  /* banner */
+  .banner{
+    display:flex;gap:12px;align-items:flex-start;
+    background:linear-gradient(90deg,rgba(57,255,20,.07),transparent);
+    border:1px solid var(--neon-bd);border-left:3px solid var(--neon);
+    border-radius:11px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.55;
+  }
+  .banner b{color:var(--neon)}
+  .banner .mut{color:var(--mut)}
+
+  /* KPI grid */
+  .kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin-bottom:16px}
+  @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--bg700);border:1px solid #243024;border-radius:13px;padding:13px 14px;position:relative;overflow:hidden}
+  .kpi.hl{border-color:var(--neon-bd);box-shadow:0 0 0 1px var(--neon-dim) inset}
+  .kpi .lbl{font-size:10.5px;color:var(--mut);letter-spacing:.5px;display:flex;gap:5px;align-items:center}
+  .kpi .num{font-size:26px;font-weight:700;margin-top:6px}
+  .kpi.hl .num{color:var(--neon)}
+  .kpi .u{font-size:12px;color:var(--mut);margin-left:3px;font-weight:400}
+  .kpi .delta{font-size:10.5px;margin-top:3px}
+  .up{color:var(--neon)} .down{color:var(--orange)}
+
+  /* panels */
+  .grid2{display:grid;grid-template-columns:2fr 1fr;gap:15px;margin-bottom:15px}
+  .grid3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:15px;margin-bottom:15px}
+  @media(max-width:980px){.grid2,.grid3{grid-template-columns:1fr}}
+  .panel{background:var(--bg700);border:1px solid #243024;border-radius:14px;padding:16px}
+  .panel h3{font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+  canvas{width:100%;display:block;border-radius:10px;background:linear-gradient(180deg,#0d120d,#0a0e0a)}
+
+  /* shot detail */
+  .detail{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .rank{width:84px;height:84px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;flex-shrink:0}
+  .dstats{display:grid;grid-template-columns:repeat(4,auto);gap:14px 26px}
+  .dstat .k{font-size:10px;color:var(--mut)}
+  .dstat .v{font-size:18px;font-weight:700;margin-top:2px}
+  .tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{color:var(--mut);font-weight:600;text-align:right;padding:7px 9px;border-bottom:1px solid #243024;font-size:10.5px;letter-spacing:.5px}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:8px 9px;border-bottom:1px solid #1a221a;text-align:right}
+  tr:hover td{background:rgba(57,255,20,.04)}
+  .shape{font-size:10.5px;padding:1px 8px;border-radius:12px}
+
+  .btn{background:var(--neon-dim);border:1px solid var(--neon-bd);color:var(--neon);font:inherit;font-size:12px;font-weight:700;border-radius:9px;padding:6px 13px;cursor:pointer}
+  .btn:hover{background:rgba(57,255,20,.2)}
+  .foot{color:var(--mut);font-size:11px;text-align:center;margin-top:26px;line-height:1.6}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#39FF14" stroke-width="1.5" stroke-opacity=".4"/><path d="M9 22V8" stroke="#39FF14" stroke-width="2" stroke-linecap="round"/><path d="M9 8 L20 12 L9 16" fill="#39FF14" fill-opacity=".8"/></svg>
+    <b>SWING<span>DASH</span></b><small>Golf Simulator Analytics</small>
+  </div>
+  <div class="tabs"><div class="tab active">Driving Range</div><div class="tab">Course Play</div></div>
+  <div class="conn"><span>GSPro Connect · relay</span><span class="dot on"></span></div>
+</nav>
+
+<div class="wrap">
+
+  <div class="sbar">
+    <span class="dot on"></span><span class="live">LIVE SESSION</span>
+    <div class="sep"></div>
+    <span class="mut">⏱ <span class="val">12:47</span></span>
+    <span class="mut">🏌️ <span class="val" id="shotCount">4</span> shots</span>
+    <div class="sep"></div>
+    <span class="dot on"></span><span class="live">LAUNCH MONITOR · GSPro</span>
+    <div class="pill">
+      <span class="mut">Club:</span>
+      <select id="club"><option>Driver</option><option selected>7 Iron</option><option>5 Iron</option><option>PW</option></select>
+      <span class="src">from GSPro</span>
+      <button class="btn" onclick="nextShot()">⚡ Next sample shot</button>
+    </div>
+  </div>
+
+  <div class="banner">
+    <span>🧠</span>
+    <div>
+      <b>Reverse-calculated by open-golf-coach.</b> launch monitor ส่งมาแค่ <span class="mut">ball data</span>
+      (Speed, VLA, HLA, TotalSpin, SpinAxis) — ค่า <b>Club Speed / Smash / Club Path / Face / Carry / Shot grade</b>
+      ทั้งหมดถูกคำนวนย้อนกลับด้วย <span class="mut">opengolfcoach.calculate_derived_values()</span>.
+      เหล็กที่เลือก (<b>7 Iron</b>) ดึงจาก GSPro <span class="mut">Player.Club</span> ในโหมด relay.
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid3">
+    <div class="panel">
+      <h3>Shot Detail <span id="dname" class="mut"></span></h3>
+      <div class="detail">
+        <div class="rank" id="rank">A</div>
+        <div class="dstats" id="dstats"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Ball Flight · side</h3>
+      <canvas id="traj" height="180"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Dispersion · top</h3>
+      <canvas id="disp" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Shot History <span class="mut">last shots · derived metrics</span></h3>
+    <table>
+      <thead><tr><th>#</th><th>Club</th><th>Ball</th><th>Club spd</th><th>Smash</th><th>Launch</th><th>Spin</th><th>Path</th><th>Face</th><th>Carry</th><th>Total</th><th>Shape</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="foot">
+    SwingDash mockup · ข้อมูลตัวอย่างจริงจาก pipeline (GSPro Open Connect V1 → open-golf-coach)<br>
+    ของจริงเป็น React + FastAPI ที่อัปเดตแบบ real-time ผ่าน WebSocket
+  </div>
+</div>
+
+<script>
+// Sample shots: input = GSPro BallData, derived = open-golf-coach output (from real test runs)
+const SHOTS = [
+  {n:1, club:"7 Iron", ball:148.0, clubspd:101.5, smash:1.46, launch:21.0, spin:6100, path:0.3, face:-0.9, carry:178.4, total:191.2, lateral:-2.1, apex:92, shape:"draw",     name:"Straight Draw", rank:"A", color:"#39FF14"},
+  {n:2, club:"7 Iron", ball:131.0, clubspd:96.4,  smash:1.36, launch:18.0, spin:6090, path:-0.0,face:1.0,  carry:191.4, total:205.0, lateral:8.1,  apex:88, shape:"straight", name:"Straight",      rank:"B", color:"#ADFF2F"},
+  {n:3, club:"Driver",  ball:167.0, clubspd:112.4, smash:1.49, launch:12.5, spin:2550, path:0.0, face:-1.4, carry:271.4, total:276.2, lateral:-13.9,apex:106,shape:"draw",     name:"Straight Draw", rank:"A", color:"#39FF14"},
+  {n:4, club:"7 Iron", ball:118.0, clubspd:92.3,  smash:1.28, launch:24.5, spin:7180, path:-1.1,face:4.8,  carry:157.9, total:166.0, lateral:33.6, apex:79, shape:"slice",    name:"Push Slice",    rank:"D", color:"#FF6B35"},
+];
+const SHAPE_COLORS={straight:"#39FF14",draw:"#4FC3F7",fade:"#FFD600",hook:"#ADFF2F",slice:"#FF6B35"};
+let idx = 2; // start on the Driver bomb
+
+const KPIS=[
+  {k:"Ball Speed",   f:s=>s.ball.toFixed(1),    u:"mph", key:"ball"},
+  {k:"Club Speed",   f:s=>s.clubspd.toFixed(1), u:"mph", key:"clubspd"},
+  {k:"Smash Factor", f:s=>s.smash.toFixed(2),   u:"",    key:"smash"},
+  {k:"Launch Angle", f:s=>s.launch.toFixed(1),  u:"°",   key:"launch"},
+  {k:"Spin Rate",    f:s=>s.spin.toLocaleString(),u:"rpm",key:"spin"},
+  {k:"Carry",        f:s=>s.carry.toFixed(0),   u:"yds", key:"carry", hl:true},
+  {k:"Total",        f:s=>s.total.toFixed(0),   u:"yds", key:"total"},
+];
+
+function render(){
+  const s=SHOTS[idx], prev=SHOTS[(idx-1+SHOTS.length)%SHOTS.length];
+  document.getElementById("club").value = SHOTS.find(x=>x.club)? s.club : "7 Iron";
+  // KPIs
+  document.getElementById("kpis").innerHTML = KPIS.map(c=>{
+    const d = s[c.key]-prev[c.key];
+    const da = c.u==="rpm"? Math.round(d).toLocaleString() : (c.key==="smash"? d.toFixed(2):d.toFixed(1));
+    const cls = d>=0?"up":"down", arr=d>=0?"▲":"▼";
+    return `<div class="kpi ${c.hl?'hl':''}"><div class="lbl">${c.k}</div>
+      <div class="num">${c.f(s)}<span class="u">${c.u}</span></div>
+      <div class="delta ${cls}">${arr} ${da} ${c.u}</div></div>`;
+  }).join("");
+  // detail
+  const rk=document.getElementById("rank");
+  rk.textContent=s.rank; rk.style.background=s.color+"22"; rk.style.color=s.color; rk.style.border="1px solid "+s.color+"66";
+  document.getElementById("dname").innerHTML=`<span class="tag" style="background:${s.color}22;color:${s.color}">${s.name}</span>`;
+  const ds=[["Smash",s.smash.toFixed(2)],["Club Path",s.path.toFixed(1)+"°"],["Face→Tgt",s.face.toFixed(1)+"°"],["Apex",s.apex+" ft"],
+            ["Club Speed",s.clubspd.toFixed(1)+" mph"],["Launch",s.launch.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()],["Carry",s.carry.toFixed(0)+" yds"]];
+  document.getElementById("dstats").innerHTML=ds.map(([k,v])=>`<div class="dstat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+  // table
+  document.getElementById("rows").innerHTML=[...SHOTS].reverse().map(x=>`<tr>
+    <td>${x.n}</td><td>${x.club}</td><td>${x.ball.toFixed(1)}</td><td>${x.clubspd.toFixed(1)}</td>
+    <td>${x.smash.toFixed(2)}</td><td>${x.launch.toFixed(1)}</td><td>${x.spin.toLocaleString()}</td>
+    <td>${x.path.toFixed(1)}</td><td>${x.face.toFixed(1)}</td><td>${x.carry.toFixed(0)}</td><td>${x.total.toFixed(0)}</td>
+    <td><span class="shape" style="background:${SHAPE_COLORS[x.shape]}22;color:${SHAPE_COLORS[x.shape]}">${x.shape}</span></td></tr>`).join("");
+  document.getElementById("shotCount").textContent=SHOTS.length;
+  drawTraj(s); drawDisp();
+}
+
+function fit(c){const w=c.clientWidth,h=c.height;const r=window.devicePixelRatio||1;c.width=w*r;c.height=h*r;const x=c.getContext("2d");x.setTransform(r,0,0,r,0,0);return{x,w,h};}
+
+function drawTraj(s){
+  const c=document.getElementById("traj");const{x,w,h}=fit(c);
+  const padL=34,padB=24,gw=w-padL-12,gh=h-padB-12;
+  // grid + ground
+  x.strokeStyle="#1c241c";x.lineWidth=1;
+  for(let i=0;i<=4;i++){const yy=12+gh*i/4;x.beginPath();x.moveTo(padL,yy);x.lineTo(w-12,yy);x.stroke();}
+  x.fillStyle="#566556";x.font="9px monospace";
+  x.fillText("ft",6,16);x.fillText("0",padL-12,h-padB+12);x.fillText(s.carry.toFixed(0)+"y",w-34,h-padB+12);
+  const maxY=Math.max(60,s.apex*1.15);
+  // parabola
+  x.beginPath();
+  for(let i=0;i<=60;i++){const t=i/60;const px=padL+gw*t;const yv=4*s.apex*t*(1-t);const py=12+gh-(yv/maxY)*gh;i?x.lineTo(px,py):x.moveTo(px,py);}
+  x.strokeStyle=s.color;x.lineWidth=2.5;x.shadowColor=s.color;x.shadowBlur=8;x.stroke();x.shadowBlur=0;
+  // apex marker
+  const apx=padL+gw*0.5, apy=12+gh-(s.apex/maxY)*gh;
+  x.fillStyle=s.color;x.beginPath();x.arc(apx,apy,3,0,7);x.fill();
+  x.fillStyle="#9fb09f";x.fillText("apex "+s.apex+"ft",apx-22,apy-7);
+  // ball landing
+  x.fillStyle="#fff";x.beginPath();x.arc(padL+gw,12+gh,3.5,0,7);x.fill();
+}
+
+function drawDisp(){
+  const c=document.getElementById("disp");const{x,w,h}=fit(c);
+  const cx=w/2;
+  x.strokeStyle="#1c241c";x.beginPath();x.moveTo(cx,8);x.lineTo(cx,h-8);x.stroke();
+  for(let i=1;i<=3;i++){x.beginPath();x.moveTo(8,8+(h-16)*i/4);x.lineTo(w-8,8+(h-16)*i/4);x.stroke();}
+  x.fillStyle="#566556";x.font="9px monospace";x.fillText("L",10,h-10);x.fillText("R",w-16,h-10);x.fillText("target",cx-18,14);
+  const maxLat=Math.max(...SHOTS.map(s=>Math.abs(s.lateral)),20);
+  const maxCar=Math.max(...SHOTS.map(s=>s.carry));
+  SHOTS.forEach((s,i)=>{
+    const px=cx+(s.lateral/maxLat)*(w/2-16);
+    const py=(h-14)-(s.carry/maxCar)*(h-26);
+    const on=Math.abs(s.lateral)<18;
+    x.fillStyle=i===idx?"#fff":(on?"#39FF14":"#FF6B35");
+    x.beginPath();x.arc(px,py,i===idx?5.5:4,0,7);x.fill();
+    if(i===idx){x.strokeStyle=s.color;x.lineWidth=2;x.beginPath();x.arc(px,py,8,0,7);x.stroke();}
+  });
+}
+
+function nextShot(){idx=(idx+1)%SHOTS.length;render();}
+window.addEventListener("resize",()=>render());
+render();
+</script>
+</body>
+</html>
