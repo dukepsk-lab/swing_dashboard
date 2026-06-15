@@ -3,274 +3,295 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SwingDash — Mockup (GSPro Connect + open-golf-coach)</title>
+<title>SwingDash — Mockup</title>
 <style>
   :root{
-    --neon:#39FF14; --neon-dim:rgba(57,255,20,.12); --neon-bd:rgba(57,255,20,.25);
-    --bg900:#0a0e0a; --bg800:#0f140f; --bg700:#141a14; --bg600:#1b231b;
-    --txt:#e8f0e8; --mut:#7c8a7c; --cyan:#4FC3F7; --lime:#ADFF2F;
-    --amber:#FFD600; --orange:#FF6B35; --red:#FF4444;
+    --bg:#060914; --bg2:#0a0f20;
+    --card:rgba(20,28,52,.55); --card2:rgba(15,22,42,.7);
+    --bd:rgba(120,150,220,.14); --bd2:rgba(120,150,220,.28);
+    --txt:#e6ecff; --mut:#8a97c2; --dim:#5b6b96;
+    --blue:#3b82f6; --cyan:#22d3ee; --sky:#60a5fa;
+    --grn:#34d399; --amber:#fbbf24; --orange:#fb923c; --red:#f87171; --violet:#a78bfa;
+    --grad:linear-gradient(135deg,#3b82f6,#22d3ee);
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
   body{
-    background:radial-gradient(1200px 600px at 70% -10%,rgba(57,255,20,.06),transparent),var(--bg900);
-    color:var(--txt);
-    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    min-height:100vh;
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--txt);min-height:100vh;letter-spacing:.1px;
+    background:
+      radial-gradient(900px 500px at 12% -8%,rgba(59,130,246,.18),transparent 60%),
+      radial-gradient(800px 500px at 92% 0%,rgba(34,211,238,.12),transparent 55%),
+      radial-gradient(700px 600px at 50% 120%,rgba(124,92,246,.10),transparent 60%),
+      var(--bg);
   }
-  a{color:inherit}
-  .wrap{max-width:1500px;margin:0 auto;padding:0 18px 60px}
+  .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1480px;margin:0 auto;padding:0 22px 70px}
 
   /* nav */
   nav{
-    position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
-    background:rgba(15,20,15,.85);border-bottom:1px solid var(--neon-bd);
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(180deg,rgba(8,12,26,.92),rgba(8,12,26,.62));
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--bd);
     display:flex;align-items:center;justify-content:space-between;
-    padding:12px 22px;margin-bottom:18px;
+    padding:14px 26px;margin-bottom:26px;
   }
-  .brand{display:flex;align-items:center;gap:12px}
-  .brand b{color:var(--neon);font-size:19px;letter-spacing:2px}
-  .brand b span{color:rgba(232,240,232,.55)}
-  .brand small{color:var(--mut);font-size:11px;margin-left:6px}
-  .tabs{display:flex;gap:8px}
-  .tab{padding:7px 16px;border-radius:9px;font-size:13px;font-weight:600;border:1px solid transparent;color:var(--mut);cursor:pointer}
-  .tab.active{background:var(--neon-dim);color:var(--neon);border-color:var(--neon-bd)}
-  .conn{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:11px}
-  .dot{width:9px;height:9px;border-radius:50%}
-  .dot.on{background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s infinite}
-  .dot.off{background:#566556}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .brand{display:flex;align-items:center;gap:13px}
+  .logo{width:38px;height:38px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(34,211,238,.35)}
+  .brand .nm{font-weight:800;font-size:19px;letter-spacing:.5px}
+  .brand .nm span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand .sub{color:var(--mut);font-size:11.5px;margin-left:8px;font-weight:500}
+  .tabs{display:flex;gap:6px;background:rgba(255,255,255,.03);padding:5px;border-radius:13px;border:1px solid var(--bd)}
+  .tab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;transition:.2s}
+  .tab.active{background:var(--grad);color:#04122b;box-shadow:0 4px 16px rgba(34,211,238,.3)}
+  .tab:not(.active):hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  .chip{display:flex;align-items:center;gap:8px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:var(--grn);font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:30px}
+  .dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 currentColor;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 7px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 transparent}}
 
   /* session bar */
-  .sbar{
-    display:flex;flex-wrap:wrap;align-items:center;gap:14px;
-    background:rgba(20,26,20,.6);border:1px solid var(--neon-bd);
-    border-radius:13px;padding:10px 16px;margin-bottom:16px;font-size:12px;
-  }
-  .sbar .sep{width:1px;height:16px;background:#33402f}
-  .sbar .live{color:var(--neon);font-weight:700;letter-spacing:1px}
-  .sbar .mut{color:var(--mut)}
-  .sbar .val{color:#fff}
-  .pill{margin-left:auto;display:flex;align-items:center;gap:8px}
-  select{background:var(--bg600);border:1px solid var(--neon-bd);color:var(--neon);font:inherit;font-size:12px;border-radius:8px;padding:4px 8px;cursor:pointer}
-  .src{font-size:10px;color:var(--mut);border:1px solid #33402f;border-radius:6px;padding:2px 6px}
+  .sbar{display:flex;flex-wrap:wrap;align-items:center;gap:18px;
+    background:var(--card);border:1px solid var(--bd);border-radius:18px;
+    padding:14px 20px;margin-bottom:18px;backdrop-filter:blur(12px);font-size:13px}
+  .sb-i{display:flex;align-items:center;gap:8px;color:var(--mut)}
+  .sb-i b{color:var(--txt);font-weight:700}
+  .sb-i .ic{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:13px}
+  .sep{width:1px;height:22px;background:var(--bd2)}
+  .pill{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .lm{display:flex;align-items:center;gap:8px;color:var(--cyan);font-weight:600;font-size:12px}
+  select{font:inherit;font-size:13px;font-weight:600;background:rgba(255,255,255,.05);border:1px solid var(--bd2);color:var(--sky);border-radius:10px;padding:7px 11px;cursor:pointer}
+  .src{font-size:10px;color:var(--cyan);background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);border-radius:7px;padding:3px 8px;font-weight:600}
+  .btn{font:inherit;font-size:13px;font-weight:700;color:#04122b;background:var(--grad);border:none;border-radius:11px;padding:9px 16px;cursor:pointer;box-shadow:0 6px 18px rgba(34,211,238,.3);transition:.2s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(34,211,238,.42)}
 
   /* banner */
-  .banner{
-    display:flex;gap:12px;align-items:flex-start;
-    background:linear-gradient(90deg,rgba(57,255,20,.07),transparent);
-    border:1px solid var(--neon-bd);border-left:3px solid var(--neon);
-    border-radius:11px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;line-height:1.55;
-  }
-  .banner b{color:var(--neon)}
-  .banner .mut{color:var(--mut)}
+  .banner{display:flex;gap:14px;align-items:center;
+    background:linear-gradient(100deg,rgba(59,130,246,.12),rgba(34,211,238,.05) 60%,transparent);
+    border:1px solid var(--bd2);border-radius:16px;padding:15px 20px;margin-bottom:24px;font-size:13px;line-height:1.6}
+  .banner .bi{width:40px;height:40px;flex-shrink:0;border-radius:12px;background:rgba(34,211,238,.12);display:flex;align-items:center;justify-content:center;font-size:19px}
+  .banner b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+  .banner .m{color:var(--mut)}
 
-  /* KPI grid */
-  .kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin-bottom:16px}
-  @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
-  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  .kpi{background:var(--bg700);border:1px solid #243024;border-radius:13px;padding:13px 14px;position:relative;overflow:hidden}
-  .kpi.hl{border-color:var(--neon-bd);box-shadow:0 0 0 1px var(--neon-dim) inset}
-  .kpi .lbl{font-size:10.5px;color:var(--mut);letter-spacing:.5px;display:flex;gap:5px;align-items:center}
-  .kpi .num{font-size:26px;font-weight:700;margin-top:6px}
-  .kpi.hl .num{color:var(--neon)}
-  .kpi .u{font-size:12px;color:var(--mut);margin-left:3px;font-weight:400}
-  .kpi .delta{font-size:10.5px;margin-top:3px}
-  .up{color:var(--neon)} .down{color:var(--orange)}
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-bottom:22px}
+  @media(max-width:1150px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{position:relative;background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;backdrop-filter:blur(12px);overflow:hidden;transition:.25s}
+  .kpi:hover{border-color:var(--bd2);transform:translateY(-2px)}
+  .kpi::after{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:var(--grad);opacity:0;transition:.25s}
+  .kpi.hl::after{opacity:1}
+  .kpi.hl{background:linear-gradient(160deg,rgba(34,211,238,.1),var(--card))}
+  .kpi .lbl{font-size:11px;color:var(--mut);font-weight:600;display:flex;align-items:center;gap:6px}
+  .kpi .num{font-size:27px;font-weight:800;margin-top:9px;letter-spacing:-.5px}
+  .kpi.hl .num{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kpi .u{font-size:12px;color:var(--mut);font-weight:500;margin-left:3px;-webkit-text-fill-color:var(--mut)}
+  .kpi .delta{font-size:11px;margin-top:5px;font-weight:600;display:flex;align-items:center;gap:4px}
+  .up{color:var(--grn)} .down{color:var(--orange)}
 
-  /* panels */
-  .grid2{display:grid;grid-template-columns:2fr 1fr;gap:15px;margin-bottom:15px}
-  .grid3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:15px;margin-bottom:15px}
-  @media(max-width:980px){.grid2,.grid3{grid-template-columns:1fr}}
-  .panel{background:var(--bg700);border:1px solid #243024;border-radius:14px;padding:16px}
-  .panel h3{font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-  canvas{width:100%;display:block;border-radius:10px;background:linear-gradient(180deg,#0d120d,#0a0e0a)}
+  /* layout */
+  .grid3{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:18px;margin-bottom:18px}
+  @media(max-width:1000px){.grid3{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;backdrop-filter:blur(12px)}
+  .card h3{font-size:12px;color:var(--mut);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .card h3 .m{text-transform:none;letter-spacing:0;font-weight:500;color:var(--dim)}
+  canvas{width:100%;display:block;border-radius:14px}
 
   /* shot detail */
-  .detail{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-  .rank{width:84px;height:84px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;flex-shrink:0}
-  .dstats{display:grid;grid-template-columns:repeat(4,auto);gap:14px 26px}
-  .dstat .k{font-size:10px;color:var(--mut)}
-  .dstat .v{font-size:18px;font-weight:700;margin-top:2px}
-  .tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .detail{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  .rank{width:92px;height:92px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-weight:800}
+  .rank .g{font-size:42px;line-height:1}
+  .rank .t{font-size:9px;font-weight:600;opacity:.8;margin-top:2px;letter-spacing:.5px}
+  .dstats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 22px;flex:1;min-width:230px}
+  .dstat .k{font-size:10.5px;color:var(--mut);font-weight:500}
+  .dstat .v{font-size:19px;font-weight:700;margin-top:3px;letter-spacing:-.3px}
+  .nm-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 11px;border-radius:30px}
 
   /* table */
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th{color:var(--mut);font-weight:600;text-align:right;padding:7px 9px;border-bottom:1px solid #243024;font-size:10.5px;letter-spacing:.5px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--mut);font-weight:600;text-align:right;padding:9px 11px;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--bd)}
   th:first-child,td:first-child{text-align:left}
-  td{padding:8px 9px;border-bottom:1px solid #1a221a;text-align:right}
-  tr:hover td{background:rgba(57,255,20,.04)}
-  .shape{font-size:10.5px;padding:1px 8px;border-radius:12px}
+  td{padding:11px;border-bottom:1px solid rgba(120,150,220,.07);text-align:right}
+  tbody tr{transition:.15s}
+  tbody tr:hover{background:rgba(59,130,246,.06)}
+  tbody tr.act{background:linear-gradient(90deg,rgba(34,211,238,.1),transparent)}
+  .clubcell{display:inline-flex;align-items:center;gap:7px;font-weight:600}
+  .cdot{width:7px;height:7px;border-radius:50%}
+  .shape{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+  .rk{font-weight:800;font-size:13px}
 
-  .btn{background:var(--neon-dim);border:1px solid var(--neon-bd);color:var(--neon);font:inherit;font-size:12px;font-weight:700;border-radius:9px;padding:6px 13px;cursor:pointer}
-  .btn:hover{background:rgba(57,255,20,.2)}
-  .foot{color:var(--mut);font-size:11px;text-align:center;margin-top:26px;line-height:1.6}
+  .foot{color:var(--dim);font-size:11.5px;text-align:center;margin-top:30px;line-height:1.7}
+  .foot b{color:var(--mut)}
 </style>
 </head>
 <body>
 <nav>
   <div class="brand">
-    <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#39FF14" stroke-width="1.5" stroke-opacity=".4"/><path d="M9 22V8" stroke="#39FF14" stroke-width="2" stroke-linecap="round"/><path d="M9 8 L20 12 L9 16" fill="#39FF14" fill-opacity=".8"/></svg>
-    <b>SWING<span>DASH</span></b><small>Golf Simulator Analytics</small>
+    <div class="logo">
+      <svg width="20" height="20" viewBox="0 0 28 28" fill="none"><path d="M9 23V6" stroke="#04122b" stroke-width="2.4" stroke-linecap="round"/><path d="M9 6 L21 10.5 L9 15" fill="#04122b"/></svg>
+    </div>
+    <div><div class="nm">Swing<span>Dash</span></div></div>
+    <span class="sub">Golf Simulator Analytics</span>
   </div>
   <div class="tabs"><div class="tab active">Driving Range</div><div class="tab">Course Play</div></div>
-  <div class="conn"><span>GSPro Connect · relay</span><span class="dot on"></span></div>
+  <div class="chip"><span class="dot"></span>GSPro Connect · Relay</div>
 </nav>
 
 <div class="wrap">
 
   <div class="sbar">
-    <span class="dot on"></span><span class="live">LIVE SESSION</span>
+    <div class="sb-i"><span class="ic" style="color:var(--grn)">●</span><b>Live Session</b></div>
     <div class="sep"></div>
-    <span class="mut">⏱ <span class="val">12:47</span></span>
-    <span class="mut">🏌️ <span class="val" id="shotCount">4</span> shots</span>
+    <div class="sb-i"><span class="ic">⏱</span><span>Elapsed</span><b class="mono">12:47</b></div>
+    <div class="sb-i"><span class="ic">🏌</span><span>Shots</span><b class="mono" id="shotCount">4</b></div>
     <div class="sep"></div>
-    <span class="dot on"></span><span class="live">LAUNCH MONITOR · GSPro</span>
+    <div class="lm"><span class="dot" style="color:var(--cyan)"></span>Launch Monitor connected</div>
     <div class="pill">
-      <span class="mut">Club:</span>
+      <span style="color:var(--mut);font-size:12px">Club</span>
       <select id="club"><option>Driver</option><option selected>7 Iron</option><option>5 Iron</option><option>PW</option></select>
-      <span class="src">from GSPro</span>
-      <button class="btn" onclick="nextShot()">⚡ Next sample shot</button>
+      <span class="src">↧ from GSPro</span>
+      <button class="btn" onclick="nextShot()">Next shot →</button>
     </div>
   </div>
 
   <div class="banner">
-    <span>🧠</span>
+    <div class="bi">🧠</div>
     <div>
-      <b>Reverse-calculated by open-golf-coach.</b> launch monitor ส่งมาแค่ <span class="mut">ball data</span>
-      (Speed, VLA, HLA, TotalSpin, SpinAxis) — ค่า <b>Club Speed / Smash / Club Path / Face / Carry / Shot grade</b>
-      ทั้งหมดถูกคำนวนย้อนกลับด้วย <span class="mut">opengolfcoach.calculate_derived_values()</span>.
-      เหล็กที่เลือก (<b>7 Iron</b>) ดึงจาก GSPro <span class="mut">Player.Club</span> ในโหมด relay.
+      <b>Reverse-calculated by open-golf-coach.</b> launch monitor ส่งมาแค่ <span class="m">ball data</span>
+      (Speed · VLA · HLA · TotalSpin · SpinAxis) — ค่า <b>Club Speed · Smash · Path · Face · Carry · Grade</b>
+      ถูกคำนวนย้อนกลับทั้งหมด · เหล็กที่เลือกดึงจาก GSPro <span class="m">Player.Club</span> ในโหมด relay
     </div>
   </div>
 
   <div class="kpis" id="kpis"></div>
 
   <div class="grid3">
-    <div class="panel">
-      <h3>Shot Detail <span id="dname" class="mut"></span></h3>
+    <div class="card">
+      <h3>Shot Detail <span class="m" id="dname"></span></h3>
       <div class="detail">
-        <div class="rank" id="rank">A</div>
+        <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
         <div class="dstats" id="dstats"></div>
       </div>
     </div>
-    <div class="panel">
-      <h3>Ball Flight · side</h3>
-      <canvas id="traj" height="180"></canvas>
+    <div class="card">
+      <h3>Ball Flight <span class="m">side view</span></h3>
+      <canvas id="traj" height="190"></canvas>
     </div>
-    <div class="panel">
-      <h3>Dispersion · top</h3>
-      <canvas id="disp" height="180"></canvas>
+    <div class="card">
+      <h3>Dispersion <span class="m">top view</span></h3>
+      <canvas id="disp" height="190"></canvas>
     </div>
   </div>
 
-  <div class="panel">
-    <h3>Shot History <span class="mut">last shots · derived metrics</span></h3>
+  <div class="card">
+    <h3>Shot History <span class="m">derived metrics</span></h3>
     <table>
       <thead><tr><th>#</th><th>Club</th><th>Ball</th><th>Club spd</th><th>Smash</th><th>Launch</th><th>Spin</th><th>Path</th><th>Face</th><th>Carry</th><th>Total</th><th>Shape</th></tr></thead>
-      <tbody id="rows"></tbody>
+      <tbody id="rows" class="mono"></tbody>
     </table>
   </div>
 
   <div class="foot">
-    SwingDash mockup · ข้อมูลตัวอย่างจริงจาก pipeline (GSPro Open Connect V1 → open-golf-coach)<br>
-    ของจริงเป็น React + FastAPI ที่อัปเดตแบบ real-time ผ่าน WebSocket
+    SwingDash mockup · ข้อมูลตัวอย่างจริงจาก pipeline <b>GSPro Open Connect V1 → open-golf-coach</b><br>
+    ของจริงเป็น React + FastAPI อัปเดต real-time ผ่าน WebSocket
   </div>
 </div>
 
 <script>
-// Sample shots: input = GSPro BallData, derived = open-golf-coach output (from real test runs)
-const SHOTS = [
-  {n:1, club:"7 Iron", ball:148.0, clubspd:101.5, smash:1.46, launch:21.0, spin:6100, path:0.3, face:-0.9, carry:178.4, total:191.2, lateral:-2.1, apex:92, shape:"draw",     name:"Straight Draw", rank:"A", color:"#39FF14"},
-  {n:2, club:"7 Iron", ball:131.0, clubspd:96.4,  smash:1.36, launch:18.0, spin:6090, path:-0.0,face:1.0,  carry:191.4, total:205.0, lateral:8.1,  apex:88, shape:"straight", name:"Straight",      rank:"B", color:"#ADFF2F"},
-  {n:3, club:"Driver",  ball:167.0, clubspd:112.4, smash:1.49, launch:12.5, spin:2550, path:0.0, face:-1.4, carry:271.4, total:276.2, lateral:-13.9,apex:106,shape:"draw",     name:"Straight Draw", rank:"A", color:"#39FF14"},
-  {n:4, club:"7 Iron", ball:118.0, clubspd:92.3,  smash:1.28, launch:24.5, spin:7180, path:-1.1,face:4.8,  carry:157.9, total:166.0, lateral:33.6, apex:79, shape:"slice",    name:"Push Slice",    rank:"D", color:"#FF6B35"},
+const SHOTS=[
+  {n:1,club:"7 Iron",ball:148.0,clubspd:101.5,smash:1.46,launch:21.0,spin:6100,path:0.3,face:-0.9,carry:178.4,total:191.2,lateral:-2.1,apex:92,shape:"draw",name:"Straight Draw",rank:"A",color:"#34d399"},
+  {n:2,club:"7 Iron",ball:131.0,clubspd:96.4,smash:1.36,launch:18.0,spin:6090,path:-0.0,face:1.0,carry:191.4,total:205.0,lateral:8.1,apex:88,shape:"straight",name:"Straight",rank:"B",color:"#60a5fa"},
+  {n:3,club:"Driver",ball:167.0,clubspd:112.4,smash:1.49,launch:12.5,spin:2550,path:0.0,face:-1.4,carry:271.4,total:276.2,lateral:-13.9,apex:106,shape:"draw",name:"Straight Draw",rank:"A",color:"#34d399"},
+  {n:4,club:"7 Iron",ball:118.0,clubspd:92.3,smash:1.28,launch:24.5,spin:7180,path:-1.1,face:4.8,carry:157.9,total:166.0,lateral:33.6,apex:79,shape:"slice",name:"Push Slice",rank:"D",color:"#fb923c"},
 ];
-const SHAPE_COLORS={straight:"#39FF14",draw:"#4FC3F7",fade:"#FFD600",hook:"#ADFF2F",slice:"#FF6B35"};
-let idx = 2; // start on the Driver bomb
+const SC={straight:"#22d3ee",draw:"#60a5fa",fade:"#fbbf24",hook:"#34d399",slice:"#fb923c"};
+let idx=2;
 
 const KPIS=[
-  {k:"Ball Speed",   f:s=>s.ball.toFixed(1),    u:"mph", key:"ball"},
-  {k:"Club Speed",   f:s=>s.clubspd.toFixed(1), u:"mph", key:"clubspd"},
-  {k:"Smash Factor", f:s=>s.smash.toFixed(2),   u:"",    key:"smash"},
-  {k:"Launch Angle", f:s=>s.launch.toFixed(1),  u:"°",   key:"launch"},
-  {k:"Spin Rate",    f:s=>s.spin.toLocaleString(),u:"rpm",key:"spin"},
-  {k:"Carry",        f:s=>s.carry.toFixed(0),   u:"yds", key:"carry", hl:true},
-  {k:"Total",        f:s=>s.total.toFixed(0),   u:"yds", key:"total"},
+  {k:"Ball Speed",i:"⚡",f:s=>s.ball.toFixed(1),u:"mph",key:"ball"},
+  {k:"Club Speed",i:"🏌",f:s=>s.clubspd.toFixed(1),u:"mph",key:"clubspd"},
+  {k:"Smash",i:"💥",f:s=>s.smash.toFixed(2),u:"",key:"smash"},
+  {k:"Launch",i:"📐",f:s=>s.launch.toFixed(1),u:"°",key:"launch"},
+  {k:"Spin",i:"🌀",f:s=>s.spin.toLocaleString(),u:"rpm",key:"spin"},
+  {k:"Carry",i:"🎯",f:s=>s.carry.toFixed(0),u:"yds",key:"carry",hl:true},
+  {k:"Total",i:"📏",f:s=>s.total.toFixed(0),u:"yds",key:"total"},
 ];
 
 function render(){
-  const s=SHOTS[idx], prev=SHOTS[(idx-1+SHOTS.length)%SHOTS.length];
-  document.getElementById("club").value = SHOTS.find(x=>x.club)? s.club : "7 Iron";
-  // KPIs
-  document.getElementById("kpis").innerHTML = KPIS.map(c=>{
-    const d = s[c.key]-prev[c.key];
-    const da = c.u==="rpm"? Math.round(d).toLocaleString() : (c.key==="smash"? d.toFixed(2):d.toFixed(1));
-    const cls = d>=0?"up":"down", arr=d>=0?"▲":"▼";
-    return `<div class="kpi ${c.hl?'hl':''}"><div class="lbl">${c.k}</div>
+  const s=SHOTS[idx],prev=SHOTS[(idx-1+SHOTS.length)%SHOTS.length];
+  document.getElementById("club").value=["Driver","7 Iron","5 Iron","PW"].includes(s.club)?s.club:"7 Iron";
+  document.getElementById("kpis").innerHTML=KPIS.map(c=>{
+    const d=s[c.key]-prev[c.key];
+    const da=c.u==="rpm"?Math.round(Math.abs(d)).toLocaleString():(c.key==="smash"?Math.abs(d).toFixed(2):Math.abs(d).toFixed(1));
+    const cls=d>=0?"up":"down",arr=d>=0?"↑":"↓";
+    return `<div class="kpi ${c.hl?'hl':''}"><div class="lbl"><span>${c.i}</span>${c.k}</div>
       <div class="num">${c.f(s)}<span class="u">${c.u}</span></div>
       <div class="delta ${cls}">${arr} ${da} ${c.u}</div></div>`;
   }).join("");
-  // detail
   const rk=document.getElementById("rank");
-  rk.textContent=s.rank; rk.style.background=s.color+"22"; rk.style.color=s.color; rk.style.border="1px solid "+s.color+"66";
-  document.getElementById("dname").innerHTML=`<span class="tag" style="background:${s.color}22;color:${s.color}">${s.name}</span>`;
-  const ds=[["Smash",s.smash.toFixed(2)],["Club Path",s.path.toFixed(1)+"°"],["Face→Tgt",s.face.toFixed(1)+"°"],["Apex",s.apex+" ft"],
-            ["Club Speed",s.clubspd.toFixed(1)+" mph"],["Launch",s.launch.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()],["Carry",s.carry.toFixed(0)+" yds"]];
-  document.getElementById("dstats").innerHTML=ds.map(([k,v])=>`<div class="dstat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
-  // table
-  document.getElementById("rows").innerHTML=[...SHOTS].reverse().map(x=>`<tr>
-    <td>${x.n}</td><td>${x.club}</td><td>${x.ball.toFixed(1)}</td><td>${x.clubspd.toFixed(1)}</td>
-    <td>${x.smash.toFixed(2)}</td><td>${x.launch.toFixed(1)}</td><td>${x.spin.toLocaleString()}</td>
-    <td>${x.path.toFixed(1)}</td><td>${x.face.toFixed(1)}</td><td>${x.carry.toFixed(0)}</td><td>${x.total.toFixed(0)}</td>
-    <td><span class="shape" style="background:${SHAPE_COLORS[x.shape]}22;color:${SHAPE_COLORS[x.shape]}">${x.shape}</span></td></tr>`).join("");
+  rk.querySelector(".g").textContent=s.rank;
+  rk.style.background="linear-gradient(160deg,"+s.color+"33,"+s.color+"11)";
+  rk.style.border="1px solid "+s.color+"55";rk.style.color=s.color;
+  document.getElementById("dname").innerHTML=`<span class="nm-tag" style="background:${s.color}22;color:${s.color}">${s.name}</span>`;
+  const ds=[["Smash",s.smash.toFixed(2)],["Club Path",s.path.toFixed(1)+"°"],["Face → Tgt",s.face.toFixed(1)+"°"],["Apex",s.apex+" ft"],
+            ["Club Speed",s.clubspd.toFixed(1)],["Launch",s.launch.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()],["Carry",s.carry.toFixed(0)+" y"]];
+  document.getElementById("dstats").innerHTML=ds.map(([k,v])=>`<div class="dstat"><div class="k">${k}</div><div class="v mono">${v}</div></div>`).join("");
+  document.getElementById("rows").innerHTML=[...SHOTS].reverse().map(x=>`<tr class="${x.n===s.n?'act':''}">
+    <td>${x.n}</td><td><span class="clubcell"><span class="cdot" style="background:${SC[x.shape]}"></span>${x.club}</span></td>
+    <td>${x.ball.toFixed(1)}</td><td>${x.clubspd.toFixed(1)}</td><td>${x.smash.toFixed(2)}</td><td>${x.launch.toFixed(1)}</td>
+    <td>${x.spin.toLocaleString()}</td><td>${x.path.toFixed(1)}</td><td>${x.face.toFixed(1)}</td>
+    <td style="color:#22d3ee;font-weight:700">${x.carry.toFixed(0)}</td><td>${x.total.toFixed(0)}</td>
+    <td><span class="shape" style="background:${SC[x.shape]}22;color:${SC[x.shape]}">${x.shape}</span></td></tr>`).join("");
   document.getElementById("shotCount").textContent=SHOTS.length;
-  drawTraj(s); drawDisp();
+  drawTraj(s);drawDisp();
 }
 
-function fit(c){const w=c.clientWidth,h=c.height;const r=window.devicePixelRatio||1;c.width=w*r;c.height=h*r;const x=c.getContext("2d");x.setTransform(r,0,0,r,0,0);return{x,w,h};}
+function fit(c){const w=c.clientWidth,h=c.height,r=window.devicePixelRatio||1;c.width=w*r;c.height=h*r;const x=c.getContext("2d");x.setTransform(r,0,0,r,0,0);x.clearRect(0,0,w,h);
+  const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#0b1326");g.addColorStop(1,"#070b16");x.fillStyle=g;x.fillRect(0,0,w,h);return{x,w,h};}
 
 function drawTraj(s){
   const c=document.getElementById("traj");const{x,w,h}=fit(c);
-  const padL=34,padB=24,gw=w-padL-12,gh=h-padB-12;
-  // grid + ground
-  x.strokeStyle="#1c241c";x.lineWidth=1;
-  for(let i=0;i<=4;i++){const yy=12+gh*i/4;x.beginPath();x.moveTo(padL,yy);x.lineTo(w-12,yy);x.stroke();}
-  x.fillStyle="#566556";x.font="9px monospace";
-  x.fillText("ft",6,16);x.fillText("0",padL-12,h-padB+12);x.fillText(s.carry.toFixed(0)+"y",w-34,h-padB+12);
-  const maxY=Math.max(60,s.apex*1.15);
-  // parabola
+  const pl=36,pb=26,gw=w-pl-14,gh=h-pb-14,top=12;
+  x.strokeStyle="rgba(120,150,220,.1)";x.lineWidth=1;
+  for(let i=0;i<=4;i++){const yy=top+gh*i/4;x.beginPath();x.moveTo(pl,yy);x.lineTo(w-14,yy);x.stroke();}
+  x.fillStyle="#5b6b96";x.font="9px monospace";x.fillText("ft",8,top+4);x.fillText("0y",pl-14,h-pb+13);x.fillText(s.carry.toFixed(0)+"y",w-38,h-pb+13);
+  const maxY=Math.max(60,s.apex*1.18);
+  const grad=x.createLinearGradient(pl,0,pl+gw,0);grad.addColorStop(0,"#3b82f6");grad.addColorStop(1,s.color);
+  // area fill
+  x.beginPath();x.moveTo(pl,top+gh);
+  for(let i=0;i<=60;i++){const t=i/60,px=pl+gw*t,yv=4*s.apex*t*(1-t),py=top+gh-(yv/maxY)*gh;x.lineTo(px,py);}
+  x.lineTo(pl+gw,top+gh);x.closePath();
+  const ar=x.createLinearGradient(0,top,0,top+gh);ar.addColorStop(0,s.color+"3a");ar.addColorStop(1,s.color+"00");x.fillStyle=ar;x.fill();
+  // line
   x.beginPath();
-  for(let i=0;i<=60;i++){const t=i/60;const px=padL+gw*t;const yv=4*s.apex*t*(1-t);const py=12+gh-(yv/maxY)*gh;i?x.lineTo(px,py):x.moveTo(px,py);}
-  x.strokeStyle=s.color;x.lineWidth=2.5;x.shadowColor=s.color;x.shadowBlur=8;x.stroke();x.shadowBlur=0;
-  // apex marker
-  const apx=padL+gw*0.5, apy=12+gh-(s.apex/maxY)*gh;
-  x.fillStyle=s.color;x.beginPath();x.arc(apx,apy,3,0,7);x.fill();
-  x.fillStyle="#9fb09f";x.fillText("apex "+s.apex+"ft",apx-22,apy-7);
-  // ball landing
-  x.fillStyle="#fff";x.beginPath();x.arc(padL+gw,12+gh,3.5,0,7);x.fill();
+  for(let i=0;i<=60;i++){const t=i/60,px=pl+gw*t,yv=4*s.apex*t*(1-t),py=top+gh-(yv/maxY)*gh;i?x.lineTo(px,py):x.moveTo(px,py);}
+  x.strokeStyle=grad;x.lineWidth=3;x.shadowColor=s.color;x.shadowBlur=12;x.stroke();x.shadowBlur=0;
+  const apx=pl+gw*0.5,apy=top+gh-(s.apex/maxY)*gh;
+  x.fillStyle=s.color;x.beginPath();x.arc(apx,apy,3.5,0,7);x.fill();
+  x.fillStyle="#aebbe0";x.fillText("apex "+s.apex+"ft",apx-24,apy-8);
+  x.fillStyle="#fff";x.beginPath();x.arc(pl+gw,top+gh,4,0,7);x.fill();
+  x.strokeStyle=s.color;x.lineWidth=1.5;x.beginPath();x.arc(pl+gw,top+gh,7,0,7);x.stroke();
 }
 
 function drawDisp(){
   const c=document.getElementById("disp");const{x,w,h}=fit(c);
   const cx=w/2;
-  x.strokeStyle="#1c241c";x.beginPath();x.moveTo(cx,8);x.lineTo(cx,h-8);x.stroke();
-  for(let i=1;i<=3;i++){x.beginPath();x.moveTo(8,8+(h-16)*i/4);x.lineTo(w-8,8+(h-16)*i/4);x.stroke();}
-  x.fillStyle="#566556";x.font="9px monospace";x.fillText("L",10,h-10);x.fillText("R",w-16,h-10);x.fillText("target",cx-18,14);
-  const maxLat=Math.max(...SHOTS.map(s=>Math.abs(s.lateral)),20);
-  const maxCar=Math.max(...SHOTS.map(s=>s.carry));
+  x.strokeStyle="rgba(120,150,220,.1)";x.lineWidth=1;
+  for(let i=1;i<=3;i++){const yy=10+(h-20)*i/4;x.beginPath();x.moveTo(10,yy);x.lineTo(w-10,yy);x.stroke();}
+  x.setLineDash([4,5]);x.strokeStyle="rgba(34,211,238,.4)";x.beginPath();x.moveTo(cx,10);x.lineTo(cx,h-10);x.stroke();x.setLineDash([]);
+  x.fillStyle="#5b6b96";x.font="9px monospace";x.fillText("L",12,h-12);x.fillText("R",w-18,h-12);x.fillText("target",cx-17,16);
+  const maxLat=Math.max(...SHOTS.map(s=>Math.abs(s.lateral)),20),maxCar=Math.max(...SHOTS.map(s=>s.carry));
   SHOTS.forEach((s,i)=>{
-    const px=cx+(s.lateral/maxLat)*(w/2-16);
-    const py=(h-14)-(s.carry/maxCar)*(h-26);
-    const on=Math.abs(s.lateral)<18;
-    x.fillStyle=i===idx?"#fff":(on?"#39FF14":"#FF6B35");
+    const px=cx+(s.lateral/maxLat)*(w/2-18),py=(h-16)-(s.carry/maxCar)*(h-30),on=Math.abs(s.lateral)<18;
+    if(i===idx){x.fillStyle=s.color+"22";x.beginPath();x.arc(px,py,11,0,7);x.fill();}
+    x.fillStyle=i===idx?"#fff":(on?"#22d3ee":"#fb923c");
     x.beginPath();x.arc(px,py,i===idx?5.5:4,0,7);x.fill();
-    if(i===idx){x.strokeStyle=s.color;x.lineWidth=2;x.beginPath();x.arc(px,py,8,0,7);x.stroke();}
+    if(i===idx){x.strokeStyle=s.color;x.lineWidth=2;x.beginPath();x.arc(px,py,8.5,0,7);x.stroke();}
   });
 }
 
 function nextShot(){idx=(idx+1)%SHOTS.length;render();}
-window.addEventListener("resize",()=>render());
+window.addEventListener("resize",render);
 render();
 </script>
 </body>
