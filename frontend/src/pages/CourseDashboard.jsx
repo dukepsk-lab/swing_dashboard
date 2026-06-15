@@ -6,7 +6,8 @@ import ScoreTrend from '../components/ScoreTrend';
 import RoundSummary from '../components/RoundSummary';
 import { motion } from 'framer-motion';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Empty default = same-origin (dev: Vite proxies /api; prod: FastAPI serves it).
+const API = import.meta.env.VITE_API_URL || '';
 
 export default function CourseDashboard() {
   const [roundData, setRoundData] = useState(null);

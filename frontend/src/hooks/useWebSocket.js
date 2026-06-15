@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
+// Default to same-origin so it works both in dev (Vite proxies /ws) and in
+// production when FastAPI serves the built dashboard on its own port.
+const WS_URL =
+  import.meta.env.VITE_WS_URL ||
+  (typeof window !== 'undefined'
+    ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`
+    : 'ws://localhost:8000/ws');
 
 export function useWebSocket() {
   const ws = useRef(null);

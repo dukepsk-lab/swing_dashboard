@@ -76,6 +76,32 @@ swing_dashboard/
 
 ## Quick Start
 
+### One-click (recommended)
+
+Run everything — backend, dashboard, and the GSPro Connect receiver — from a single command.
+It serves the built dashboard from FastAPI, so the whole app lives on **one port**
+(`http://localhost:8000`) and the browser opens automatically.
+
+| OS | Run |
+|----|-----|
+| **Windows** | double-click **`start.bat`** |
+| **macOS / Linux** | `./start.sh` |
+
+The first run creates a Python virtual env, installs dependencies, and builds the dashboard
+(needs **Python 3.10+** and **Node 18+** installed); later runs skip straight to launching.
+Keep the window open while you play; close it to stop.
+
+#### Standalone Windows program (.exe)
+
+Want a single file that needs **neither Python nor Node** on the playing PC? On a Windows
+machine run **`build_exe.bat`** — it builds the dashboard and packages everything with
+PyInstaller into **`dist\SWINGBOX.exe`**. Copy that one file anywhere and double-click to run.
+
+> The `.exe` must be built on Windows (PyInstaller is platform-specific). `start.bat` is the
+> simplest option if Python + Node are already installed.
+
+### Manual / development setup
+
 ### 1. Backend
 
 ```bash

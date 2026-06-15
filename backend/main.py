@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import asyncio
 import json
 import os
+import sys
 import logging
 from datetime import datetime
 from typing import List, Optional
@@ -289,3 +290,45 @@ async def manual_shot(payload: dict = Body(default=None)):
     club = payload.get("club")
     shot = await ingest_ball_data(ball, club_data, club)
     return shot
+
+
+# ── Serve the built React dashboard (single-program mode) ────────────────────────
+# When `frontend/dist` exists (after `npm run build`, or bundled into the .exe), FastAPI
+# serves the whole UI itself, so the app runs from one process on one port. API and
+# WebSocket routes above are registered first, so they take precedence over this.
+import pathlib
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+
+def _dist_dir() -> Optional[pathlib.Path]:
+    # PyInstaller bundle (.exe) unpacks data files under sys._MEIPASS/dist
+    bundled = getattr(sys, "_MEIPASS", None)
+    if bundled:
+        p = pathlib.Path(bundled) / "dist"
+        if (p / "index.html").exists():
+            return p
+    p = pathlib.Path(__file__).resolve().parent.parent / "frontend" / "dist"
+    return p if (p / "index.html").exists() else None
+
+
+_DIST = _dist_dir()
+if _DIST is not None:
+    if (_DIST / "assets").is_dir():
+        app.mount("/assets", StaticFiles(directory=str(_DIST / "assets")), name="assets")
+
+    @app.get("/")
+    async def _spa_index():
+        return FileResponse(str(_DIST / "index.html"))
+
+    @app.get("/{full_path:path}")
+    async def _spa_fallback(full_path: str):
+        # Serve real static files (favicon, etc.); otherwise hand back index.html
+        # so client-side routes like /course work on refresh.
+        target = _DIST / full_path
+        if target.is_file():
+            return FileResponse(str(target))
+        return FileResponse(str(_DIST / "index.html"))
+else:
+    logging.info("frontend/dist not found — UI not served by FastAPI. "
+                 "Run `npm run build` (or use start.bat) to enable single-port mode.")
