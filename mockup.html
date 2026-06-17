@@ -107,9 +107,33 @@
   .legend{display:flex;gap:14px;align-items:center;font-size:10.5px;color:#9fb0dd;font-weight:600}
   .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
 
+  /* nav info (merged session bar) */
+  .navinfo{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-size:13px;color:var(--mut);margin-left:8px}
+  .navinfo .sb-i{display:flex;align-items:center;gap:7px}
+  .navinfo b{color:var(--txt);font-weight:700}
+  .clubnow{display:flex;align-items:center;gap:9px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);border-radius:30px;padding:6px 13px}
+  .clubnow .cl{font-weight:800;color:var(--ice);font-size:15px;letter-spacing:.3px}
+
   /* layout */
-  .grid3{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px;margin-bottom:18px}
-  @media(max-width:1000px){.grid3{grid-template-columns:1fr}}
+  .main{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:start}
+  @media(max-width:1000px){.main{grid-template-columns:1fr}}
+  .rightcol{display:flex;flex-direction:column;gap:18px}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:560px){.duo{grid-template-columns:1fr}}
+  .stage{margin-bottom:0}
+  .flow{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+  .flow .b{text-align:center}
+  .flow .b .v{font-size:20px;font-weight:800}
+  .flow .b .k{font-size:10px;color:var(--mut);margin-top:2px}
+  .flow .bigval{font-size:26px;background:linear-gradient(120deg,#7df3ff,#5aa2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .flow .arw{color:var(--dim);font-size:15px}
+  .bar{height:8px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:10px}
+  .bar>i{display:block;height:100%;border-radius:6px;background:var(--grad);transition:width .5s}
+  .note{font-size:11px;color:var(--mut);margin-top:8px}
+  .angles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+  .angles .v{font-size:22px;font-weight:800}
+  .angles .v small{font-size:12px;font-weight:600;color:var(--mut)}
+  .angles .k{font-size:10px;color:var(--mut);margin-top:3px}
   .card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;backdrop-filter:blur(12px);box-shadow:var(--glow)}
   .card h3{font-size:12px;color:var(--mut);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
   .card h3 .m{text-transform:none;letter-spacing:0;font-weight:500;color:var(--dim)}
@@ -147,72 +171,88 @@
       <svg width="21" height="21" viewBox="0 0 28 28" fill="none"><path d="M9 23V6" stroke="#03122b" stroke-width="2.4" stroke-linecap="round"/><path d="M9 6 L21 10.5 L9 15" fill="#03122b"/></svg>
     </div>
     <div><div class="nm">SWINGBOX <span>GOLF SIMULATOR</span></div></div>
-    <span class="sub">Virtual Driving Range</span>
   </div>
-  <div class="tabs"><div class="tab active">Driving Range</div><div class="tab">Course Play</div></div>
+  <div class="navinfo">
+    <div class="sb-i"><span class="dot" style="color:var(--grn)"></span><b>Live</b></div>
+    <div class="sep"></div>
+    <div class="sb-i">⏱ <b class="mono">12:47</b></div>
+    <div class="sb-i">🏌 <b class="mono" id="shotCount">4</b> shots</div>
+    <div class="sep"></div>
+    <div class="lm"><span class="dot" style="color:var(--cyan)"></span>Launch Monitor connected</div>
+    <div class="sep"></div>
+    <div class="clubnow"><span style="color:var(--mut);font-size:11px">CLUB</span><span class="cl" id="clubNow">Driver</span><span class="src">↧ GSPro</span></div>
+  </div>
   <div class="chip"><span class="dot"></span>GSPro Connect · Relay</div>
 </nav>
 
 <div class="wrap">
 
-  <div class="sbar">
-    <div class="sb-i"><span class="ic" style="color:var(--grn)">●</span><b>Live Session</b></div>
-    <div class="sep"></div>
-    <div class="sb-i"><span class="ic">⏱</span><span>Elapsed</span><b class="mono">12:47</b></div>
-    <div class="sb-i"><span class="ic">🏌</span><span>Shots</span><b class="mono" id="shotCount">4</b></div>
-    <div class="sep"></div>
-    <div class="lm"><span class="dot" style="color:var(--cyan)"></span>Launch Monitor connected</div>
-    <div class="pill">
-      <span style="color:var(--mut);font-size:12px">Club</span>
-      <select id="club"><option>Driver</option><option selected>7 Iron</option><option>5 Iron</option><option>PW</option></select>
-      <span class="src">↧ from GSPro</span>
-      <button class="btn" onclick="nextShot()">Next shot →</button>
-    </div>
-  </div>
-
   <div class="kpis" id="kpis"></div>
 
-  <!-- HERO: virtual 3D range -->
-  <div class="stage">
-    <canvas id="range" height="430"></canvas>
-    <div class="ov ov-tl">
-      <div class="vtag">Virtual Range · 3D</div>
-      <div class="vclub" id="vclub">7 Iron</div>
-    </div>
-    <div class="ov ov-tr">
-      <div class="vtag" id="vshapename">Straight Draw</div>
-      <div class="vcarry"><span id="vcarry">178</span><small>yds carry</small></div>
-      <div class="vsub" id="vsub">Total 191 y · Apex 92 ft · Side 2 L</div>
-    </div>
-    <div class="ov ov-bl">
-      <div class="vgrade"><div class="vg-badge" id="vgrade">A</div>
-        <div><div class="vtag">Shot grade</div><div id="vshape"></div></div>
+  <div class="main">
+    <!-- LEFT: virtual 3D range (half width) -->
+    <div class="stage">
+      <canvas id="range" height="540"></canvas>
+      <div class="ov ov-tl">
+        <div class="vtag">Virtual Range · 3D</div>
+        <div class="vclub" id="vclub">7 Iron</div>
+      </div>
+      <div class="ov ov-tr">
+        <div class="vtag" id="vshapename">Straight Draw</div>
+        <div class="vcarry"><span id="vcarry">178</span><small>yds carry</small></div>
+        <div class="vsub" id="vsub">Total 191 y · Apex 92 ft · Side 2 L</div>
+      </div>
+      <div class="ov ov-bl">
+        <div class="vgrade"><div class="vg-badge" id="vgrade">A</div>
+          <div><div class="vtag">Shot grade</div><div id="vshape"></div></div>
+        </div>
+      </div>
+      <div class="ov ov-br">
+        <div class="legend">
+          <span><i style="background:#7df3ff"></i>This shot</span>
+          <span><i style="background:#22d3ee"></i>On target</span>
+          <span><i style="background:#fb923c"></i>Off target</span>
+        </div>
       </div>
     </div>
-    <div class="ov ov-br">
-      <div class="legend">
-        <span><i style="background:#7df3ff"></i>This shot</span>
-        <span><i style="background:#22d3ee"></i>On target</span>
-        <span><i style="background:#fb923c"></i>Off target</span>
-      </div>
-    </div>
-  </div>
 
-  <div class="grid3">
-    <div class="card">
-      <h3>Shot Detail <span class="m" id="dname"></span></h3>
-      <div class="detail">
-        <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
-        <div class="dstats" id="dstats"></div>
+    <!-- RIGHT: ball flight, shot detail, smash, ball flight angle -->
+    <div class="rightcol">
+      <div class="card">
+        <h3>Ball Flight <span class="m">side profile</span></h3>
+        <canvas id="traj" height="172"></canvas>
       </div>
-    </div>
-    <div class="card">
-      <h3>Ball Flight <span class="m">side profile</span></h3>
-      <canvas id="traj" height="186"></canvas>
-    </div>
-    <div class="card">
-      <h3>Dispersion <span class="m">top-down</span></h3>
-      <canvas id="disp" height="186"></canvas>
+      <div class="card">
+        <h3>Shot Detail <span class="m" id="dname"></span></h3>
+        <div class="detail">
+          <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
+          <div class="dstats" id="dstats"></div>
+        </div>
+      </div>
+      <div class="duo">
+        <div class="card">
+          <h3>Smash Factor <span class="m">efficiency</span></h3>
+          <div class="flow">
+            <div class="b"><div class="v mono" id="smClub">112</div><div class="k">Club mph</div></div>
+            <div class="arw">→</div>
+            <div class="b"><div class="v mono" id="smBall">167</div><div class="k">Ball mph</div></div>
+            <div class="arw">=</div>
+            <div class="b"><div class="v mono bigval" id="smVal">1.49</div><div class="k">Smash</div></div>
+          </div>
+          <div class="bar"><i id="smBar"></i></div>
+          <div class="note" id="smNote">Efficiency 99% · near optimal</div>
+        </div>
+        <div class="card">
+          <h3>Ball Flight Angle <span class="m">launch / descent</span></h3>
+          <div class="angles">
+            <div><div class="v mono" id="anLaunch" style="color:var(--sky)">12.5°</div><div class="k">Launch</div></div>
+            <div><div class="v mono" id="anApex">106<small> ft</small></div><div class="k">Apex</div></div>
+            <div><div class="v mono" id="anLand" style="color:var(--ice)">37°</div><div class="k">Descent</div></div>
+          </div>
+          <div class="bar"><i id="anBar"></i></div>
+          <div class="note" id="anNote">Penetrating ball flight</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -231,10 +271,10 @@
 
 <script>
 const SHOTS=[
-  {n:1,club:"7 Iron",ball:148.0,clubspd:101.5,smash:1.46,launch:21.0,spin:6100,path:0.3,face:-0.9,carry:178.4,total:191.2,lateral:-2.1,apex:92,shape:"draw",name:"Straight Draw",rank:"A",color:"#34d399"},
-  {n:2,club:"7 Iron",ball:131.0,clubspd:96.4,smash:1.36,launch:18.0,spin:6090,path:0.0,face:1.0,carry:191.4,total:205.0,lateral:8.1,apex:88,shape:"straight",name:"Straight",rank:"B",color:"#22d3ee"},
-  {n:3,club:"Driver",ball:167.0,clubspd:112.4,smash:1.49,launch:12.5,spin:2550,path:0.0,face:-1.4,carry:271.4,total:276.2,lateral:-13.9,apex:106,shape:"draw",name:"Power Draw",rank:"A",color:"#34d399"},
-  {n:4,club:"7 Iron",ball:118.0,clubspd:92.3,smash:1.28,launch:24.5,spin:7180,path:-1.1,face:4.8,carry:157.9,total:166.0,lateral:33.6,apex:79,shape:"slice",name:"Push Slice",rank:"D",color:"#fb923c"},
+  {n:1,club:"7 Iron",ball:148.0,clubspd:101.5,smash:1.46,launch:21.0,land:48,spin:6100,path:0.3,face:-0.9,carry:178.4,total:191.2,lateral:-2.1,apex:92,shape:"draw",name:"Straight Draw",rank:"A",color:"#34d399"},
+  {n:2,club:"7 Iron",ball:131.0,clubspd:96.4,smash:1.36,launch:18.0,land:44,spin:6090,path:0.0,face:1.0,carry:191.4,total:205.0,lateral:8.1,apex:88,shape:"straight",name:"Straight",rank:"B",color:"#22d3ee"},
+  {n:3,club:"Driver",ball:167.0,clubspd:112.4,smash:1.49,launch:12.5,land:37,spin:2550,path:0.0,face:-1.4,carry:271.4,total:276.2,lateral:-13.9,apex:106,shape:"draw",name:"Power Draw",rank:"A",color:"#34d399"},
+  {n:4,club:"7 Iron",ball:118.0,clubspd:92.3,smash:1.28,launch:24.5,land:51,spin:7180,path:-1.1,face:4.8,carry:157.9,total:166.0,lateral:33.6,apex:79,shape:"slice",name:"Push Slice",rank:"D",color:"#fb923c"},
 ];
 const SC={straight:"#22d3ee",draw:"#5aa2ff",fade:"#fbbf24",hook:"#34d399",slice:"#fb923c"};
 let idx=2;
@@ -380,28 +420,9 @@ function drawTraj(s){
   x.strokeStyle=s.color;x.lineWidth=1.5;x.beginPath();x.arc(pl+gw,top+gh,7,0,7);x.stroke();
 }
 
-function drawDisp(){
-  const c=document.getElementById("disp");const{x,w,h}=fit(c);
-  const gg=x.createLinearGradient(0,0,0,h);gg.addColorStop(0,"#091428");gg.addColorStop(1,"#050b18");x.fillStyle=gg;x.fillRect(0,0,w,h);
-  const cx=w/2;
-  x.strokeStyle="rgba(96,135,220,.12)";x.lineWidth=1;
-  for(let i=1;i<=3;i++){const yy=10+(h-20)*i/4;x.beginPath();x.moveTo(10,yy);x.lineTo(w-10,yy);x.stroke();}
-  x.setLineDash([4,5]);x.strokeStyle="rgba(34,211,238,.4)";x.beginPath();x.moveTo(cx,10);x.lineTo(cx,h-10);x.stroke();x.setLineDash([]);
-  x.fillStyle="#5a6a98";x.font="9px JetBrains Mono";x.textAlign="left";
-  x.fillText("L",12,h-12);x.fillText("R",w-18,h-12);x.fillText("target",cx-17,16);
-  const maxLat=Math.max(...SHOTS.map(s=>Math.abs(s.lateral)),20),maxCar=Math.max(...SHOTS.map(s=>s.carry));
-  SHOTS.forEach((s,i)=>{
-    const px=cx+(s.lateral/maxLat)*(w/2-18),py=(h-16)-(s.carry/maxCar)*(h-30),on=Math.abs(s.lateral)<18;
-    if(i===idx){x.fillStyle=s.color+"22";x.beginPath();x.arc(px,py,11,0,7);x.fill();}
-    x.fillStyle=i===idx?"#fff":(on?"#22d3ee":"#fb923c");
-    x.beginPath();x.arc(px,py,i===idx?5.5:4,0,7);x.fill();
-    if(i===idx){x.strokeStyle=s.color;x.lineWidth=2;x.beginPath();x.arc(px,py,8.5,0,7);x.stroke();}
-  });
-}
-
 function render(){
   const s=SHOTS[idx],prev=SHOTS[(idx-1+SHOTS.length)%SHOTS.length];
-  document.getElementById("club").value=["Driver","7 Iron","5 Iron","PW"].includes(s.club)?s.club:"7 Iron";
+  document.getElementById("clubNow").textContent=s.club;   // latest club, from GSPro
 
   document.getElementById("kpis").innerHTML=KPIS.map(c=>{
     const d=s[c.key]-prev[c.key];
@@ -428,9 +449,23 @@ function render(){
   rk.style.background="linear-gradient(160deg,"+s.color+"33,"+s.color+"11)";
   rk.style.border="1px solid "+s.color+"55";rk.style.color=s.color;
   document.getElementById("dname").innerHTML=`<span class="shape" style="background:${s.color}22;color:${s.color}">${s.name}</span>`;
-  const ds=[["Smash",s.smash.toFixed(2)],["Club Path",s.path.toFixed(1)+"°"],["Face → Tgt",s.face.toFixed(1)+"°"],["Apex",s.apex+" ft"],
-            ["Club Speed",s.clubspd.toFixed(1)],["Launch",s.launch.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()],["Carry",s.carry.toFixed(0)+" y"]];
+  const ds=[["Club Path",s.path.toFixed(1)+"°"],["Face → Tgt",s.face.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()],["Total",s.total.toFixed(0)+" y"]];
   document.getElementById("dstats").innerHTML=ds.map(([k,v])=>`<div class="dstat"><div class="k">${k}</div><div class="v mono">${v}</div></div>`).join("");
+
+  // smash factor
+  document.getElementById("smClub").textContent=s.clubspd.toFixed(1);
+  document.getElementById("smBall").textContent=s.ball.toFixed(1);
+  document.getElementById("smVal").textContent=s.smash.toFixed(2);
+  const eff=Math.min(100,Math.round(s.smash/1.50*100));
+  document.getElementById("smBar").style.width=eff+"%";
+  document.getElementById("smNote").textContent=`Efficiency ${eff}% · `+(eff>=96?"near optimal":eff>=88?"solid strike":"off-centre contact");
+
+  // ball flight angle
+  document.getElementById("anLaunch").textContent=s.launch.toFixed(1)+"°";
+  document.getElementById("anApex").innerHTML=s.apex+"<small> ft</small>";
+  document.getElementById("anLand").textContent=s.land+"°";
+  document.getElementById("anBar").style.width=Math.min(100,Math.round(s.launch/30*100))+"%";
+  document.getElementById("anNote").textContent=s.launch<14?"Penetrating ball flight":s.launch<22?"Mid launch window":"High, soft-landing flight";
 
   document.getElementById("rows").innerHTML=[...SHOTS].reverse().map((xx,ri)=>{
     const realIdx=SHOTS.length-1-ri;
@@ -442,11 +477,12 @@ function render(){
     <td><span class="shape" style="background:${SC[xx.shape]}22;color:${SC[xx.shape]}">${xx.shape}</span></td></tr>`;}).join("");
   document.getElementById("shotCount").textContent=SHOTS.length;
 
-  drawRange(s);drawTraj(s);drawDisp();
+  drawRange(s);drawTraj(s);
 }
 
-function nextShot(){idx=(idx+1)%SHOTS.length;render();}
-function jump(i){idx=i;render();}
+// New shots arrive automatically from the launch monitor — simulate that cadence.
+let autoTimer=setInterval(()=>{idx=(idx+1)%SHOTS.length;render();},5000);
+function jump(i){idx=i;render();clearInterval(autoTimer);autoTimer=setInterval(()=>{idx=(idx+1)%SHOTS.length;render();},5000);}
 window.addEventListener("resize",render);
 render();
 </script>
