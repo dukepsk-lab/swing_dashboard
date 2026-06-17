@@ -121,6 +121,10 @@
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:560px){.duo{grid-template-columns:1fr}}
   .stage{margin-bottom:0}
+  .vis3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
+  @media(max-width:1000px){.vis3{grid-template-columns:1fr}}
+  .capt{margin-top:13px;font-size:12px;color:var(--mut);text-align:center}
+  .capt b{color:var(--ice);font-size:17px;font-weight:800;letter-spacing:.3px}
   .flow{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
   .flow .b{text-align:center}
   .flow .b .v{font-size:20px;font-weight:800}
@@ -189,70 +193,28 @@
 
   <div class="kpis" id="kpis"></div>
 
-  <div class="main">
-    <!-- LEFT: virtual 3D range (half width) -->
-    <div class="stage">
-      <canvas id="range" height="540"></canvas>
-      <div class="ov ov-tl">
-        <div class="vtag">Virtual Range · 3D</div>
-        <div class="vclub" id="vclub">7 Iron</div>
-      </div>
-      <div class="ov ov-tr">
-        <div class="vtag" id="vshapename">Straight Draw</div>
-        <div class="vcarry"><span id="vcarry">178</span><small>yds carry</small></div>
-        <div class="vsub" id="vsub">Total 191 y · Apex 92 ft · Side 2 L</div>
-      </div>
-      <div class="ov ov-bl">
-        <div class="vgrade"><div class="vg-badge" id="vgrade">A</div>
-          <div><div class="vtag">Shot grade</div><div id="vshape"></div></div>
-        </div>
-      </div>
-      <div class="ov ov-br">
-        <div class="legend">
-          <span><i style="background:#7df3ff"></i>This shot</span>
-          <span><i style="background:#22d3ee"></i>On target</span>
-          <span><i style="background:#fb923c"></i>Off target</span>
-        </div>
-      </div>
+  <div class="vis3">
+    <div class="card">
+      <h3>Ball Flight <span class="m">side profile</span></h3>
+      <canvas id="traj" height="210"></canvas>
     </div>
+    <div class="card">
+      <h3>Smash Factor <span class="m">impact on face</span></h3>
+      <canvas id="face" height="210"></canvas>
+      <div class="capt"><b id="smBig">1.49</b> smash · <span id="smCap">99% efficiency</span></div>
+    </div>
+    <div class="card">
+      <h3>Launch &amp; Spin <span class="m">TP5x</span></h3>
+      <canvas id="spin" height="210"></canvas>
+      <div class="capt" id="spCap">12.5° launch · 37° descent · 2,550 rpm</div>
+    </div>
+  </div>
 
-    <!-- RIGHT: ball flight, shot detail, smash, ball flight angle -->
-    <div class="rightcol">
-      <div class="card">
-        <h3>Ball Flight <span class="m">side profile</span></h3>
-        <canvas id="traj" height="172"></canvas>
-      </div>
-      <div class="card">
-        <h3>Shot Detail <span class="m" id="dname"></span></h3>
-        <div class="detail">
-          <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
-          <div class="dstats" id="dstats"></div>
-        </div>
-      </div>
-      <div class="duo">
-        <div class="card">
-          <h3>Smash Factor <span class="m">efficiency</span></h3>
-          <div class="flow">
-            <div class="b"><div class="v mono" id="smClub">112</div><div class="k">Club mph</div></div>
-            <div class="arw">→</div>
-            <div class="b"><div class="v mono" id="smBall">167</div><div class="k">Ball mph</div></div>
-            <div class="arw">=</div>
-            <div class="b"><div class="v mono bigval" id="smVal">1.49</div><div class="k">Smash</div></div>
-          </div>
-          <div class="bar"><i id="smBar"></i></div>
-          <div class="note" id="smNote">Efficiency 99% · near optimal</div>
-        </div>
-        <div class="card">
-          <h3>Ball Flight Angle <span class="m">launch / descent</span></h3>
-          <div class="angles">
-            <div><div class="v mono" id="anLaunch" style="color:var(--sky)">12.5°</div><div class="k">Launch</div></div>
-            <div><div class="v mono" id="anApex">106<small> ft</small></div><div class="k">Apex</div></div>
-            <div><div class="v mono" id="anLand" style="color:var(--ice)">37°</div><div class="k">Descent</div></div>
-          </div>
-          <div class="bar"><i id="anBar"></i></div>
-          <div class="note" id="anNote">Penetrating ball flight</div>
-        </div>
-      </div>
+  <div class="card" style="margin-bottom:18px">
+    <h3>Shot Detail <span class="m" id="dname"></span></h3>
+    <div class="detail">
+      <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
+      <div class="dstats" id="dstats"></div>
     </div>
   </div>
 
@@ -271,10 +233,10 @@
 
 <script>
 const SHOTS=[
-  {n:1,club:"7 Iron",ball:148.0,clubspd:101.5,smash:1.46,launch:21.0,land:48,spin:6100,path:0.3,face:-0.9,carry:178.4,total:191.2,lateral:-2.1,apex:92,shape:"draw",name:"Straight Draw",rank:"A",color:"#34d399"},
-  {n:2,club:"7 Iron",ball:131.0,clubspd:96.4,smash:1.36,launch:18.0,land:44,spin:6090,path:0.0,face:1.0,carry:191.4,total:205.0,lateral:8.1,apex:88,shape:"straight",name:"Straight",rank:"B",color:"#22d3ee"},
-  {n:3,club:"Driver",ball:167.0,clubspd:112.4,smash:1.49,launch:12.5,land:37,spin:2550,path:0.0,face:-1.4,carry:271.4,total:276.2,lateral:-13.9,apex:106,shape:"draw",name:"Power Draw",rank:"A",color:"#34d399"},
-  {n:4,club:"7 Iron",ball:118.0,clubspd:92.3,smash:1.28,launch:24.5,land:51,spin:7180,path:-1.1,face:4.8,carry:157.9,total:166.0,lateral:33.6,apex:79,shape:"slice",name:"Push Slice",rank:"D",color:"#fb923c"},
+  {n:1,club:"7 Iron",ball:148.0,clubspd:101.5,smash:1.46,launch:21.0,land:48,spin:6100,axis:-9,path:0.3,face:-0.9,carry:178.4,total:191.2,lateral:-2.1,apex:92,imp:[-0.12,0.06],shape:"draw",name:"Straight Draw",rank:"A",color:"#34d399"},
+  {n:2,club:"7 Iron",ball:131.0,clubspd:96.4,smash:1.36,launch:18.0,land:44,spin:6090,axis:5,path:0.0,face:1.0,carry:191.4,total:205.0,lateral:8.1,apex:88,imp:[0.22,-0.16],shape:"straight",name:"Straight",rank:"B",color:"#22d3ee"},
+  {n:3,club:"Driver",ball:167.0,clubspd:112.4,smash:1.49,launch:12.5,land:37,spin:2550,axis:-7,path:0.0,face:-1.4,carry:271.4,total:276.2,lateral:-13.9,apex:106,imp:[0.05,0.12],shape:"draw",name:"Power Draw",rank:"A",color:"#34d399"},
+  {n:4,club:"7 Iron",ball:118.0,clubspd:92.3,smash:1.28,launch:24.5,land:51,spin:7180,axis:22,path:-1.1,face:4.8,carry:157.9,total:166.0,lateral:33.6,apex:79,imp:[0.46,-0.34],shape:"slice",name:"Push Slice",rank:"D",color:"#fb923c"},
 ];
 const SC={straight:"#22d3ee",draw:"#5aa2ff",fade:"#fbbf24",hook:"#34d399",slice:"#fb923c"};
 let idx=2;
@@ -289,113 +251,135 @@ const KPIS=[
   {k:"Total",i:"📏",f:s=>s.total.toFixed(0),u:"yds",key:"total"},
 ];
 
-function fit(c){const w=c.clientWidth,h=c.height,r=window.devicePixelRatio||1;c.width=w*r;c.height=h*r;
+// h is the FIXED logical height — never read it back off the element (that compounds
+// with devicePixelRatio every frame and makes the canvas grow without bound).
+function fit(c,h){const w=c.clientWidth,r=window.devicePixelRatio||1;
+  c.width=w*r;c.height=h*r;c.style.height=h+"px";
   const x=c.getContext("2d");x.setTransform(r,0,0,r,0,0);x.clearRect(0,0,w,h);return{x,w,h};}
 
-/* ---------- 3D perspective projection for the virtual range ---------- */
-function makeGeo(s,w,h){
-  const dmax=s.carry*1.12;
-  return {cx:w/2, horizonY:h*0.27, y0:h*0.99, k:dmax*0.52,
-          latScale:(w*0.5-26)/40, htScale:h*0.0066, dmax,
-          fwHalf:34};
-}
-function proj(lat,d,ht,g){
-  const sc=g.k/(g.k+d);
-  const yg=g.horizonY+(g.y0-g.horizonY)*sc;
-  return {x:g.cx+lat*g.latScale*sc, y:yg-ht*g.htScale*sc, yg, sc};
-}
+/* ---------- shared canvas helpers ---------- */
+function roundRect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath();}
+function arrowHead(x,px,py,ang,col){x.save();x.fillStyle=col;x.translate(px,py);x.rotate(ang);x.beginPath();x.moveTo(0,0);x.lineTo(-8,-3.4);x.lineTo(-8,3.4);x.closePath();x.fill();x.restore();}
+function panelBg(x,w,h){const bg=x.createLinearGradient(0,0,0,h);bg.addColorStop(0,"#0b1626");bg.addColorStop(1,"#060c18");x.fillStyle=bg;x.fillRect(0,0,w,h);}
 
-let raf=null;
-function drawRange(s){
-  const c=document.getElementById("range");const{x,w,h}=fit(c);
-  const g=makeGeo(s,w,h);
+/* ---------- Smash Factor: club head face-on + red impact mark ---------- */
+function drawClubface(s){
+  const c=document.getElementById("face");const{x,w,h}=fit(c,210);
+  panelBg(x,w,h);
+  const club=s.club.toLowerCase();
+  const isDriver=club.includes("driver")||club.includes("wood");
+  const cx=w/2, cy=h*0.50;
+  let fw,fh;
+  if(isDriver){fw=Math.min(w*0.58,180);fh=fw*0.6;}
+  else{fw=Math.min(w*0.40,120);fh=fw*1.2;}
+  const x0=cx-fw/2,y0=cy-fh/2;
 
-  // sky
-  const sky=x.createLinearGradient(0,0,0,g.horizonY+30);
-  sky.addColorStop(0,"#081634");sky.addColorStop(.6,"#0a1d44");sky.addColorStop(1,"#0d2756");
-  x.fillStyle=sky;x.fillRect(0,0,w,g.horizonY+30);
-  // horizon glow
-  const hg=x.createLinearGradient(0,g.horizonY-40,0,g.horizonY+40);
-  hg.addColorStop(0,"rgba(34,211,238,0)");hg.addColorStop(.5,"rgba(90,162,255,.28)");hg.addColorStop(1,"rgba(34,211,238,0)");
-  x.fillStyle=hg;x.fillRect(0,g.horizonY-40,w,80);
+  // hosel + shaft on the heel side
+  x.strokeStyle="#9aa6c4";x.lineWidth=6;x.lineCap="round";
+  x.beginPath();x.moveTo(x0+(isDriver?fw*0.18:7),y0-1);x.lineTo(x0-9,y0-30);x.stroke();
+  x.strokeStyle="#c7d0e6";x.lineWidth=3;x.beginPath();x.moveTo(x0-9,y0-30);x.lineTo(x0-13,y0-44);x.stroke();
 
-  // ground base
-  const gr=x.createLinearGradient(0,g.horizonY,0,h);
-  gr.addColorStop(0,"#06223a");gr.addColorStop(1,"#03101f");
-  x.fillStyle=gr;x.fillRect(0,g.horizonY,w,h-g.horizonY);
+  // metallic face body
+  const mg=x.createLinearGradient(x0,y0,x0,y0+fh);
+  mg.addColorStop(0,"#e7ecf6");mg.addColorStop(.5,"#aeb7cd");mg.addColorStop(1,"#828ba3");
+  roundRect(x,x0,y0,fw,fh,isDriver?fh*0.45:13);x.fillStyle=mg;x.fill();
+  x.strokeStyle="rgba(255,255,255,.4)";x.lineWidth=1.5;x.stroke();
 
-  // fairway trapezoid
-  const nl=proj(-g.fwHalf,0,0,g),nr=proj(g.fwHalf,0,0,g),
-        fl=proj(-g.fwHalf,g.dmax,0,g),fr=proj(g.fwHalf,g.dmax,0,g);
-  const fwg=x.createLinearGradient(0,g.horizonY,0,h);
-  fwg.addColorStop(0,"#0f4a3a");fwg.addColorStop(1,"#1d6e50");
-  x.beginPath();x.moveTo(nl.x,nl.yg);x.lineTo(fl.x,fl.yg);x.lineTo(fr.x,fr.yg);x.lineTo(nr.x,nr.yg);x.closePath();
-  x.fillStyle=fwg;x.fill();
-  // fairway side glow edges
-  x.strokeStyle="rgba(125,243,255,.22)";x.lineWidth=1.5;
-  x.beginPath();x.moveTo(nl.x,nl.yg);x.lineTo(fl.x,fl.yg);x.moveTo(nr.x,nr.yg);x.lineTo(fr.x,fr.yg);x.stroke();
-
-  // distance bands + labels
-  x.font="600 10px JetBrains Mono";
-  for(let D=50;D<g.dmax;D+=50){
-    const l=proj(-g.fwHalf,D,0,g),r=proj(g.fwHalf,D,0,g);
-    x.strokeStyle="rgba(125,243,255,.16)";x.lineWidth=1;
-    x.beginPath();x.moveTo(l.x,l.yg);x.lineTo(r.x,r.yg);x.stroke();
-    x.fillStyle="rgba(174,200,255,.7)";x.textAlign="left";
-    x.fillText(D+"y",r.x+6,r.yg+3);
+  // grooves / score lines
+  x.save();roundRect(x,x0,y0,fw,fh,isDriver?fh*0.45:13);x.clip();
+  if(!isDriver){
+    x.strokeStyle="rgba(40,52,74,.5)";x.lineWidth=1.3;
+    for(let i=1;i<=8;i++){const gy=y0+fh*i/9;x.beginPath();x.moveTo(x0+6,gy);x.lineTo(x0+fw-6,gy);x.stroke();}
+  }else{
+    x.strokeStyle="rgba(40,52,74,.28)";x.lineWidth=1;
+    for(let i=1;i<=6;i++){const gx=x0+fw*i/7;x.beginPath();x.moveTo(gx,y0+5);x.lineTo(gx,y0+fh-5);x.stroke();}
   }
-  // center target line
-  const t0=proj(0,0,0,g),t1=proj(0,g.dmax,0,g);
-  x.setLineDash([5,7]);x.strokeStyle="rgba(34,211,238,.45)";x.lineWidth=1.4;
-  x.beginPath();x.moveTo(t0.x,t0.yg);x.lineTo(t1.x,t1.yg);x.stroke();x.setLineDash([]);
+  x.restore();
 
-  // dispersion of other shots (ground markers)
-  SHOTS.forEach((o,i)=>{
-    if(i===idx)return;
-    const p=proj(o.lateral,o.carry,0,g),on=Math.abs(o.lateral)<18;
-    x.fillStyle=on?"rgba(34,211,238,.5)":"rgba(251,146,60,.55)";
-    x.beginPath();x.ellipse(p.x,p.yg,5*p.sc+2.5,2.4*p.sc+1.2,0,0,7);x.fill();
-  });
+  // sweet spot
+  x.strokeStyle="rgba(34,211,238,.65)";x.lineWidth=1;x.setLineDash([3,3]);
+  x.beginPath();x.moveTo(cx-11,cy);x.lineTo(cx+11,cy);x.moveTo(cx,cy-11);x.lineTo(cx,cy+11);x.stroke();x.setLineDash([]);
+  x.beginPath();x.arc(cx,cy,6,0,7);x.stroke();
 
-  // tee
-  const tee=proj(0,0,0,g);
-  x.fillStyle="rgba(255,255,255,.85)";x.beginPath();x.arc(tee.x,tee.yg-2,3,0,7);x.fill();
+  // red impact mark
+  const ix=cx+s.imp[0]*(fw/2*0.82), iy=cy-s.imp[1]*(fh/2*0.82);
+  x.strokeStyle="rgba(248,113,113,.5)";x.lineWidth=1;x.setLineDash([2,3]);
+  x.beginPath();x.moveTo(cx,cy);x.lineTo(ix,iy);x.stroke();x.setLineDash([]);
+  x.strokeStyle="rgba(248,81,79,.6)";x.lineWidth=1.5;x.beginPath();x.arc(ix,iy,12,0,7);x.stroke();
+  x.fillStyle="rgba(248,81,79,.18)";x.beginPath();x.arc(ix,iy,12,0,7);x.fill();
+  x.fillStyle="#f8514f";x.shadowColor="#ff4d4d";x.shadowBlur=13;x.beginPath();x.arc(ix,iy,5.5,0,7);x.fill();x.shadowBlur=0;
+  x.fillStyle="#fff";x.beginPath();x.arc(ix-1.5,iy-1.5,1.6,0,7);x.fill();
 
-  // ground shadow track of the flight
-  x.beginPath();
-  for(let i=0;i<=60;i++){const t=i/60,d=s.carry*t,lat=s.lateral*Math.pow(t,1.65);const p=proj(lat,d,0,g);i?x.lineTo(p.x,p.yg):x.moveTo(p.x,p.yg);}
-  x.strokeStyle="rgba(0,0,0,.35)";x.lineWidth=2;x.stroke();
+  // labels
+  x.fillStyle="#7c89ad";x.font="600 9px JetBrains Mono";
+  x.textAlign="left";x.fillText("HEEL",4,h-8);
+  x.textAlign="right";x.fillText("TOE",w-4,h-8);
+  x.textAlign="center";x.fillStyle="#ff7d7a";x.fillText("● IMPACT",cx,h-8);
+  x.textAlign="left";
+}
 
-  // flight arc
-  const pts=[];
-  for(let i=0;i<=80;i++){const t=i/80,d=s.carry*t,lat=s.lateral*Math.pow(t,1.65),ht=4*s.apex*t*(1-t);pts.push(proj(lat,d,ht,g));}
-  const fg=x.createLinearGradient(0,0,w,0);fg.addColorStop(0,"#2f6bff");fg.addColorStop(1,s.color);
-  x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));
-  x.strokeStyle=fg;x.lineWidth=3.4;x.shadowColor=s.color;x.shadowBlur=16;x.lineCap="round";x.stroke();x.shadowBlur=0;
+/* ---------- Launch & Spin: angle gauge + TaylorMade TP5x (orange pix dots) ---------- */
+function drawAngleSpin(s){
+  const c=document.getElementById("spin");const{x,w,h}=fit(c,210);
+  panelBg(x,w,h);
 
-  // apex marker
-  const ap=pts[40];
-  x.fillStyle=s.color;x.beginPath();x.arc(ap.x,ap.y,3.5,0,7);x.fill();
-  x.fillStyle="#cfe0ff";x.font="600 10px JetBrains Mono";x.textAlign="center";
-  x.fillText("apex "+s.apex+" ft",ap.x,ap.y-9);
+  // --- left: launch & descent angle gauge ---
+  const ox=24, gy=h-34, R=Math.min(h*0.56, w*0.32);
+  x.strokeStyle="rgba(120,150,220,.25)";x.lineWidth=1.5;
+  x.beginPath();x.moveTo(ox-6,gy);x.lineTo(ox+R+34,gy);x.stroke();
+  const la=s.launch*Math.PI/180;
+  x.fillStyle="rgba(34,211,238,.14)";x.beginPath();x.moveTo(ox,gy);x.arc(ox,gy,R,0,-la,true);x.closePath();x.fill();
+  x.strokeStyle="rgba(34,211,238,.5)";x.lineWidth=1.2;x.beginPath();x.arc(ox,gy,R,0,-la,true);x.stroke();
+  // launch ray
+  const lx=ox+Math.cos(-la)*(R+12), ly=gy+Math.sin(-la)*(R+12);
+  const lg=x.createLinearGradient(ox,gy,lx,ly);lg.addColorStop(0,"#2f6bff");lg.addColorStop(1,"#7df3ff");
+  x.strokeStyle=lg;x.lineWidth=3.2;x.lineCap="round";x.shadowColor="#22d3ee";x.shadowBlur=10;
+  x.beginPath();x.moveTo(ox,gy);x.lineTo(lx,ly);x.stroke();x.shadowBlur=0;
+  arrowHead(x,lx,ly,-la,"#7df3ff");
+  x.fillStyle="#eef2fc";x.beginPath();x.arc(ox,gy-3,4,0,7);x.fill();
+  // descent ray (dashed, landing down on the right)
+  const da=s.land*Math.PI/180, dxL=ox+R+34;
+  x.setLineDash([4,4]);x.strokeStyle="rgba(251,146,60,.75)";x.lineWidth=2;
+  x.beginPath();x.moveTo(dxL-Math.cos(da)*(R*0.72),gy-Math.sin(da)*(R*0.72));x.lineTo(dxL,gy);x.stroke();x.setLineDash([]);
+  arrowHead(x,dxL,gy,da,"#fb923c");
+  // angle labels
+  x.fillStyle="#7df3ff";x.font="700 12px Inter";x.textAlign="left";x.fillText(s.launch.toFixed(1)+"°",ox+12,gy-R*0.5);
+  x.fillStyle="#fb923c";x.textAlign="right";x.fillText(s.land+"°",dxL+2,gy-R*0.4);
+  x.fillStyle="#7c89ad";x.font="600 9px JetBrains Mono";x.textAlign="left";x.fillText("LAUNCH",ox-2,h-8);
 
-  // landing: drop line + flag + ring
-  const land=pts[80];
-  x.setLineDash([3,4]);x.strokeStyle="rgba(125,243,255,.5)";x.lineWidth=1.2;
-  x.beginPath();x.moveTo(land.x,land.y);x.lineTo(land.x,land.yg);x.stroke();x.setLineDash([]);
-  // ring on ground
-  x.strokeStyle=s.color;x.lineWidth=2;x.beginPath();x.ellipse(land.x,land.yg,9,4,0,0,7);x.stroke();
-  x.fillStyle=s.color+"33";x.beginPath();x.ellipse(land.x,land.yg,9,4,0,0,7);x.fill();
-  // flag pole
-  x.strokeStyle="#dfe9ff";x.lineWidth=1.5;x.beginPath();x.moveTo(land.x,land.yg);x.lineTo(land.x,land.yg-22);x.stroke();
-  x.fillStyle=s.color;x.beginPath();x.moveTo(land.x,land.yg-22);x.lineTo(land.x+13,land.yg-18);x.lineTo(land.x,land.yg-14);x.closePath();x.fill();
-  // glowing ball at landing
-  x.fillStyle="#fff";x.shadowColor="#7df3ff";x.shadowBlur=14;x.beginPath();x.arc(land.x,land.y,4.5,0,7);x.fill();x.shadowBlur=0;
+  // --- right: TaylorMade TP5x ball (orange pix dots) + backspin ---
+  const bx=w*0.76, by=h*0.45, rad=Math.min(h*0.29,w*0.16);
+  const axis=s.axis*Math.PI/180;
+  // shadow
+  x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(bx,by+rad+9,rad*0.82,rad*0.2,0,0,7);x.fill();
+  // sphere
+  const sg=x.createRadialGradient(bx-rad*0.35,by-rad*0.4,rad*0.18,bx,by,rad);
+  sg.addColorStop(0,"#ffffff");sg.addColorStop(.72,"#e7ecf6");sg.addColorStop(1,"#b7c0d4");
+  x.fillStyle=sg;x.beginPath();x.arc(bx,by,rad,0,7);x.fill();
+  // orange dots, tilted by spin axis
+  x.save();x.beginPath();x.arc(bx,by,rad,0,7);x.clip();
+  const dots=[[0,0,1]];
+  for(let ring=1;ring<=3;ring++){const rr=rad*ring*0.26,cnt=ring*6;for(let k=0;k<cnt;k++){const a=k/cnt*Math.PI*2+ring*0.5;dots.push([Math.cos(a)*rr,Math.sin(a)*rr,1-ring*0.14]);}}
+  x.fillStyle="#fb7c1d";
+  dots.forEach(([dx,dy,sz])=>{const rx=dx*Math.cos(axis)-dy*Math.sin(axis),ry=dx*Math.sin(axis)+dy*Math.cos(axis);
+    x.globalAlpha=0.5+0.5*sz;x.beginPath();x.arc(bx+rx,by+ry,2.3*sz+1.2,0,7);x.fill();});
+  x.globalAlpha=1;x.restore();
+  x.strokeStyle="rgba(120,150,220,.4)";x.lineWidth=1;x.beginPath();x.arc(bx,by,rad,0,7);x.stroke();
+  // backspin arc + arrow, tilted by axis
+  x.save();x.translate(bx,by);x.rotate(axis);
+  x.strokeStyle="#22d3ee";x.lineWidth=2.4;x.shadowColor="#22d3ee";x.shadowBlur=8;
+  x.beginPath();x.arc(0,0,rad+9,Math.PI*0.18,Math.PI*0.82);x.stroke();x.shadowBlur=0;
+  const ea=Math.PI*0.18,ex=Math.cos(ea)*(rad+9),ey=Math.sin(ea)*(rad+9);
+  arrowHead(x,ex,ey,ea-Math.PI/2,"#22d3ee");
+  x.restore();
+  // spin label
+  x.fillStyle="#aab6da";x.font="700 13px Inter";x.textAlign="center";x.fillText(s.spin.toLocaleString(),bx,by+rad+25);
+  x.fillStyle="#7c89ad";x.font="600 8.5px JetBrains Mono";x.fillText("RPM · TP5x",bx,by+rad+37);
   x.textAlign="left";
 }
 
 function drawTraj(s){
-  const c=document.getElementById("traj");const{x,w,h}=fit(c);
+  const c=document.getElementById("traj");const{x,w,h}=fit(c,210);
   const gg=x.createLinearGradient(0,0,0,h);gg.addColorStop(0,"#091428");gg.addColorStop(1,"#050b18");x.fillStyle=gg;x.fillRect(0,0,w,h);
   const pl=36,pb=24,gw=w-pl-16,gh=h-pb-14,top=12;
   x.strokeStyle="rgba(96,135,220,.12)";x.lineWidth=1;
@@ -433,39 +417,24 @@ function render(){
       <div class="delta ${cls}">${arr} ${da} ${c.u}</div></div>`;
   }).join("");
 
-  // hero overlays
-  const side=Math.abs(s.lateral).toFixed(0)+(s.lateral<0?" L":" R");
-  document.getElementById("vclub").textContent=s.club;
-  document.getElementById("vshapename").textContent=s.name;
-  document.getElementById("vcarry").textContent=s.carry.toFixed(0);
-  document.getElementById("vsub").textContent=`Total ${s.total.toFixed(0)} y · Apex ${s.apex} ft · Side ${side}`;
-  const vg=document.getElementById("vgrade");
-  vg.textContent=s.rank;vg.style.background=s.color+"26";vg.style.color=s.color;vg.style.border="1px solid "+s.color+"66";
-  document.getElementById("vshape").innerHTML=`<span class="vshape" style="background:${SC[s.shape]}26;color:${SC[s.shape]};border:1px solid ${SC[s.shape]}55">${s.shape.toUpperCase()}</span>`;
-
   // shot detail
   const rk=document.getElementById("rank");
   rk.querySelector(".g").textContent=s.rank;
   rk.style.background="linear-gradient(160deg,"+s.color+"33,"+s.color+"11)";
   rk.style.border="1px solid "+s.color+"55";rk.style.color=s.color;
   document.getElementById("dname").innerHTML=`<span class="shape" style="background:${s.color}22;color:${s.color}">${s.name}</span>`;
-  const ds=[["Club Path",s.path.toFixed(1)+"°"],["Face → Tgt",s.face.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()],["Total",s.total.toFixed(0)+" y"]];
+  const side=Math.abs(s.lateral).toFixed(0)+(s.lateral<0?" L":" R");
+  const ds=[["Carry",s.carry.toFixed(0)+" y"],["Total",s.total.toFixed(0)+" y"],["Club Path",s.path.toFixed(1)+"°"],["Face → Tgt",s.face.toFixed(1)+"°"],
+            ["Apex",s.apex+" ft"],["Side",side],["Launch",s.launch.toFixed(1)+"°"],["Spin",s.spin.toLocaleString()]];
   document.getElementById("dstats").innerHTML=ds.map(([k,v])=>`<div class="dstat"><div class="k">${k}</div><div class="v mono">${v}</div></div>`).join("");
 
-  // smash factor
-  document.getElementById("smClub").textContent=s.clubspd.toFixed(1);
-  document.getElementById("smBall").textContent=s.ball.toFixed(1);
-  document.getElementById("smVal").textContent=s.smash.toFixed(2);
+  // smash factor (clubface visual caption)
   const eff=Math.min(100,Math.round(s.smash/1.50*100));
-  document.getElementById("smBar").style.width=eff+"%";
-  document.getElementById("smNote").textContent=`Efficiency ${eff}% · `+(eff>=96?"near optimal":eff>=88?"solid strike":"off-centre contact");
+  document.getElementById("smBig").textContent=s.smash.toFixed(2);
+  document.getElementById("smCap").textContent=`${eff}% efficiency · `+(eff>=96?"flush centre":eff>=88?"solid strike":"off-centre hit");
 
-  // ball flight angle
-  document.getElementById("anLaunch").textContent=s.launch.toFixed(1)+"°";
-  document.getElementById("anApex").innerHTML=s.apex+"<small> ft</small>";
-  document.getElementById("anLand").textContent=s.land+"°";
-  document.getElementById("anBar").style.width=Math.min(100,Math.round(s.launch/30*100))+"%";
-  document.getElementById("anNote").textContent=s.launch<14?"Penetrating ball flight":s.launch<22?"Mid launch window":"High, soft-landing flight";
+  // launch & spin caption
+  document.getElementById("spCap").textContent=`${s.launch.toFixed(1)}° launch · ${s.land}° descent · ${s.spin.toLocaleString()} rpm`;
 
   document.getElementById("rows").innerHTML=[...SHOTS].reverse().map((xx,ri)=>{
     const realIdx=SHOTS.length-1-ri;
@@ -477,7 +446,7 @@ function render(){
     <td><span class="shape" style="background:${SC[xx.shape]}22;color:${SC[xx.shape]}">${xx.shape}</span></td></tr>`;}).join("");
   document.getElementById("shotCount").textContent=SHOTS.length;
 
-  drawRange(s);drawTraj(s);
+  drawTraj(s);drawClubface(s);drawAngleSpin(s);
 }
 
 // New shots arrive automatically from the launch monitor — simulate that cadence.
