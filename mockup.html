@@ -121,10 +121,15 @@
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:560px){.duo{grid-template-columns:1fr}}
   .stage{margin-bottom:0}
-  .vis3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
-  @media(max-width:1000px){.vis3{grid-template-columns:1fr}}
+  .row4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:18px}
+  @media(max-width:1180px){.row4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:620px){.row4{grid-template-columns:1fr}}
   .capt{margin-top:13px;font-size:12px;color:var(--mut);text-align:center}
   .capt b{color:var(--ice);font-size:17px;font-weight:800;letter-spacing:.3px}
+  .detailv{display:flex;flex-direction:column;gap:14px}
+  .detailv .rank{width:100%;height:auto;padding:11px 15px;border-radius:14px;flex-direction:row;justify-content:flex-start;gap:13px}
+  .detailv .rank .g{font-size:30px}
+  .detailv .dstats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 14px}
   .flow{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
   .flow .b{text-align:center}
   .flow .b .v{font-size:20px;font-weight:800}
@@ -193,28 +198,27 @@
 
   <div class="kpis" id="kpis"></div>
 
-  <div class="vis3">
+  <div class="row4">
     <div class="card">
       <h3>Ball Flight <span class="m">side profile</span></h3>
-      <canvas id="traj" height="210"></canvas>
+      <canvas id="traj" height="220"></canvas>
     </div>
     <div class="card">
       <h3>Smash Factor <span class="m">impact on face</span></h3>
-      <canvas id="face" height="210"></canvas>
+      <canvas id="face" height="220"></canvas>
       <div class="capt"><b id="smBig">1.49</b> smash · <span id="smCap">99% efficiency</span></div>
     </div>
     <div class="card">
       <h3>Launch &amp; Spin <span class="m">TP5x</span></h3>
-      <canvas id="spin" height="210"></canvas>
+      <canvas id="spin" height="220"></canvas>
       <div class="capt" id="spCap">12.5° launch · 37° descent · 2,550 rpm</div>
     </div>
-  </div>
-
-  <div class="card" style="margin-bottom:18px">
-    <h3>Shot Detail <span class="m" id="dname"></span></h3>
-    <div class="detail">
-      <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
-      <div class="dstats" id="dstats"></div>
+    <div class="card">
+      <h3>Shot Detail <span class="m" id="dname"></span></h3>
+      <div class="detailv">
+        <div class="rank" id="rank"><div class="g">A</div><div class="t">GRADE</div></div>
+        <div class="dstats" id="dstats"></div>
+      </div>
     </div>
   </div>
 
@@ -262,124 +266,136 @@ function roundRect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,
 function arrowHead(x,px,py,ang,col){x.save();x.fillStyle=col;x.translate(px,py);x.rotate(ang);x.beginPath();x.moveTo(0,0);x.lineTo(-8,-3.4);x.lineTo(-8,3.4);x.closePath();x.fill();x.restore();}
 function panelBg(x,w,h){const bg=x.createLinearGradient(0,0,0,h);bg.addColorStop(0,"#0b1626");bg.addColorStop(1,"#060c18");x.fillStyle=bg;x.fillRect(0,0,w,h);}
 
-/* ---------- Smash Factor: club head face-on + red impact mark ---------- */
+/* ---------- Smash Factor: realistic club head (driver / iron / wedge) + red impact ---------- */
+function clubType(name){const cl=name.toLowerCase();
+  if(cl.includes("driver")||cl.includes("wood")) return "wood";
+  if(cl.includes("pw")||cl.includes("sw")||cl.includes("gw")||cl.includes("lw")||cl.includes("wedge")) return "wedge";
+  return "iron";}
+
 function drawClubface(s){
-  const c=document.getElementById("face");const{x,w,h}=fit(c,210);
+  const c=document.getElementById("face");const{x,w,h}=fit(c,220);
   panelBg(x,w,h);
-  const club=s.club.toLowerCase();
-  const isDriver=club.includes("driver")||club.includes("wood");
+  const type=clubType(s.club);     // fixed picture per club type
   const cx=w/2, cy=h*0.50;
-  let fw,fh;
-  if(isDriver){fw=Math.min(w*0.58,180);fh=fw*0.6;}
-  else{fw=Math.min(w*0.40,120);fh=fw*1.2;}
-  const x0=cx-fw/2,y0=cy-fh/2;
+  let f; // strike-face rect {fx,fy,fw,fh}
 
-  // hosel + shaft on the heel side
-  x.strokeStyle="#9aa6c4";x.lineWidth=6;x.lineCap="round";
-  x.beginPath();x.moveTo(x0+(isDriver?fw*0.18:7),y0-1);x.lineTo(x0-9,y0-30);x.stroke();
-  x.strokeStyle="#c7d0e6";x.lineWidth=3;x.beginPath();x.moveTo(x0-9,y0-30);x.lineTo(x0-13,y0-44);x.stroke();
-
-  // metallic face body
-  const mg=x.createLinearGradient(x0,y0,x0,y0+fh);
-  mg.addColorStop(0,"#e7ecf6");mg.addColorStop(.5,"#aeb7cd");mg.addColorStop(1,"#828ba3");
-  roundRect(x,x0,y0,fw,fh,isDriver?fh*0.45:13);x.fillStyle=mg;x.fill();
-  x.strokeStyle="rgba(255,255,255,.4)";x.lineWidth=1.5;x.stroke();
-
-  // grooves / score lines
-  x.save();roundRect(x,x0,y0,fw,fh,isDriver?fh*0.45:13);x.clip();
-  if(!isDriver){
+  if(type==="wood"){
+    const hw=Math.min(w*0.66,210), hh=hw*0.56, hx=cx-hw/2, hy=cy-hh*0.46;
+    // shaft + hosel (heel)
+    x.lineCap="round";
+    x.strokeStyle="#aab3c9";x.lineWidth=7;x.beginPath();x.moveTo(hx+hw*0.22,hy+6);x.lineTo(hx+hw*0.05,hy-28);x.stroke();
+    x.strokeStyle="#d2d9ea";x.lineWidth=3.5;x.beginPath();x.moveTo(hx+hw*0.05,hy-28);x.lineTo(hx+hw*0.01,hy-44);x.stroke();
+    // big rounded driver head (metallic)
+    const bg=x.createLinearGradient(0,hy,0,hy+hh);bg.addColorStop(0,"#dde3f0");bg.addColorStop(.5,"#aab3c9");bg.addColorStop(1,"#7c87a3");
+    roundRect(x,hx,hy,hw,hh,hh*0.46);x.fillStyle=bg;x.fill();
+    x.strokeStyle="rgba(255,255,255,.4)";x.lineWidth=1.5;x.stroke();
+    // dark crown across the top
+    x.save();roundRect(x,hx,hy,hw,hh,hh*0.46);x.clip();
+    const cg=x.createLinearGradient(0,hy,0,hy+hh*0.46);cg.addColorStop(0,"#18233c");cg.addColorStop(1,"#34425f");
+    x.fillStyle=cg;x.fillRect(hx,hy,hw,hh*0.46);
+    x.strokeStyle="rgba(125,243,255,.22)";x.lineWidth=1;x.beginPath();x.moveTo(hx,hy+hh*0.46);x.lineTo(hx+hw,hy+hh*0.46);x.stroke();
+    x.restore();
+    // titanium strike face (inset)
+    const fw=hw*0.46, fh=hh*0.56, fx=cx-fw/2, fy=cy-fh*0.28;
+    const fg=x.createLinearGradient(0,fy,0,fy+fh);fg.addColorStop(0,"#eef2fa");fg.addColorStop(1,"#b4bdd2");
+    roundRect(x,fx,fy,fw,fh,9);x.fillStyle=fg;x.fill();x.strokeStyle="rgba(40,52,74,.35)";x.lineWidth=1;x.stroke();
+    x.save();roundRect(x,fx,fy,fw,fh,9);x.clip();x.strokeStyle="rgba(60,72,96,.3)";x.lineWidth=1;
+    for(let i=1;i<=7;i++){const gx=fx+fw*i/8;x.beginPath();x.moveTo(gx,fy+3);x.lineTo(gx,fy+fh-3);x.stroke();}x.restore();
+    f={fx,fy,fw,fh};
+  } else {
+    const fw=Math.min(w*0.4,120), fh=fw*(type==="wedge"?1.36:1.18), fx=cx-fw/2, fy=cy-fh/2;
+    // shaft + hosel (heel, top-left)
+    x.lineCap="round";
+    x.strokeStyle="#9aa6c4";x.lineWidth=6;x.beginPath();x.moveTo(fx+8,fy+2);x.lineTo(fx-9,fy-30);x.stroke();
+    x.strokeStyle="#c7d0e6";x.lineWidth=3;x.beginPath();x.moveTo(fx-9,fy-30);x.lineTo(fx-13,fy-44);x.stroke();
+    // blade body (metallic)
+    const mg=x.createLinearGradient(fx,fy,fx,fy+fh);mg.addColorStop(0,"#e7ecf6");mg.addColorStop(.5,"#aeb7cd");mg.addColorStop(1,"#828ba3");
+    roundRect(x,fx,fy,fw,fh,12);x.fillStyle=mg;x.fill();x.strokeStyle="rgba(255,255,255,.4)";x.lineWidth=1.5;x.stroke();
+    x.save();roundRect(x,fx,fy,fw,fh,12);x.clip();
+    // sole (darker bottom)
+    x.fillStyle="rgba(40,52,74,.28)";x.fillRect(fx,fy+fh*0.84,fw,fh*0.16);
+    // grooves
     x.strokeStyle="rgba(40,52,74,.5)";x.lineWidth=1.3;
-    for(let i=1;i<=8;i++){const gy=y0+fh*i/9;x.beginPath();x.moveTo(x0+6,gy);x.lineTo(x0+fw-6,gy);x.stroke();}
-  }else{
-    x.strokeStyle="rgba(40,52,74,.28)";x.lineWidth=1;
-    for(let i=1;i<=6;i++){const gx=x0+fw*i/7;x.beginPath();x.moveTo(gx,y0+5);x.lineTo(gx,y0+fh-5);x.stroke();}
+    const ng=type==="wedge"?11:8;
+    for(let i=1;i<=ng;i++){const gy=fy+fh*0.1+(fh*0.72)*i/(ng+1);x.beginPath();x.moveTo(fx+6,gy);x.lineTo(fx+fw-6,gy);x.stroke();}
+    x.restore();
+    f={fx,fy,fw,fh};
   }
-  x.restore();
 
-  // sweet spot
+  // sweet spot at the centre of the face
+  const fcx=f.fx+f.fw/2, fcy=f.fy+f.fh/2;
   x.strokeStyle="rgba(34,211,238,.65)";x.lineWidth=1;x.setLineDash([3,3]);
-  x.beginPath();x.moveTo(cx-11,cy);x.lineTo(cx+11,cy);x.moveTo(cx,cy-11);x.lineTo(cx,cy+11);x.stroke();x.setLineDash([]);
-  x.beginPath();x.arc(cx,cy,6,0,7);x.stroke();
+  x.beginPath();x.moveTo(fcx-11,fcy);x.lineTo(fcx+11,fcy);x.moveTo(fcx,fcy-11);x.lineTo(fcx,fcy+11);x.stroke();x.setLineDash([]);
+  x.beginPath();x.arc(fcx,fcy,6,0,7);x.stroke();
 
   // red impact mark
-  const ix=cx+s.imp[0]*(fw/2*0.82), iy=cy-s.imp[1]*(fh/2*0.82);
-  x.strokeStyle="rgba(248,113,113,.5)";x.lineWidth=1;x.setLineDash([2,3]);
-  x.beginPath();x.moveTo(cx,cy);x.lineTo(ix,iy);x.stroke();x.setLineDash([]);
+  const ix=fcx+s.imp[0]*(f.fw/2*0.8), iy=fcy-s.imp[1]*(f.fh/2*0.8);
+  x.strokeStyle="rgba(248,113,113,.5)";x.lineWidth=1;x.setLineDash([2,3]);x.beginPath();x.moveTo(fcx,fcy);x.lineTo(ix,iy);x.stroke();x.setLineDash([]);
   x.strokeStyle="rgba(248,81,79,.6)";x.lineWidth=1.5;x.beginPath();x.arc(ix,iy,12,0,7);x.stroke();
   x.fillStyle="rgba(248,81,79,.18)";x.beginPath();x.arc(ix,iy,12,0,7);x.fill();
   x.fillStyle="#f8514f";x.shadowColor="#ff4d4d";x.shadowBlur=13;x.beginPath();x.arc(ix,iy,5.5,0,7);x.fill();x.shadowBlur=0;
   x.fillStyle="#fff";x.beginPath();x.arc(ix-1.5,iy-1.5,1.6,0,7);x.fill();
 
   // labels
-  x.fillStyle="#7c89ad";x.font="600 9px JetBrains Mono";
-  x.textAlign="left";x.fillText("HEEL",4,h-8);
+  x.font="600 9px JetBrains Mono";
+  x.fillStyle="#7c89ad";x.textAlign="left";x.fillText("HEEL",4,h-8);
   x.textAlign="right";x.fillText("TOE",w-4,h-8);
   x.textAlign="center";x.fillStyle="#ff7d7a";x.fillText("● IMPACT",cx,h-8);
   x.textAlign="left";
 }
 
-/* ---------- Launch & Spin: angle gauge + TaylorMade TP5x (orange pix dots) ---------- */
+/* ---------- Launch & Spin: compact angle gauge + BIG TaylorMade TP5x ball ---------- */
 function drawAngleSpin(s){
-  const c=document.getElementById("spin");const{x,w,h}=fit(c,210);
+  const c=document.getElementById("spin");const{x,w,h}=fit(c,220);
   panelBg(x,w,h);
 
-  // --- left: launch & descent angle gauge ---
-  const ox=24, gy=h-34, R=Math.min(h*0.56, w*0.32);
-  x.strokeStyle="rgba(120,150,220,.25)";x.lineWidth=1.5;
-  x.beginPath();x.moveTo(ox-6,gy);x.lineTo(ox+R+34,gy);x.stroke();
+  // --- left: compact launch / descent gauge ---
+  const ox=22, gy=h-30, R=Math.min(h*0.5, w*0.3);
+  x.strokeStyle="rgba(120,150,220,.25)";x.lineWidth=1.5;x.beginPath();x.moveTo(ox-6,gy);x.lineTo(ox+R+24,gy);x.stroke();
   const la=s.launch*Math.PI/180;
   x.fillStyle="rgba(34,211,238,.14)";x.beginPath();x.moveTo(ox,gy);x.arc(ox,gy,R,0,-la,true);x.closePath();x.fill();
   x.strokeStyle="rgba(34,211,238,.5)";x.lineWidth=1.2;x.beginPath();x.arc(ox,gy,R,0,-la,true);x.stroke();
-  // launch ray
-  const lx=ox+Math.cos(-la)*(R+12), ly=gy+Math.sin(-la)*(R+12);
+  const lx=ox+Math.cos(-la)*(R+10), ly=gy+Math.sin(-la)*(R+10);
   const lg=x.createLinearGradient(ox,gy,lx,ly);lg.addColorStop(0,"#2f6bff");lg.addColorStop(1,"#7df3ff");
-  x.strokeStyle=lg;x.lineWidth=3.2;x.lineCap="round";x.shadowColor="#22d3ee";x.shadowBlur=10;
-  x.beginPath();x.moveTo(ox,gy);x.lineTo(lx,ly);x.stroke();x.shadowBlur=0;
+  x.strokeStyle=lg;x.lineWidth=3;x.lineCap="round";x.shadowColor="#22d3ee";x.shadowBlur=9;x.beginPath();x.moveTo(ox,gy);x.lineTo(lx,ly);x.stroke();x.shadowBlur=0;
   arrowHead(x,lx,ly,-la,"#7df3ff");
-  x.fillStyle="#eef2fc";x.beginPath();x.arc(ox,gy-3,4,0,7);x.fill();
-  // descent ray (dashed, landing down on the right)
-  const da=s.land*Math.PI/180, dxL=ox+R+34;
-  x.setLineDash([4,4]);x.strokeStyle="rgba(251,146,60,.75)";x.lineWidth=2;
-  x.beginPath();x.moveTo(dxL-Math.cos(da)*(R*0.72),gy-Math.sin(da)*(R*0.72));x.lineTo(dxL,gy);x.stroke();x.setLineDash([]);
+  x.fillStyle="#eef2fc";x.beginPath();x.arc(ox,gy-3,3.5,0,7);x.fill();
+  const da=s.land*Math.PI/180, dxL=ox+R+24;
+  x.setLineDash([4,4]);x.strokeStyle="rgba(251,146,60,.75)";x.lineWidth=2;x.beginPath();x.moveTo(dxL-Math.cos(da)*(R*0.7),gy-Math.sin(da)*(R*0.7));x.lineTo(dxL,gy);x.stroke();x.setLineDash([]);
   arrowHead(x,dxL,gy,da,"#fb923c");
-  // angle labels
-  x.fillStyle="#7df3ff";x.font="700 12px Inter";x.textAlign="left";x.fillText(s.launch.toFixed(1)+"°",ox+12,gy-R*0.5);
-  x.fillStyle="#fb923c";x.textAlign="right";x.fillText(s.land+"°",dxL+2,gy-R*0.4);
-  x.fillStyle="#7c89ad";x.font="600 9px JetBrains Mono";x.textAlign="left";x.fillText("LAUNCH",ox-2,h-8);
+  x.fillStyle="#7df3ff";x.font="700 11px Inter";x.textAlign="left";x.fillText(s.launch.toFixed(1)+"°",ox+8,gy-R*0.5);
+  x.fillStyle="#fb923c";x.textAlign="right";x.fillText(s.land+"°",dxL+2,gy-R*0.38);
+  x.fillStyle="#7c89ad";x.font="600 8.5px JetBrains Mono";x.textAlign="left";x.fillText("LAUNCH / DESCENT",ox-2,h-7);
 
-  // --- right: TaylorMade TP5x ball (orange pix dots) + backspin ---
-  const bx=w*0.76, by=h*0.45, rad=Math.min(h*0.29,w*0.16);
+  // --- right: BIG TP5x ball + backspin ---
+  const bx=w*0.72, by=h*0.43, rad=Math.min(h*0.4, w*0.27);
   const axis=s.axis*Math.PI/180;
-  // shadow
-  x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(bx,by+rad+9,rad*0.82,rad*0.2,0,0,7);x.fill();
-  // sphere
+  x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(bx,by+rad+8,rad*0.82,rad*0.18,0,0,7);x.fill();
   const sg=x.createRadialGradient(bx-rad*0.35,by-rad*0.4,rad*0.18,bx,by,rad);
   sg.addColorStop(0,"#ffffff");sg.addColorStop(.72,"#e7ecf6");sg.addColorStop(1,"#b7c0d4");
   x.fillStyle=sg;x.beginPath();x.arc(bx,by,rad,0,7);x.fill();
-  // orange dots, tilted by spin axis
+  // orange "pix" dots, scaled to the ball and tilted by spin axis
   x.save();x.beginPath();x.arc(bx,by,rad,0,7);x.clip();
   const dots=[[0,0,1]];
-  for(let ring=1;ring<=3;ring++){const rr=rad*ring*0.26,cnt=ring*6;for(let k=0;k<cnt;k++){const a=k/cnt*Math.PI*2+ring*0.5;dots.push([Math.cos(a)*rr,Math.sin(a)*rr,1-ring*0.14]);}}
+  for(let ring=1;ring<=4;ring++){const rr=rad*ring*0.2,cnt=ring*6;for(let k=0;k<cnt;k++){const a=k/cnt*Math.PI*2+ring*0.5;dots.push([Math.cos(a)*rr,Math.sin(a)*rr,1-ring*0.1]);}}
   x.fillStyle="#fb7c1d";
   dots.forEach(([dx,dy,sz])=>{const rx=dx*Math.cos(axis)-dy*Math.sin(axis),ry=dx*Math.sin(axis)+dy*Math.cos(axis);
-    x.globalAlpha=0.5+0.5*sz;x.beginPath();x.arc(bx+rx,by+ry,2.3*sz+1.2,0,7);x.fill();});
+    x.globalAlpha=0.5+0.5*sz;x.beginPath();x.arc(bx+rx,by+ry,rad*0.05*sz+1.5,0,7);x.fill();});
   x.globalAlpha=1;x.restore();
   x.strokeStyle="rgba(120,150,220,.4)";x.lineWidth=1;x.beginPath();x.arc(bx,by,rad,0,7);x.stroke();
   // backspin arc + arrow, tilted by axis
   x.save();x.translate(bx,by);x.rotate(axis);
-  x.strokeStyle="#22d3ee";x.lineWidth=2.4;x.shadowColor="#22d3ee";x.shadowBlur=8;
-  x.beginPath();x.arc(0,0,rad+9,Math.PI*0.18,Math.PI*0.82);x.stroke();x.shadowBlur=0;
-  const ea=Math.PI*0.18,ex=Math.cos(ea)*(rad+9),ey=Math.sin(ea)*(rad+9);
-  arrowHead(x,ex,ey,ea-Math.PI/2,"#22d3ee");
+  x.strokeStyle="#22d3ee";x.lineWidth=2.6;x.shadowColor="#22d3ee";x.shadowBlur=9;x.beginPath();x.arc(0,0,rad+8,Math.PI*0.18,Math.PI*0.82);x.stroke();x.shadowBlur=0;
+  const ea=Math.PI*0.18,ex=Math.cos(ea)*(rad+8),ey=Math.sin(ea)*(rad+8);arrowHead(x,ex,ey,ea-Math.PI/2,"#22d3ee");
   x.restore();
   // spin label
-  x.fillStyle="#aab6da";x.font="700 13px Inter";x.textAlign="center";x.fillText(s.spin.toLocaleString(),bx,by+rad+25);
-  x.fillStyle="#7c89ad";x.font="600 8.5px JetBrains Mono";x.fillText("RPM · TP5x",bx,by+rad+37);
+  x.fillStyle="#aab6da";x.font="700 13px Inter";x.textAlign="center";x.fillText(s.spin.toLocaleString(),bx,by+rad+22);
+  x.fillStyle="#7c89ad";x.font="600 8.5px JetBrains Mono";x.fillText("RPM · TP5x",bx,by+rad+34);
   x.textAlign="left";
 }
 
 function drawTraj(s){
-  const c=document.getElementById("traj");const{x,w,h}=fit(c,210);
+  const c=document.getElementById("traj");const{x,w,h}=fit(c,220);
   const gg=x.createLinearGradient(0,0,0,h);gg.addColorStop(0,"#091428");gg.addColorStop(1,"#050b18");x.fillStyle=gg;x.fillRect(0,0,w,h);
   const pl=36,pb=24,gw=w-pl-16,gh=h-pb-14,top=12;
   x.strokeStyle="rgba(96,135,220,.12)";x.lineWidth=1;
