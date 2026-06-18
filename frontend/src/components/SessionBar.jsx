@@ -21,7 +21,7 @@ export default function SessionBar({ connected, currentClub, sessionInfo, shotCo
   }, [sessionInfo]);
 
   return (
-    <div className="flex flex-wrap items-center gap-3 px-4 py-2 bg-dark-700/50 border border-neon-green/10 rounded-xl mb-4">
+    <div className="flex flex-wrap items-center gap-3 px-4 py-1 bg-dark-700/50 border border-neon-green/10 rounded-xl mb-2">
       {/* Live indicator */}
       <div className="flex items-center gap-2">
         <div className={`w-2.5 h-2.5 rounded-full ${connected ? 'bg-neon-green animate-pulse_slow' : 'bg-red-500'}`} />

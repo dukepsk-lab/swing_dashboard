@@ -24,7 +24,7 @@ export default function DrivingRange() {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-4 max-w-[1600px] mx-auto animate-fade-in">
+    <div className="p-4 md:p-6 space-y-2 max-w-[1600px] mx-auto animate-fade-in">
       {/* Session Status Bar */}
       <SessionBar
         connected={connected}

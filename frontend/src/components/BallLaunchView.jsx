@@ -87,58 +87,7 @@ function drawTP5xBall(ctx, cx, cy, r) {
   ctx.stroke();
 }
 
-function drawSpinArrow(ctx, cx, cy, r, spinAxis, backspin, sidespin) {
-  const totalSpin = Math.sqrt(backspin * backspin + sidespin * sidespin) || 1;
-  const spinDeg   = Math.abs(spinAxis) || 0;
-
-  // Arrow size scales with spin magnitude
-  const arrowLen = r * 0.85 + (totalSpin / 12000) * r * 0.4;
-  // Arrow direction: spin_axis angle, rotated so 0 = pure backspin (upward arrow)
-  const arrowAngle = (spinAxis * Math.PI) / 180 - Math.PI / 2;
-
-  const ax = cx + Math.cos(arrowAngle) * (r + 10);
-  const ay = cy + Math.sin(arrowAngle) * (r + 10);
-  const bx = cx + Math.cos(arrowAngle) * (r + 10 + arrowLen);
-  const by = cy + Math.sin(arrowAngle) * (r + 10 + arrowLen);
-
-  const arrowColor = spinDeg < 10 ? '#39FF14' : Math.abs(sidespin) > backspin * 0.5 ? '#FF6B35' : '#00FFD1';
-
-  ctx.save();
-  ctx.strokeStyle = arrowColor;
-  ctx.fillStyle   = arrowColor;
-  ctx.lineWidth   = 2.5;
-  ctx.shadowColor = arrowColor;
-  ctx.shadowBlur  = 8;
-  ctx.lineCap     = 'round';
-
-  ctx.beginPath();
-  ctx.moveTo(ax, ay);
-  ctx.lineTo(bx, by);
-  ctx.stroke();
-
-  // Arrowhead
-  const headSize = 8;
-  const perpAngle = arrowAngle + Math.PI / 2;
-  ctx.beginPath();
-  ctx.moveTo(bx, by);
-  ctx.lineTo(bx - headSize * Math.cos(arrowAngle - 0.4), by - headSize * Math.sin(arrowAngle - 0.4));
-  ctx.lineTo(bx - headSize * Math.cos(arrowAngle + 0.4), by - headSize * Math.sin(arrowAngle + 0.4));
-  ctx.closePath();
-  ctx.fill();
-
-  // Spin axis rotation indicator arc
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = arrowColor + '44';
-  ctx.lineWidth = 1.2;
-  ctx.setLineDash([3, 3]);
-  ctx.beginPath();
-  ctx.arc(cx, cy, r + 6, -Math.PI / 2, arrowAngle, spinAxis < 0);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-}
-
-export default function BallSpinView({ shot }) {
+export default function BallLaunchView({ shot }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -168,31 +117,23 @@ export default function BallSpinView({ shot }) {
     drawTP5xBall(ctx, cx, cy, r);
 
     if (!shot) return;
-
-    const spinAxis = shot.spin_axis ?? 0;
-    const backspin = shot.backspin ?? shot.spin_rate ?? 3000;
-    const sidespin = shot.sidespin ?? 0;
-
-    drawSpinArrow(ctx, cx, cy, r, spinAxis, backspin, sidespin);
   }, [shot]);
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <p className="section-title w-full text-center">Ball · Spin Direction</p>
+      <p className="section-title w-full text-center">Ball · Launch</p>
       <canvas ref={canvasRef} width={200} height={160} className="w-full max-w-[200px]" />
       {shot && (
         <div className="grid grid-cols-2 gap-2 text-xs text-center w-full mt-1">
           <div>
             <div className="text-slate-500 text-[10px]">BACKSPIN</div>
-            <div className="text-neon-teal font-bold">{(shot.backspin ?? 0).toLocaleString()}</div>
+            <div className="text-neon-teal font-bold">{(shot.backspin ?? shot.spin_rate ?? 0).toLocaleString()}</div>
             <div className="text-slate-600 text-[10px]">rpm</div>
           </div>
           <div>
-            <div className="text-slate-500 text-[10px]">SIDESPIN / AXIS</div>
-            <div className={`font-bold ${Math.abs(shot.sidespin ?? 0) > 800 ? 'text-amber-400' : 'text-neon-green'}`}>
-              {(shot.sidespin ?? 0) > 0 ? '+' : ''}{(shot.sidespin ?? 0).toLocaleString()} rpm / {(shot.spin_axis ?? 0) > 0 ? '+' : ''}{(shot.spin_axis ?? 0).toFixed(1)}°
-            </div>
-            <div className="text-slate-600 text-[10px]">{(shot.spin_axis ?? 0) > 5 ? 'fade' : (shot.spin_axis ?? 0) < -5 ? 'draw' : 'neutral'}</div>
+            <div className="text-slate-500 text-[10px]">LAUNCH ANGLE</div>
+            <div className="text-neon-green font-bold">{(shot.launch_angle ?? 0).toFixed(1)}°</div>
+            <div className="text-slate-600 text-[10px]">deg</div>
           </div>
         </div>
       )}
