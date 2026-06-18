@@ -122,20 +122,25 @@
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:560px){.duo{grid-template-columns:1fr}}
   .stage{margin-bottom:0}
-  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;height:500px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;height:334px}
   @media(max-width:1000px){.row3{grid-template-columns:1fr;height:auto}}
   .row3 .card{display:flex;flex-direction:column;min-height:0}
-  .row3 .card h3{flex:0 0 auto}
-  .row3 canvas{flex:1 1 auto;width:100%;min-height:110px}
+  .row3 .card h3{flex:0 0 auto;margin-bottom:10px}
+  .row3 canvas{flex:1 1 auto;width:100%;min-height:70px}
   .row3 .capt{flex:0 0 auto}
-  .stack{display:grid;grid-template-rows:1fr 1fr;gap:18px;min-height:0}
-  .stack .card{min-height:0;overflow:hidden}
+  .stack{display:grid;grid-template-rows:1.1fr 1fr;gap:14px;min-height:0}
+  .stack .card{min-height:0;overflow:hidden;padding:14px 16px}
+  .stack .card h3{margin-bottom:6px}
+  .stack .capt{margin-top:4px;font-size:10.5px}
   .capt{margin-top:12px;font-size:12px;color:var(--mut);text-align:center}
   .capt b{color:var(--ice);font-size:17px;font-weight:800;letter-spacing:.3px}
-  .detailv{display:flex;flex-direction:column;gap:12px;min-height:0}
-  .detailv .rank{width:100%;height:auto;padding:10px 14px;border-radius:13px;flex-direction:row;justify-content:flex-start;gap:12px}
-  .detailv .rank .g{font-size:28px}
-  .detailv .dstats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+  .detailv{display:flex;flex-direction:column;gap:6px;min-height:0}
+  .detailv .rank{width:100%;height:auto;padding:6px 12px;border-radius:12px;flex-direction:row;justify-content:flex-start;gap:10px}
+  .detailv .rank .g{font-size:19px}
+  .detailv .rank .t{font-size:8px}
+  .detailv .dstats{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 14px}
+  .detailv .dstat .k{font-size:9.5px}
+  .detailv .dstat .v{font-size:15px;margin-top:1px}
   .flow{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
   .flow .b{text-align:center}
   .flow .b .v{font-size:20px;font-weight:800}
@@ -214,9 +219,9 @@
     </div>
     <div class="stack">
       <div class="card">
-        <h3>Launch &amp; Spin <span class="m">TP5x</span></h3>
+        <h3>Launch &amp; Spin <span class="m">TP5x · side &amp; height</span></h3>
         <canvas id="spin"></canvas>
-        <div class="capt" id="spCap">12.5° launch · 37° descent · 2,550 rpm</div>
+        <div class="capt" id="spCap">side angle/spin · launch/backspin</div>
       </div>
       <div class="card">
         <h3>Shot Detail <span class="m" id="dname"></span></h3>
@@ -290,33 +295,46 @@ function clubType(name){const cl=name.toLowerCase();
   if(cl.includes("pw")||cl.includes("sw")||cl.includes("gw")||cl.includes("lw")||cl.includes("wedge")) return "wedge";
   return "iron";}
 
-// Side-profile silhouette of the whole head (face points left). No shaft.
+// Whole-head silhouette (face points left). No shaft.
 function drawClubProfile(x,type,cx,cy,w){
   if(type==="wood"){
-    const W=Math.min(w*0.62,260), H=W*0.58;
-    const ftx=cx-W*0.40, fty=cy-H*0.40, fbx=cx-W*0.46, fby=cy+H*0.30;
+    // Address/top-down view of a driver head — big rounded bulbous body tapering to a
+    // point at the back (heel-to-toe teardrop), flat titanium face on the left edge.
+    const W=Math.min(w*0.78,300), H=W*0.62;
+    const fx=cx-W*0.50;                       // face plane x
     x.beginPath();
-    x.moveTo(ftx,fty);
-    x.bezierCurveTo(cx-W*0.18,cy-H*0.62, cx+W*0.30,cy-H*0.60, cx+W*0.50,cy-H*0.10);
-    x.bezierCurveTo(cx+W*0.60,cy+H*0.20, cx+W*0.30,cy+H*0.50, cx,cy+H*0.50);
-    x.bezierCurveTo(cx-W*0.22,cy+H*0.50, fbx,cy+H*0.44, fbx,fby);
-    x.lineTo(ftx,fty);x.closePath();
-    const g=x.createRadialGradient(cx-W*0.08,cy-H*0.32,W*0.08,cx,cy,W*0.72);
-    g.addColorStop(0,"#4a5680");g.addColorStop(.5,"#222d49");g.addColorStop(1,"#0f1729");
-    x.fillStyle=g;x.fill();x.strokeStyle="rgba(125,160,255,.35)";x.lineWidth=1.5;x.stroke();
-    // crown gloss
+    x.moveTo(fx,cy-H*0.34);                                            // top of face (heel side)
+    x.bezierCurveTo(cx-W*0.40,cy-H*0.56, cx-W*0.05,cy-H*0.58, cx+W*0.18,cy-H*0.46); // crown top curve
+    x.bezierCurveTo(cx+W*0.42,cy-H*0.34, cx+W*0.52,cy-H*0.08, cx+W*0.50,cy+H*0.06); // toe-side bulge
+    x.bezierCurveTo(cx+W*0.48,cy+H*0.30, cx+W*0.22,cy+H*0.48, cx-W*0.06,cy+H*0.50); // back taper
+    x.bezierCurveTo(cx-W*0.30,cy+H*0.52, cx-W*0.44,cy+H*0.40, fx,cy+H*0.34);       // bottom of face (toe side)
+    x.lineTo(fx,cy-H*0.34);x.closePath();
+    const g=x.createRadialGradient(cx-W*0.10,cy-H*0.30,W*0.10,cx+W*0.06,cy+H*0.05,W*0.78);
+    g.addColorStop(0,"#566394");g.addColorStop(.45,"#28335a");g.addColorStop(1,"#0c1322");
+    x.fillStyle=g;x.fill();x.strokeStyle="rgba(125,160,255,.4)";x.lineWidth=1.6;x.stroke();
+    // crown gloss highlight
     x.save();x.clip();
-    const hl=x.createLinearGradient(0,cy-H*0.6,0,cy);hl.addColorStop(0,"rgba(255,255,255,.30)");hl.addColorStop(1,"rgba(255,255,255,0)");
-    x.fillStyle=hl;x.fillRect(cx-W*0.5,cy-H*0.6,W,H*0.55);x.restore();
-    // strike face strip on the left edge (titanium)
+    const hl=x.createLinearGradient(0,cy-H*0.58,0,cy+H*0.1);hl.addColorStop(0,"rgba(255,255,255,.34)");hl.addColorStop(1,"rgba(255,255,255,0)");
+    x.fillStyle=hl;x.fillRect(cx-W*0.5,cy-H*0.6,W,H*0.6);
+    // alignment sight-line on the crown (classic driver detail)
+    x.strokeStyle="rgba(255,255,255,.55)";x.lineWidth=2;x.lineCap="round";
+    x.beginPath();x.moveTo(fx+W*0.10,cy);x.lineTo(cx+W*0.06,cy);x.stroke();
+    // brand badge
+    x.fillStyle="rgba(255,255,255,.12)";x.beginPath();x.arc(cx+W*0.16,cy-H*0.06,W*0.05,0,7);x.fill();
+    x.strokeStyle="rgba(255,255,255,.3)";x.lineWidth=1;x.stroke();
+    x.restore();
+    // flat titanium strike face on the left edge
     x.beginPath();
-    x.moveTo(ftx,fty);
-    x.bezierCurveTo(ftx-7,cy-H*0.10, fbx-5,cy+H*0.10, fbx,fby);
-    x.lineTo(fbx+W*0.07,fby-2);
-    x.bezierCurveTo(fbx+W*0.05,cy, ftx+W*0.05,cy-H*0.20, ftx+W*0.07,fty+3);
+    x.moveTo(fx,cy-H*0.34);
+    x.lineTo(fx+W*0.085,cy-H*0.30);
+    x.lineTo(fx+W*0.085,cy+H*0.28);
+    x.lineTo(fx,cy+H*0.34);
     x.closePath();
-    const fgr=x.createLinearGradient(ftx-7,0,ftx+W*0.09,0);fgr.addColorStop(0,"#d4dbec");fgr.addColorStop(1,"#9aa4bd");
-    x.fillStyle=fgr;x.fill();x.strokeStyle="rgba(255,255,255,.4)";x.lineWidth=1;x.stroke();
+    const fgr=x.createLinearGradient(fx,0,fx+W*0.09,0);fgr.addColorStop(0,"#e6ebf6");fgr.addColorStop(1,"#9aa4bd");
+    x.fillStyle=fgr;x.fill();x.strokeStyle="rgba(255,255,255,.45)";x.lineWidth=1;x.stroke();
+    // face scorelines
+    x.strokeStyle="rgba(40,52,74,.4)";x.lineWidth=.8;
+    for(let i=1;i<=5;i++){const fy=cy-H*0.30+H*0.58*i/6;x.beginPath();x.moveTo(fx+1,fy);x.lineTo(fx+W*0.082,fy);x.stroke();}
   } else {
     const H=Math.min(w*0.5,180)*(type==="wedge"?1.0:0.92), Wb=H*0.30;
     x.beginPath();
@@ -385,41 +403,17 @@ function drawClubface(s){
   x.textAlign="left";
 }
 
-/* ---------- Launch & Spin: compact angle gauge + BIG TaylorMade TP5x ball ---------- */
-function drawAngleSpin(s){
-  const c=document.getElementById("spin");const{x,w,h}=fit(c);
-  panelBg(x,w,h);
-
-  // --- left: compact launch / descent gauge ---
-  const ox=22, gy=h-30, R=Math.min(h*0.5, w*0.3);
-  x.strokeStyle="rgba(120,150,220,.25)";x.lineWidth=1.5;x.beginPath();x.moveTo(ox-6,gy);x.lineTo(ox+R+24,gy);x.stroke();
-  const la=s.launch*Math.PI/180;
-  x.fillStyle="rgba(34,211,238,.14)";x.beginPath();x.moveTo(ox,gy);x.arc(ox,gy,R,0,-la,true);x.closePath();x.fill();
-  x.strokeStyle="rgba(34,211,238,.5)";x.lineWidth=1.2;x.beginPath();x.arc(ox,gy,R,0,-la,true);x.stroke();
-  const lx=ox+Math.cos(-la)*(R+10), ly=gy+Math.sin(-la)*(R+10);
-  const lg=x.createLinearGradient(ox,gy,lx,ly);lg.addColorStop(0,"#2f6bff");lg.addColorStop(1,"#7df3ff");
-  x.strokeStyle=lg;x.lineWidth=3;x.lineCap="round";x.shadowColor="#22d3ee";x.shadowBlur=9;x.beginPath();x.moveTo(ox,gy);x.lineTo(lx,ly);x.stroke();x.shadowBlur=0;
-  arrowHead(x,lx,ly,-la,"#7df3ff");
-  x.fillStyle="#eef2fc";x.beginPath();x.arc(ox,gy-3,3.5,0,7);x.fill();
-  const da=s.land*Math.PI/180, dxL=ox+R+24;
-  x.setLineDash([4,4]);x.strokeStyle="rgba(251,146,60,.75)";x.lineWidth=2;x.beginPath();x.moveTo(dxL-Math.cos(da)*(R*0.7),gy-Math.sin(da)*(R*0.7));x.lineTo(dxL,gy);x.stroke();x.setLineDash([]);
-  arrowHead(x,dxL,gy,da,"#fb923c");
-  x.fillStyle="#7df3ff";x.font="700 11px Inter";x.textAlign="left";x.fillText(s.launch.toFixed(1)+"°",ox+8,gy-R*0.5);
-  x.fillStyle="#fb923c";x.textAlign="right";x.fillText(s.land+"°",dxL+2,gy-R*0.38);
-  x.fillStyle="#7c89ad";x.font="600 8.5px JetBrains Mono";x.textAlign="left";x.fillText("LAUNCH / DESCENT",ox-2,h-7);
-
-  // --- right: BIG TP5x ball + backspin ---
-  const bx=w*0.72, by=h*0.43, rad=Math.min(h*0.4, w*0.27);
-  const axis=s.axis*Math.PI/180;
-  x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(bx,by+rad+8,rad*0.82,rad*0.18,0,0,7);x.fill();
+/* ---------- Launch & Spin: TWO TaylorMade TP5x balls ----------
+   Ball A (left)  = side angle + side spin combined (curvature view)
+   Ball B (right) = launch/height angle + backspin combined (trajectory view) */
+function drawBallBase(x,bx,by,rad,rotation,ringCol){
+  x.fillStyle="rgba(0,0,0,.35)";x.beginPath();x.ellipse(bx,by+rad+7,rad*0.8,rad*0.17,0,0,7);x.fill();
   if(ballReady){
-    // real TaylorMade TP5x photo (ball.png), clipped to a circle and tilted by the spin axis
     x.save();x.beginPath();x.arc(bx,by,rad,0,7);x.clip();
-    x.translate(bx,by);x.rotate(axis);
+    x.translate(bx,by);x.rotate(rotation);
     x.drawImage(ballImg,-rad,-rad,rad*2,rad*2);
     x.restore();
   } else {
-    // fallback: drawn TP5x (white ball + orange pix dots) when ball.png isn't available
     const sg=x.createRadialGradient(bx-rad*0.35,by-rad*0.4,rad*0.18,bx,by,rad);
     sg.addColorStop(0,"#ffffff");sg.addColorStop(.72,"#e7ecf6");sg.addColorStop(1,"#b7c0d4");
     x.fillStyle=sg;x.beginPath();x.arc(bx,by,rad,0,7);x.fill();
@@ -427,19 +421,61 @@ function drawAngleSpin(s){
     const dots=[[0,0,1]];
     for(let ring=1;ring<=4;ring++){const rr=rad*ring*0.2,cnt=ring*6;for(let k=0;k<cnt;k++){const a=k/cnt*Math.PI*2+ring*0.5;dots.push([Math.cos(a)*rr,Math.sin(a)*rr,1-ring*0.1]);}}
     x.fillStyle="#fb7c1d";
-    dots.forEach(([dx,dy,sz])=>{const rx=dx*Math.cos(axis)-dy*Math.sin(axis),ry=dx*Math.sin(axis)+dy*Math.cos(axis);
+    dots.forEach(([dx,dy,sz])=>{const rx=dx*Math.cos(rotation)-dy*Math.sin(rotation),ry=dx*Math.sin(rotation)+dy*Math.cos(rotation);
       x.globalAlpha=0.5+0.5*sz;x.beginPath();x.arc(bx+rx,by+ry,rad*0.05*sz+1.5,0,7);x.fill();});
     x.globalAlpha=1;x.restore();
   }
-  x.strokeStyle="rgba(120,150,220,.4)";x.lineWidth=1;x.beginPath();x.arc(bx,by,rad,0,7);x.stroke();
-  // backspin arc + arrow, tilted by axis
-  x.save();x.translate(bx,by);x.rotate(axis);
-  x.strokeStyle="#22d3ee";x.lineWidth=2.6;x.shadowColor="#22d3ee";x.shadowBlur=9;x.beginPath();x.arc(0,0,rad+8,Math.PI*0.18,Math.PI*0.82);x.stroke();x.shadowBlur=0;
+  x.strokeStyle=ringCol||"rgba(120,150,220,.4)";x.lineWidth=1;x.beginPath();x.arc(bx,by,rad,0,7);x.stroke();
+}
+function drawAngleSpin(s){
+  const c=document.getElementById("spin");const{x,w,h}=fit(c);
+  panelBg(x,w,h);
+  const rad=Math.min(h*0.30,w*0.155);
+  const by=h*0.38, bxA=w*0.27, bxB=w*0.73;
+  const axis=s.axis*Math.PI/180;
+  const sideAngle=Math.atan2(s.lateral,Math.max(1,s.carry*3))*180/Math.PI;   // horizontal launch direction
+  const sideSpin=Math.abs(s.spin*Math.sin(axis));
+  const backSpin=Math.abs(s.spin*Math.cos(axis));
+
+  /* --- Ball A: side angle + side spin --- */
+  drawBallBase(x,bxA,by,rad,axis,"rgba(167,139,250,.55)");
+  // side-angle arrow above the ball, tilted left/right
+  const sa=sideAngle*Math.PI/180, ay=by-rad-11, ar=rad*0.85;
+  x.strokeStyle="rgba(120,150,220,.3)";x.lineWidth=1.2;x.beginPath();x.moveTo(bxA-ar,ay);x.lineTo(bxA+ar,ay);x.stroke();
+  const sax=bxA+Math.sin(sa)*ar, say=ay;
+  const sg2=x.createLinearGradient(bxA,ay,sax,say);sg2.addColorStop(0,"#a78bfa");sg2.addColorStop(1,"#22d3ee");
+  x.strokeStyle=sg2;x.lineWidth=3;x.lineCap="round";x.shadowColor="#a78bfa";x.shadowBlur=8;
+  x.beginPath();x.moveTo(bxA,ay);x.lineTo(sax,say);x.stroke();x.shadowBlur=0;
+  arrowHead(x,sax,say,sa-Math.PI/2,"#22d3ee");
+  x.fillStyle="#cfd6f5";x.beginPath();x.arc(bxA,ay,3,0,7);x.fill();
+  // sidespin curl marks tilted by axis, around the ball
+  x.save();x.translate(bxA,by);x.rotate(axis);
+  x.strokeStyle="#a78bfa";x.lineWidth=2.4;x.shadowColor="#a78bfa";x.shadowBlur=8;
+  x.beginPath();x.arc(0,0,rad+7,Math.PI*1.18,Math.PI*1.82);x.stroke();x.shadowBlur=0;
+  const sea=Math.PI*1.18,sex=Math.cos(sea)*(rad+7),sey=Math.sin(sea)*(rad+7);arrowHead(x,sex,sey,sea-Math.PI/2,"#a78bfa");
+  x.restore();
+  x.fillStyle="#cfd6f5";x.font="700 12px Inter";x.textAlign="center";
+  x.fillText(sideAngle.toFixed(1)+"° "+(sideAngle<0?"L":"R"),bxA,by+rad+19);
+  x.fillStyle="#7c89ad";x.font="600 8px JetBrains Mono";x.fillText(Math.round(sideSpin).toLocaleString()+" RPM SIDE",bxA,by+rad+30);
+
+  /* --- Ball B: launch/height angle + backspin --- */
+  drawBallBase(x,bxB,by,rad,axis,"rgba(34,211,238,.55)");
+  const la=s.launch*Math.PI/180, by2=by-rad-11, ar2=rad*0.85;
+  x.strokeStyle="rgba(120,150,220,.3)";x.lineWidth=1.2;x.beginPath();x.moveTo(bxB-ar2,by2+8);x.lineTo(bxB-ar2,by2-2);x.stroke();
+  const lvx=bxB-ar2, lvy=by2-Math.sin(la)*ar2*1.1;
+  const lg2=x.createLinearGradient(bxB-ar2,by2,lvx,lvy);lg2.addColorStop(0,"#2f6bff");lg2.addColorStop(1,"#7df3ff");
+  x.strokeStyle=lg2;x.lineWidth=3;x.lineCap="round";x.shadowColor="#22d3ee";x.shadowBlur=8;
+  x.beginPath();x.moveTo(bxB-ar2,by2+6);x.lineTo(lvx,lvy);x.stroke();x.shadowBlur=0;
+  arrowHead(x,lvx,lvy,-la-Math.PI/2,"#7df3ff");
+  // backspin arc on top of ball B, tilted by axis
+  x.save();x.translate(bxB,by);x.rotate(axis);
+  x.strokeStyle="#22d3ee";x.lineWidth=2.6;x.shadowColor="#22d3ee";x.shadowBlur=9;
+  x.beginPath();x.arc(0,0,rad+8,Math.PI*0.18,Math.PI*0.82);x.stroke();x.shadowBlur=0;
   const ea=Math.PI*0.18,ex=Math.cos(ea)*(rad+8),ey=Math.sin(ea)*(rad+8);arrowHead(x,ex,ey,ea-Math.PI/2,"#22d3ee");
   x.restore();
-  // spin label
-  x.fillStyle="#aab6da";x.font="700 13px Inter";x.textAlign="center";x.fillText(s.spin.toLocaleString(),bx,by+rad+22);
-  x.fillStyle="#7c89ad";x.font="600 8.5px JetBrains Mono";x.fillText("RPM · TP5x",bx,by+rad+34);
+  x.fillStyle="#cfd6f5";x.font="700 12px Inter";x.textAlign="center";
+  x.fillText(s.launch.toFixed(1)+"° launch",bxB,by+rad+19);
+  x.fillStyle="#7c89ad";x.font="600 8px JetBrains Mono";x.fillText(Math.round(backSpin).toLocaleString()+" RPM BACK",bxB,by+rad+30);
   x.textAlign="left";
 }
 
@@ -489,8 +525,7 @@ function render(){
   rk.style.border="1px solid "+s.color+"55";rk.style.color=s.color;
   document.getElementById("dname").innerHTML=`<span class="shape" style="background:${s.color}22;color:${s.color}">${s.name}</span>`;
   const side=Math.abs(s.lateral).toFixed(0)+(s.lateral<0?" L":" R");
-  const ds=[["Carry",s.carry.toFixed(0)+" y"],["Total",s.total.toFixed(0)+" y"],["Club Path",s.path.toFixed(1)+"°"],
-            ["Face → Tgt",s.face.toFixed(1)+"°"],["Side",side],["Spin",s.spin.toLocaleString()]];
+  const ds=[["Carry",s.carry.toFixed(0)+" y"],["Total",s.total.toFixed(0)+" y"],["Side",side],["Spin",s.spin.toLocaleString()]];
   document.getElementById("dstats").innerHTML=ds.map(([k,v])=>`<div class="dstat"><div class="k">${k}</div><div class="v mono">${v}</div></div>`).join("");
 
   // smash factor (clubface visual caption)
@@ -498,8 +533,13 @@ function render(){
   document.getElementById("smBig").textContent=s.smash.toFixed(2);
   document.getElementById("smCap").textContent=`${eff}% efficiency · `+(eff>=96?"flush centre":eff>=88?"solid strike":"off-centre hit");
 
-  // launch & spin caption
-  document.getElementById("spCap").textContent=`${s.launch.toFixed(1)}° launch · ${s.land}° descent · ${s.spin.toLocaleString()} rpm`;
+  // launch & spin caption (two balls: side angle+spin / launch+backspin)
+  const axisR=s.axis*Math.PI/180;
+  const sideAngle=Math.atan2(s.lateral,Math.max(1,s.carry*3))*180/Math.PI;
+  const sideSpin=Math.round(Math.abs(s.spin*Math.sin(axisR)));
+  const backSpin=Math.round(Math.abs(s.spin*Math.cos(axisR)));
+  document.getElementById("spCap").textContent=
+    `${Math.abs(sideAngle).toFixed(1)}°${sideAngle<0?"L":"R"} · ${sideSpin.toLocaleString()}rpm side  ·  ${s.launch.toFixed(1)}° launch · ${backSpin.toLocaleString()}rpm back`;
 
   document.getElementById("rows").innerHTML=[...SHOTS].reverse().map((xx,ri)=>{
     const realIdx=SHOTS.length-1-ri;
