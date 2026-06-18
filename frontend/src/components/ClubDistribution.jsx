@@ -29,14 +29,14 @@ export default function ClubDistribution({ shots }) {
       {data.length === 0 ? (
         <div className="flex items-center justify-center h-48 text-slate-600 text-sm">No data</div>
       ) : (
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={145}>
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={55}
-              outerRadius={85}
+              innerRadius={40}
+              outerRadius={60}
               paddingAngle={3}
               dataKey="value"
               stroke="none"

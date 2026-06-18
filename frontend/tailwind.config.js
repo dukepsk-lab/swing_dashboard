@@ -5,20 +5,21 @@ export default {
     extend: {
       colors: {
         neon: {
-          green: "#39FF14",
+          green: "#22C55E",
           lime: "#ADFF2F",
           teal: "#00FFD1",
         },
         dark: {
-          900: "#080C10",
-          800: "#0D1117",
-          700: "#131A22",
-          600: "#1C2632",
-          500: "#243040",
+          900: "#020617",
+          800: "#0F172A",
+          700: "#1E293B",
+          600: "#334155",
+          500: "#475569",
         },
       },
       fontFamily: {
-        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+        sans: ["Fira Sans", "sans-serif"],
+        mono: ["Fira Code", "monospace"],
       },
       animation: {
         pulse_slow: "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",

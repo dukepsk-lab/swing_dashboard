@@ -6,7 +6,7 @@ export default function ShotHistoryTable({ shots }) {
   const recent = shots.slice(0, 20);
 
   return (
-    <div className="glass-panel glow-green p-4 overflow-hidden">
+    <div className="glass-panel glow-green p-4 overflow-y-auto max-h-[215px]">
       <p className="section-title">Shot History</p>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">

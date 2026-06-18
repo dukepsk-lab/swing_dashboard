@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import ClubFaceView from './ClubFaceView';
 import BallSpinView from './BallSpinView';
+import BallLaunchView from './BallLaunchView';
 import ClubHeadView from './ClubHeadView';
 import { FlightSideView, FlightTopView } from './FlightViews';
 
@@ -125,10 +126,11 @@ export default function ShotDetailPanel({ shot }) {
       {/* Divider */}
       <div className="border-t border-neon-green/10" />
 
-      {/* Bottom row: club face | ball spin | club head */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Bottom row: club face | ball spin | ball launch | club head */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <ClubFaceView shot={shot} />
         <BallSpinView shot={shot} />
+        <BallLaunchView shot={shot} />
         <ClubHeadView shot={shot} />
       </div>
 
